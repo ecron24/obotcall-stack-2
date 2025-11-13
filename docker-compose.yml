@@ -2,13 +2,13 @@ version: '3.8'
 
 services:
   # ===================================
-  # 🏠 Obotcall App (Hub principal)
+  # 🏠 Web (Hub principal)
   # ===================================
-  obotcall-app:
+  web:
     build:
-      context: ./apps/obotcall-app
+      context: ./apps/web
       dockerfile: Dockerfile
-    container_name: obotcall-app
+    container_name: obotcall-web
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -25,7 +25,7 @@ services:
     networks:
       - obotcall-network
     depends_on:
-      - obotcall-api
+      - web-api
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
       interval: 30s
@@ -33,12 +33,12 @@ services:
       retries: 3
       start_period: 40s
 
-  # API Obotcall (Backend Hub)
-  obotcall-api:
+  # API Web (Backend Hub)
+  web-api:
     build:
-      context: ./apps/obotcall-app/api
+      context: ./apps/web/api
       dockerfile: Dockerfile
-    container_name: obotcall-api
+    container_name: obotcall-web-api
     restart: unless-stopped
     ports:
       - "3010:3010"
@@ -59,13 +59,13 @@ services:
       retries: 3
 
   # ===================================
-  # 🔧 Inter-App (Interventions)
+  # 🔧 Inter (Interventions)
   # ===================================
-  inter-app:
+  inter:
     build:
-      context: ./apps/inter-app
+      context: ./apps/inter
       dockerfile: Dockerfile
-    container_name: inter-app
+    container_name: obotcall-inter
     restart: unless-stopped
     ports:
       - "3001:3001"
@@ -89,12 +89,12 @@ services:
       timeout: 10s
       retries: 3
 
-  # API Inter-App
+  # API Inter
   inter-api:
     build:
-      context: ./apps/inter-app/inter-api
+      context: ./apps/inter/inter-api
       dockerfile: Dockerfile
-    container_name: inter-api
+    container_name: obotcall-inter-api
     restart: unless-stopped
     ports:
       - "3011:3011"
@@ -115,13 +115,13 @@ services:
       retries: 3
 
   # ===================================
-  # 🏢 Immo-App (Immobilier)
+  # 🏢 Immo (Immobilier)
   # ===================================
-  immo-app:
+  immo:
     build:
-      context: ./apps/immo-app
+      context: ./apps/immo
       dockerfile: Dockerfile
-    container_name: immo-app
+    container_name: obotcall-immo
     restart: unless-stopped
     ports:
       - "3002:3002"
@@ -143,12 +143,12 @@ services:
       - immo
       - all
 
-  # API Immo-App
+  # API Immo
   immo-api:
     build:
-      context: ./apps/immo-app/api
+      context: ./apps/immo/api
       dockerfile: Dockerfile
-    container_name: immo-api
+    container_name: obotcall-immo-api
     restart: unless-stopped
     ports:
       - "3012:3012"
@@ -167,13 +167,13 @@ services:
       - all
 
   # ===================================
-  # 🤖 Agent-App (Agents IA)
+  # 🤖 Agent (Agents IA)
   # ===================================
-  agent-app:
+  agent:
     build:
-      context: ./apps/agent-app
+      context: ./apps/agent
       dockerfile: Dockerfile
-    container_name: agent-app
+    container_name: obotcall-agent
     restart: unless-stopped
     ports:
       - "3003:3003"
@@ -195,12 +195,12 @@ services:
       - agent
       - all
 
-  # API Agent-App
+  # API Agent
   agent-api:
     build:
-      context: ./apps/agent-app/api
+      context: ./apps/agent/api
       dockerfile: Dockerfile
-    container_name: agent-api
+    container_name: obotcall-agent-api
     restart: unless-stopped
     ports:
       - "3013:3013"
@@ -219,13 +219,13 @@ services:
       - all
 
   # ===================================
-  # 📋 Assist-App (Assistant)
+  # 📋 Assist (Assistant)
   # ===================================
-  assist-app:
+  assist:
     build:
-      context: ./apps/assist-app
+      context: ./apps/assist
       dockerfile: Dockerfile
-    container_name: assist-app
+    container_name: obotcall-assist
     restart: unless-stopped
     ports:
       - "3004:3004"
@@ -247,12 +247,12 @@ services:
       - assist
       - all
 
-  # API Assist-App
+  # API Assist
   assist-api:
     build:
-      context: ./apps/assist-app/api
+      context: ./apps/assist/api
       dockerfile: Dockerfile
-    container_name: assist-api
+    container_name: obotcall-assist-api
     restart: unless-stopped
     ports:
       - "3014:3014"
@@ -288,8 +288,8 @@ services:
     networks:
       - obotcall-network
     depends_on:
-      - obotcall-app
-      - inter-app
+      - web
+      - inter
     healthcheck:
       test: ["CMD", "nginx", "-t"]
       interval: 30s
