@@ -474,7 +474,8 @@ BEGIN
 
     RETURN v_number;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = inter_app, public, pg_temp;
 
 -- Trigger: Auto-generate intervention number on insert
 CREATE OR REPLACE FUNCTION inter_app.set_intervention_number()
@@ -485,7 +486,8 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path = inter_app, public, pg_temp;
 
 CREATE TRIGGER set_intervention_number_on_insert
     BEFORE INSERT ON inter_app.interventions
@@ -506,7 +508,8 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path = inter_app, public, pg_temp;
 
 CREATE TRIGGER track_intervention_status_changes
     BEFORE UPDATE ON inter_app.interventions
@@ -689,7 +692,8 @@ BEGIN
 
     RETURN v_number;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = inter_app, public, pg_temp;
 
 -- Trigger: Auto-generate invoice number on insert
 CREATE OR REPLACE FUNCTION inter_app.set_invoice_number()
@@ -700,7 +704,8 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path = inter_app, public, pg_temp;
 
 CREATE TRIGGER set_invoice_number_on_insert
     BEFORE INSERT ON inter_app.invoices
@@ -717,7 +722,8 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path = inter_app, public, pg_temp;
 
 CREATE TRIGGER check_invoice_overdue_on_update
     BEFORE UPDATE ON inter_app.invoices
@@ -740,7 +746,8 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path = inter_app, public, pg_temp;
 
 CREATE TRIGGER link_invoice_to_interventions_after_insert
     AFTER INSERT ON inter_app.invoices
