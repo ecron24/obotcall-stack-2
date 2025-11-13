@@ -69,15 +69,17 @@ RETURNS uuid[] AS $$
 $$ LANGUAGE sql SECURITY DEFINER;
 
 -- Fonctions de chiffrement/déchiffrement pour données sensibles
-CREATE OR REPLACE FUNCTION encrypt_sensitive_data(data text, key text)
-RETURNS bytea AS $$
-    SELECT pgp_sym_encrypt(data, key);
-$$ LANGUAGE sql;
-
-CREATE OR REPLACE FUNCTION decrypt_sensitive_data(data bytea, key text)
-RETURNS text AS $$
-    SELECT pgp_sym_decrypt(data, key);
-$$ LANGUAGE sql;
+-- NOTE: Ces fonctions sont commentées car pgcrypto peut ne pas être disponible sur tous les environnements Supabase
+-- Décommenter si nécessaire et si pgcrypto est activé
+-- CREATE OR REPLACE FUNCTION encrypt_sensitive_data(data text, key text)
+-- RETURNS bytea AS $$
+--     SELECT pgp_sym_encrypt(data, key);
+-- $$ LANGUAGE sql;
+--
+-- CREATE OR REPLACE FUNCTION decrypt_sensitive_data(data bytea, key text)
+-- RETURNS text AS $$
+--     SELECT pgp_sym_decrypt(data, key);
+-- $$ LANGUAGE sql;
 
 -- =====================================================
 -- 3. TABLE : countries (Pays supportés)
