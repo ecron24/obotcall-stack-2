@@ -180,39 +180,8 @@ CREATE TRIGGER update_tenants_updated_at
 BEFORE UPDATE ON public.tenants
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- RLS
+-- RLS (policies ajoutées après user_tenant_roles pour éviter les dépendances circulaires)
 ALTER TABLE public.tenants ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "users_can_view_their_tenants"
-ON public.tenants
-FOR SELECT
-TO authenticated
-USING (
-    id IN (SELECT unnest(get_current_user_tenant_ids()))
-);
-
-CREATE POLICY "owners_can_update_tenant"
-ON public.tenants
-FOR UPDATE
-TO authenticated
-USING (
-    id IN (
-        SELECT tenant_id
-        FROM public.user_tenant_roles
-        WHERE user_id = auth.uid()
-        AND role = 'owner'
-        AND is_active = true
-    )
-)
-WITH CHECK (
-    id IN (
-        SELECT tenant_id
-        FROM public.user_tenant_roles
-        WHERE user_id = auth.uid()
-        AND role = 'owner'
-        AND is_active = true
-    )
-);
 
 -- =====================================================
 -- 5. TABLE : users (Utilisateurs globaux)
@@ -299,23 +268,7 @@ TO authenticated
 USING (id = auth.uid())
 WITH CHECK (id = auth.uid());
 
-CREATE POLICY "admins_can_view_tenant_users"
-ON public.users
-FOR SELECT
-TO authenticated
-USING (
-    id IN (
-        SELECT utr.user_id
-        FROM public.user_tenant_roles utr
-        WHERE utr.tenant_id IN (
-            SELECT tenant_id
-            FROM public.user_tenant_roles
-            WHERE user_id = auth.uid()
-            AND role IN ('owner', 'admin')
-            AND is_active = true
-        )
-    )
-);
+-- Policy "admins_can_view_tenant_users" ajoutée après user_tenant_roles
 
 -- =====================================================
 -- 6. TABLE : user_tenant_roles (Rôles utilisateurs)
@@ -437,6 +390,60 @@ WITH CHECK (
         WHERE user_id = auth.uid()
         AND role = 'owner'
         AND is_active = true
+    )
+);
+
+-- =====================================================
+-- Policies pour TENANTS (ajoutées ici après user_tenant_roles)
+-- =====================================================
+
+CREATE POLICY "users_can_view_their_tenants"
+ON public.tenants
+FOR SELECT
+TO authenticated
+USING (
+    id IN (SELECT unnest(get_current_user_tenant_ids()))
+);
+
+CREATE POLICY "owners_can_update_tenant"
+ON public.tenants
+FOR UPDATE
+TO authenticated
+USING (
+    id IN (
+        SELECT tenant_id
+        FROM public.user_tenant_roles
+        WHERE user_id = auth.uid()
+        AND role = 'owner'
+        AND is_active = true
+    )
+)
+WITH CHECK (
+    id IN (
+        SELECT tenant_id
+        FROM public.user_tenant_roles
+        WHERE user_id = auth.uid()
+        AND role = 'owner'
+        AND is_active = true
+    )
+);
+
+-- Policy pour USERS (ajoutée ici après user_tenant_roles)
+CREATE POLICY "admins_can_view_tenant_users"
+ON public.users
+FOR SELECT
+TO authenticated
+USING (
+    id IN (
+        SELECT utr.user_id
+        FROM public.user_tenant_roles utr
+        WHERE utr.tenant_id IN (
+            SELECT tenant_id
+            FROM public.user_tenant_roles
+            WHERE user_id = auth.uid()
+            AND role IN ('owner', 'admin')
+            AND is_active = true
+        )
     )
 );
 
