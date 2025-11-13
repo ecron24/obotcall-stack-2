@@ -1,0 +1,124 @@
+# ===================================
+# 🔐 SECRETS & ENVIRONMENT
+# ===================================
+.env
+.env.local
+.env.production
+.env.development
+.env*.local
+*.pem
+*.key
+*.cert
+
+# ===================================
+# 📦 DEPENDENCIES
+# ===================================
+node_modules/
+.pnp
+.pnp.js
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ===================================
+# 🔨 BUILD OUTPUT
+# ===================================
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# ===================================
+# 🐳 DOCKER
+# ===================================
+docker-compose.override.yml
+.dockerignore
+
+# ===================================
+# 📝 LOGS
+# ===================================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ===================================
+# 🧪 TESTING
+# ===================================
+coverage/
+.nyc_output
+*.lcov
+.cache
+
+# ===================================
+# 💻 IDE & EDITORS
+# ===================================
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===================================
+# 🔧 SYSTEM FILES
+# ===================================
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+._*
+Desktop.ini
+$RECYCLE.BIN/
+
+# ===================================
+# 📊 DATABASE
+# ===================================
+*.sqlite
+*.sqlite3
+*.db
+
+# ===================================
+# 🗄️ BACKUPS
+# ===================================
+*.backup
+*.bak
+backups/
+*.tar.gz
+*.zip
+
+# ===================================
+# 🚀 DEPLOYMENT
+# ===================================
+.vercel
+.netlify
+
+# ===================================
+# 📱 MOBILE
+# ===================================
+*.apk
+*.ipa
+
+# ===================================
+# 🎨 ASSETS TEMPORAIRES
+# ===================================
+tmp/
+temp/
+*.tmp
+
+# ===================================
+# 🔍 MISC
+# ===================================
+.turbo
+.eslintcache
+tsconfig.tsbuildinfo
+.next-env.d.ts
