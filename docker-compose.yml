@@ -10,8 +10,6 @@ services:
       dockerfile: Dockerfile
     container_name: obotcall-web
     restart: unless-stopped
-    ports:
-      - "3000:3000"
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
@@ -32,6 +30,13 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.obotcall-web.rule=Host(`app.obotcall.tech`)"
+      - "traefik.http.routers.obotcall-web.entrypoints=websecure"
+      - "traefik.http.routers.obotcall-web.tls.certresolver=letsencrypt"
+      - "traefik.http.services.obotcall-web.loadbalancer.server.port=3000"
+      - "traefik.docker.network=docker_oppsys-network"
 
   # API Web (Backend Hub)
   web-api:
@@ -40,8 +45,6 @@ services:
       dockerfile: Dockerfile
     container_name: obotcall-web-api
     restart: unless-stopped
-    ports:
-      - "3010:3010"
     environment:
       - NODE_ENV=production
       - PORT=3010
@@ -57,6 +60,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    profiles:
+      - all
 
   # ===================================
   # 🔧 Inter (Interventions)
@@ -67,8 +72,6 @@ services:
       dockerfile: Dockerfile
     container_name: obotcall-inter
     restart: unless-stopped
-    ports:
-      - "3001:3001"
     environment:
       - NODE_ENV=production
       - PORT=3001
@@ -88,6 +91,13 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.obotcall-inter.rule=Host(`inter.app.obotcall.tech`)"
+      - "traefik.http.routers.obotcall-inter.entrypoints=websecure"
+      - "traefik.http.routers.obotcall-inter.tls.certresolver=letsencrypt"
+      - "traefik.http.services.obotcall-inter.loadbalancer.server.port=3001"
+      - "traefik.docker.network=docker_oppsys-network"
 
   # API Inter
   inter-api:
@@ -96,8 +106,6 @@ services:
       dockerfile: Dockerfile
     container_name: obotcall-inter-api
     restart: unless-stopped
-    ports:
-      - "3011:3011"
     environment:
       - NODE_ENV=production
       - PORT=3011
@@ -123,8 +131,6 @@ services:
       dockerfile: Dockerfile
     container_name: obotcall-immo
     restart: unless-stopped
-    ports:
-      - "3002:3002"
     environment:
       - NODE_ENV=production
       - PORT=3002
@@ -139,6 +145,13 @@ services:
       - obotcall-network
     depends_on:
       - immo-api
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.obotcall-immo.rule=Host(`immo.app.obotcall.tech`)"
+      - "traefik.http.routers.obotcall-immo.entrypoints=websecure"
+      - "traefik.http.routers.obotcall-immo.tls.certresolver=letsencrypt"
+      - "traefik.http.services.obotcall-immo.loadbalancer.server.port=3002"
+      - "traefik.docker.network=docker_oppsys-network"
     profiles:
       - immo
       - all
@@ -150,8 +163,6 @@ services:
       dockerfile: Dockerfile
     container_name: obotcall-immo-api
     restart: unless-stopped
-    ports:
-      - "3012:3012"
     environment:
       - NODE_ENV=production
       - PORT=3012
@@ -175,8 +186,6 @@ services:
       dockerfile: Dockerfile
     container_name: obotcall-agent
     restart: unless-stopped
-    ports:
-      - "3003:3003"
     environment:
       - NODE_ENV=production
       - PORT=3003
@@ -191,6 +200,13 @@ services:
       - obotcall-network
     depends_on:
       - agent-api
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.obotcall-agent.rule=Host(`agent.app.obotcall.tech`)"
+      - "traefik.http.routers.obotcall-agent.entrypoints=websecure"
+      - "traefik.http.routers.obotcall-agent.tls.certresolver=letsencrypt"
+      - "traefik.http.services.obotcall-agent.loadbalancer.server.port=3003"
+      - "traefik.docker.network=docker_oppsys-network"
     profiles:
       - agent
       - all
@@ -202,8 +218,6 @@ services:
       dockerfile: Dockerfile
     container_name: obotcall-agent-api
     restart: unless-stopped
-    ports:
-      - "3013:3013"
     environment:
       - NODE_ENV=production
       - PORT=3013
@@ -227,8 +241,6 @@ services:
       dockerfile: Dockerfile
     container_name: obotcall-assist
     restart: unless-stopped
-    ports:
-      - "3004:3004"
     environment:
       - NODE_ENV=production
       - PORT=3004
@@ -243,6 +255,13 @@ services:
       - obotcall-network
     depends_on:
       - assist-api
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.obotcall-assist.rule=Host(`assist.app.obotcall.tech`)"
+      - "traefik.http.routers.obotcall-assist.entrypoints=websecure"
+      - "traefik.http.routers.obotcall-assist.tls.certresolver=letsencrypt"
+      - "traefik.http.services.obotcall-assist.loadbalancer.server.port=3004"
+      - "traefik.docker.network=docker_oppsys-network"
     profiles:
       - assist
       - all
@@ -254,8 +273,6 @@ services:
       dockerfile: Dockerfile
     container_name: obotcall-assist-api
     restart: unless-stopped
-    ports:
-      - "3014:3014"
     environment:
       - NODE_ENV=production
       - PORT=3014
@@ -270,36 +287,14 @@ services:
       - assist
       - all
 
-  # ===================================
-  # 🌐 Nginx Reverse Proxy
-  # ===================================
-  nginx:
-    image: nginx:alpine
-    container_name: nginx-proxy
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
-      - /var/log/nginx:/var/log/nginx
-    networks:
-      - obotcall-network
-    depends_on:
-      - web
-      - inter
-    healthcheck:
-      test: ["CMD", "nginx", "-t"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
 networks:
   obotcall-network:
-    driver: bridge
+    external: true
+    name: docker_oppsys-network
 
-# Volumes pour les données persistantes
 volumes:
-  nginx-logs:
+  web_data:
+  inter_data:
+  immo_data:
+  agent_data:
+  assist_data:
