@@ -104,7 +104,10 @@ CREATE INDEX idx_clients_tenant_id ON inter_app.clients(tenant_id) WHERE deleted
 CREATE INDEX idx_clients_email ON inter_app.clients(email) WHERE deleted_at IS NULL;
 CREATE INDEX idx_clients_phone ON inter_app.clients(phone) WHERE deleted_at IS NULL;
 CREATE INDEX idx_clients_siret ON inter_app.clients(siret) WHERE siret IS NOT NULL AND deleted_at IS NULL;
-CREATE INDEX idx_clients_location ON inter_app.clients USING gist(ll_to_earth(latitude, longitude)) WHERE latitude IS NOT NULL AND longitude IS NOT NULL AND deleted_at IS NULL;
+-- Geolocation index (simple B-tree instead of GIST for broader compatibility)
+-- For production with PostGIS, consider: CREATE INDEX idx_clients_location ON inter_app.clients USING gist(ll_to_earth(latitude, longitude));
+CREATE INDEX idx_clients_latitude ON inter_app.clients(latitude) WHERE latitude IS NOT NULL AND deleted_at IS NULL;
+CREATE INDEX idx_clients_longitude ON inter_app.clients(longitude) WHERE longitude IS NOT NULL AND deleted_at IS NULL;
 CREATE INDEX idx_clients_created_at ON inter_app.clients(created_at DESC);
 
 -- RLS
@@ -209,7 +212,10 @@ CREATE INDEX idx_technicians_user_id ON inter_app.technicians(user_id) WHERE use
 CREATE INDEX idx_technicians_email ON inter_app.technicians(email) WHERE deleted_at IS NULL;
 CREATE INDEX idx_technicians_availability ON inter_app.technicians(is_available, availability_status) WHERE deleted_at IS NULL;
 CREATE INDEX idx_technicians_skills ON inter_app.technicians USING gin(skills);
-CREATE INDEX idx_technicians_location ON inter_app.technicians USING gist(ll_to_earth(current_latitude, current_longitude)) WHERE current_latitude IS NOT NULL AND current_longitude IS NOT NULL;
+-- Geolocation index (simple B-tree instead of GIST for broader compatibility)
+-- For production with PostGIS, consider: CREATE INDEX idx_technicians_location ON inter_app.technicians USING gist(ll_to_earth(current_latitude, current_longitude));
+CREATE INDEX idx_technicians_current_latitude ON inter_app.technicians(current_latitude) WHERE current_latitude IS NOT NULL;
+CREATE INDEX idx_technicians_current_longitude ON inter_app.technicians(current_longitude) WHERE current_longitude IS NOT NULL;
 
 -- RLS
 ALTER TABLE inter_app.technicians ENABLE ROW LEVEL SECURITY;
