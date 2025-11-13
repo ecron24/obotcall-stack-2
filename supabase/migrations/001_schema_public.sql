@@ -58,6 +58,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Fonction STUB pour obtenir les tenant_ids de l'utilisateur courant
+-- Cette fonction sera recréée correctement après la création de user_tenant_roles
+CREATE OR REPLACE FUNCTION get_current_user_tenant_ids()
+RETURNS uuid[] AS $$
+    SELECT ARRAY[]::uuid[];
+$$ LANGUAGE sql SECURITY DEFINER
+SET search_path = public, pg_temp;
+
 -- Fonctions de chiffrement/déchiffrement pour données sensibles
 -- NOTE: Ces fonctions sont commentées car pgcrypto peut ne pas être disponible sur tous les environnements Supabase
 -- Décommenter si nécessaire et si pgcrypto est activé
@@ -372,7 +380,8 @@ CREATE TRIGGER ensure_owner_exists
 BEFORE UPDATE OR DELETE ON public.user_tenant_roles
 FOR EACH ROW EXECUTE FUNCTION ensure_tenant_has_owner();
 
--- Fonction pour obtenir les tenant_ids de l'utilisateur courant
+-- Fonction finale pour obtenir les tenant_ids de l'utilisateur courant
+-- (Remplace le STUB créé au début du fichier)
 -- (Créée ici car elle dépend de user_tenant_roles)
 -- SECURITY DEFINER nécessaire car utilisée dans RLS policies
 CREATE OR REPLACE FUNCTION get_current_user_tenant_ids()
