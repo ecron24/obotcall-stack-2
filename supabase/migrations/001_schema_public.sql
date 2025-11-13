@@ -25,7 +25,8 @@ BEGIN
     NEW.updated_at = now();
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY INVOKER
+SET search_path = public, pg_temp;
 
 -- Fonction pour valider le format des permissions (jsonb)
 CREATE OR REPLACE FUNCTION validate_permissions(perms jsonb)
@@ -56,7 +57,8 @@ BEGIN
 
     RETURN true;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY INVOKER
+SET search_path = public, pg_temp;
 
 -- Fonction STUB pour obtenir les tenant_ids de l'utilisateur courant
 -- Cette fonction sera recréée correctement après la création de user_tenant_roles
@@ -246,7 +248,8 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY INVOKER
+SET search_path = public, pg_temp;
 
 CREATE TRIGGER reset_login_attempts
 BEFORE UPDATE ON public.users
@@ -327,7 +330,8 @@ BEGIN
 
     RETURN COALESCE(NEW, OLD);
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY INVOKER
+SET search_path = public, pg_temp;
 
 CREATE TRIGGER ensure_owner_exists
 BEFORE UPDATE OR DELETE ON public.user_tenant_roles
@@ -492,7 +496,8 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY INVOKER
+SET search_path = public, pg_temp;
 
 CREATE TRIGGER set_verification_token
 BEFORE INSERT ON public.domains
@@ -604,7 +609,8 @@ BEGIN
 
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY INVOKER
+SET search_path = public, pg_temp;
 
 CREATE TRIGGER check_subscription_status
 BEFORE UPDATE ON public.subscriptions
@@ -754,7 +760,8 @@ BEGIN
     GET DIAGNOSTICS deleted_count = ROW_COUNT;
     RETURN deleted_count;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public, pg_temp;
 
 -- RLS
 ALTER TABLE public.revoked_tokens ENABLE ROW LEVEL SECURITY;
