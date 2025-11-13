@@ -58,15 +58,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Fonction pour obtenir les tenant_ids de l'utilisateur courant
+-- Fonction STUB pour obtenir les tenant_ids de l'utilisateur courant
+-- Cette fonction sera recréée correctement après la création de user_tenant_roles
 CREATE OR REPLACE FUNCTION get_current_user_tenant_ids()
 RETURNS uuid[] AS $$
-    SELECT ARRAY_AGG(tenant_id)
-    FROM public.user_tenant_roles
-    WHERE user_id = auth.uid()
-    AND is_active = true
-    AND (valid_until IS NULL OR valid_until > now());
-$$ LANGUAGE sql SECURITY DEFINER;
+    SELECT ARRAY[]::uuid[];
+$$ LANGUAGE sql SECURITY DEFINER
+SET search_path = public, pg_temp;
 
 -- Fonctions de chiffrement/déchiffrement pour données sensibles
 -- NOTE: Ces fonctions sont commentées car pgcrypto peut ne pas être disponible sur tous les environnements Supabase
@@ -381,6 +379,20 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER ensure_owner_exists
 BEFORE UPDATE OR DELETE ON public.user_tenant_roles
 FOR EACH ROW EXECUTE FUNCTION ensure_tenant_has_owner();
+
+-- Fonction finale pour obtenir les tenant_ids de l'utilisateur courant
+-- (Remplace le STUB créé au début du fichier)
+-- (Créée ici car elle dépend de user_tenant_roles)
+-- SECURITY DEFINER nécessaire car utilisée dans RLS policies
+CREATE OR REPLACE FUNCTION get_current_user_tenant_ids()
+RETURNS uuid[] AS $$
+    SELECT ARRAY_AGG(tenant_id)
+    FROM public.user_tenant_roles
+    WHERE user_id = auth.uid()
+    AND is_active = true
+    AND (valid_until IS NULL OR valid_until > now());
+$$ LANGUAGE sql SECURITY DEFINER
+SET search_path = public, pg_temp;
 
 -- RLS
 ALTER TABLE public.user_tenant_roles ENABLE ROW LEVEL SECURITY;
