@@ -116,7 +116,7 @@ ALTER TABLE inter_app.clients ENABLE ROW LEVEL SECURITY;
 -- Policy: Users can only see clients from their tenants
 CREATE POLICY clients_tenant_isolation ON inter_app.clients
     FOR ALL
-    USING (tenant_id IN (SELECT * FROM get_current_user_tenant_ids()));
+    USING (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
 
 -- Trigger: Update timestamp
 CREATE TRIGGER update_clients_updated_at
@@ -223,7 +223,7 @@ ALTER TABLE inter_app.technicians ENABLE ROW LEVEL SECURITY;
 -- Policy: Users can only see technicians from their tenants
 CREATE POLICY technicians_tenant_isolation ON inter_app.technicians
     FOR ALL
-    USING (tenant_id IN (SELECT * FROM get_current_user_tenant_ids()));
+    USING (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
 
 -- Trigger: Update timestamp
 CREATE TRIGGER update_technicians_updated_at
@@ -318,7 +318,7 @@ ALTER TABLE inter_app.equipment ENABLE ROW LEVEL SECURITY;
 -- Policy: Users can only see equipment from their tenants
 CREATE POLICY equipment_tenant_isolation ON inter_app.equipment
     FOR ALL
-    USING (tenant_id IN (SELECT * FROM get_current_user_tenant_ids()));
+    USING (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
 
 -- Trigger: Update timestamp
 CREATE TRIGGER update_equipment_updated_at
@@ -444,7 +444,7 @@ ALTER TABLE inter_app.interventions ENABLE ROW LEVEL SECURITY;
 -- Policy: Users can only see interventions from their tenants
 CREATE POLICY interventions_tenant_isolation ON inter_app.interventions
     FOR ALL
-    USING (tenant_id IN (SELECT * FROM get_current_user_tenant_ids()));
+    USING (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
 
 -- Function: Auto-generate intervention number
 CREATE OR REPLACE FUNCTION inter_app.generate_intervention_number(p_tenant_id uuid)
@@ -645,7 +645,7 @@ ALTER TABLE inter_app.invoices ENABLE ROW LEVEL SECURITY;
 -- Policy: Users can only see invoices from their tenants
 CREATE POLICY invoices_tenant_isolation ON inter_app.invoices
     FOR ALL
-    USING (tenant_id IN (SELECT * FROM get_current_user_tenant_ids()));
+    USING (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
 
 -- Policy: Only owner can modify paid invoices
 CREATE POLICY invoices_paid_protection ON inter_app.invoices
