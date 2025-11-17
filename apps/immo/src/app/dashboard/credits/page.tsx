@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Plus, CreditCard, TrendingDown, TrendingUp } from 'lucide-react'
+import Link from 'next/link'
 import { formatDate } from '@/lib/utils'
 
 export default async function CreditsPage() {
@@ -40,10 +41,12 @@ export default async function CreditsPage() {
             Gérez vos crédits pour la génération de baux
           </p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Acheter des crédits
-        </Button>
+        <Link href="/dashboard/credits/purchase">
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Acheter des crédits
+          </Button>
+        </Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
