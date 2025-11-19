@@ -39,10 +39,10 @@ export function Header() {
         {/* Desktop CTA Buttons */}
         <div className="hidden md:flex items-center space-x-4">
           <Button variant="ghost" asChild>
-            <Link href="/contact">Connexion</Link>
+            <Link href="/login">Connexion</Link>
           </Button>
           <Button asChild>
-            <Link href="/contact">Démarrer</Link>
+            <Link href="/signup">Démarrer</Link>
           </Button>
         </div>
 
@@ -101,12 +101,12 @@ export function Header() {
             </Link>
             <div className="pt-4 border-t flex flex-col space-y-2">
               <Button variant="outline" asChild className="w-full">
-                <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                   Connexion
                 </Link>
               </Button>
               <Button asChild className="w-full">
-                <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
+                <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
                   Démarrer
                 </Link>
               </Button>
