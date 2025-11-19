@@ -36,47 +36,113 @@ export async function createLease(formData: FormData) {
     throw new Error('Non authentifié')
   }
 
-  // Parse dynamic fields
-  const dynamicFieldsString = formData.get('dynamic_fields') as string
-  const dynamicFields = dynamicFieldsString ? JSON.parse(dynamicFieldsString) : {}
+  // Get tenant_id
+  const { data: tenant } = await supabase
+    .from('tenants')
+    .select('id')
+    .limit(1)
+    .single()
 
-  const data = {
-    country: formData.get('country'),
-    lease_type: formData.get('lease_type'),
-    template_id: formData.get('template_id') || null,
-    landlord_name: formData.get('landlord_name'),
-    landlord_address: formData.get('landlord_address'),
-    tenant_name: formData.get('tenant_name'),
-    tenant_address: formData.get('tenant_address') || null,
-    property_address: formData.get('property_address'),
-    property_type: formData.get('property_type') || null,
-    monthly_rent: parseFloat(formData.get('monthly_rent') as string),
-    charges: parseFloat(formData.get('charges') as string) || 0,
-    deposit: parseFloat(formData.get('deposit') as string) || 0,
-    start_date: formData.get('start_date'),
-    duration_months: parseInt(formData.get('duration_months') as string) || 12,
-    status: formData.get('status') || 'draft',
-    dynamic_fields: dynamicFields,
-    notes: formData.get('notes') || null,
+  if (!tenant) {
+    throw new Error('Tenant non trouvé')
   }
-
-  const validatedData = leaseSchema.parse(data)
 
   // Generate lease number
   const year = new Date().getFullYear()
   const { count } = await supabase
-    .from('leases')
+    .from('generated_leases')
     .select('*', { count: 'exact', head: true })
     .like('lease_number', `BAIL-${year}-%`)
 
   const leaseNumber = `BAIL-${year}-${String((count || 0) + 1).padStart(5, '0')}`
 
-  const { error } = await supabase.from('leases').insert([
-    {
-      ...validatedData,
-      lease_number: leaseNumber,
-    },
-  ])
+  // Create lessor (bailleur)
+  const lessorEntityType = formData.get('lessor_entity_type') as string
+  const lessorData = {
+    tenant_id: tenant.id,
+    party_type: 'lessor',
+    entity_type: lessorEntityType,
+    // Individual fields
+    title: lessorEntityType === 'individual' ? formData.get('lessor_title') : null,
+    first_name: lessorEntityType === 'individual' ? formData.get('lessor_first_name') : null,
+    last_name: lessorEntityType === 'individual' ? formData.get('lessor_last_name') : null,
+    // Company fields
+    company_name: lessorEntityType === 'company' ? formData.get('lessor_company_name') : null,
+    legal_form: lessorEntityType === 'company' ? formData.get('lessor_legal_form') : null,
+    siret: lessorEntityType === 'company' ? formData.get('lessor_siret') : null,
+    // Common fields
+    address_line1: formData.get('lessor_address_line1'),
+    postal_code: formData.get('lessor_postal_code'),
+    city: formData.get('lessor_city'),
+  }
+
+  const { data: lessor, error: lessorError } = await supabase
+    .from('lease_parties')
+    .insert([lessorData])
+    .select()
+    .single()
+
+  if (lessorError) {
+    console.error('Error creating lessor:', lessorError)
+    throw new Error(`Erreur création bailleur: ${lessorError.message}`)
+  }
+
+  // Create lessee (locataire)
+  const lesseeEntityType = formData.get('lessee_entity_type') as string
+  const lesseeData = {
+    tenant_id: tenant.id,
+    party_type: 'lessee',
+    entity_type: lesseeEntityType,
+    // Individual fields
+    title: lesseeEntityType === 'individual' ? formData.get('lessee_title') : null,
+    first_name: lesseeEntityType === 'individual' ? formData.get('lessee_first_name') : null,
+    last_name: lesseeEntityType === 'individual' ? formData.get('lessee_last_name') : null,
+    // Company fields
+    company_name: lesseeEntityType === 'company' ? formData.get('lessee_company_name') : null,
+    legal_form: lesseeEntityType === 'company' ? formData.get('lessee_legal_form') : null,
+    siret: lesseeEntityType === 'company' ? formData.get('lessee_siret') : null,
+    // Common fields
+    address_line1: formData.get('lessee_address_line1'),
+    postal_code: formData.get('lessee_postal_code'),
+    city: formData.get('lessee_city'),
+  }
+
+  const { data: lessee, error: lesseeError } = await supabase
+    .from('lease_parties')
+    .insert([lesseeData])
+    .select()
+    .single()
+
+  if (lesseeError) {
+    console.error('Error creating lessee:', lesseeError)
+    throw new Error(`Erreur création locataire: ${lesseeError.message}`)
+  }
+
+  // Create generated_lease
+  const leaseData = {
+    tenant_id: tenant.id,
+    created_by: user.id,
+    lease_number: leaseNumber,
+    country: formData.get('country'),
+    lease_type: formData.get('lease_type'),
+    template_id: formData.get('template_id') || null,
+    property_id: formData.get('property_id'),
+    lessor_id: lessor.id,
+    lessee_id: lessee.id,
+    monthly_rent: parseFloat(formData.get('monthly_rent') as string),
+    charges: parseFloat(formData.get('charges') as string) || 0,
+    deposit: parseFloat(formData.get('deposit') as string) || 0,
+    start_date: formData.get('start_date'),
+    duration_months: parseInt(formData.get('duration_months') as string) || 12,
+    notes: formData.get('notes') || null,
+    status: 'draft',
+  }
+
+  const { error } = await supabase
+    .from('generated_leases')
+    .insert([leaseData])
+    .select()
+    .single()
 
   if (error) {
     console.error('Error creating lease:', error)
