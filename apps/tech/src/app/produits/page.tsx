@@ -85,14 +85,14 @@ export default function ProduitsPage() {
                   </div>
                 </div>
 
-                <div className="flex gap-4">
-                  <Button asChild>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button asChild className="w-full sm:w-auto">
                     <Link href="/contact">
                       Essayer Inter
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
-                  <Button variant="outline" asChild>
+                  <Button variant="outline" asChild className="w-full sm:w-auto">
                     <Link href="/fonctionnalites#inter">Voir les fonctionnalités</Link>
                   </Button>
                 </div>
@@ -186,14 +186,14 @@ export default function ProduitsPage() {
                   </div>
                 </div>
 
-                <div className="flex gap-4">
-                  <Button asChild>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button asChild className="w-full sm:w-auto">
                     <Link href="/contact">
                       Essayer Agent
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
-                  <Button variant="outline" asChild>
+                  <Button variant="outline" asChild className="w-full sm:w-auto">
                     <Link href="/fonctionnalites#agent">Voir les fonctionnalités</Link>
                   </Button>
                 </div>
@@ -290,14 +290,14 @@ export default function ProduitsPage() {
                   </div>
                 </div>
 
-                <div className="flex gap-4">
-                  <Button asChild>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button asChild className="w-full sm:w-auto">
                     <Link href="/contact">
                       Essayer Immo
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
-                  <Button variant="outline" asChild>
+                  <Button variant="outline" asChild className="w-full sm:w-auto">
                     <Link href="/fonctionnalites#immo">Voir les fonctionnalités</Link>
                   </Button>
                 </div>
@@ -351,14 +351,14 @@ export default function ProduitsPage() {
               <p className="mt-4 text-lg text-muted-foreground">
                 Ou combinez plusieurs produits pour une synergie optimale
               </p>
-              <div className="mt-10 flex items-center justify-center gap-x-6">
-                <Button size="lg" asChild>
+              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-x-6">
+                <Button size="lg" asChild className="w-full sm:w-auto">
                   <Link href="/contact">
                     Nous contacter
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild>
+                <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
                   <Link href="/tarifs">Voir les tarifs</Link>
                 </Button>
               </div>

@@ -22,14 +22,14 @@ export default function HomePage() {
               complètes : standard téléphonique intelligent, CRM pour courtiers et générateur
               de baux professionnels.
             </p>
-            <div className="mt-10 flex items-center justify-center gap-x-6">
-              <Button size="lg" asChild>
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-x-6">
+              <Button size="lg" asChild className="w-full sm:w-auto">
                 <Link href="/contact">
                   Démarrer gratuitement
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
                 <Link href="/produits">Découvrir nos produits</Link>
               </Button>
             </div>
@@ -164,14 +164,14 @@ export default function HomePage() {
                 Commencez dès aujourd'hui avec notre essai gratuit de 14 jours.
                 Aucune carte bancaire requise.
               </p>
-              <div className="mt-10 flex items-center justify-center gap-x-6">
-                <Button size="lg" asChild>
+              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-x-6">
+                <Button size="lg" asChild className="w-full sm:w-auto">
                   <Link href="/contact">
                     Essayer gratuitement
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild>
+                <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
                   <Link href="/tarifs">Voir les tarifs</Link>
                 </Button>
               </div>
