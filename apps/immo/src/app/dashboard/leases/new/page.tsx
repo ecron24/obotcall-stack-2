@@ -18,12 +18,31 @@ import { createLease } from '../actions'
 export default async function NewLeasePage() {
   const supabase = await createClient()
 
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    throw new Error('Non authentifié')
+  }
+
+  const { data: tenant } = await supabase
+    .from('tenants')
+    .select('id')
+    .limit(1)
+    .single()
+
   // Fetch templates
   const { data: templates } = await supabase
     .from('templates')
     .select('*')
     .is('deleted_at', null)
     .order('country')
+
+  // Fetch properties
+  const { data: properties } = await supabase
+    .from('properties')
+    .select('id, property_type, address_line1, city, postal_code')
+    .eq('tenant_id', tenant?.id)
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false })
 
   // Default start date: today
   const today = new Date().toISOString().split('T')[0]
@@ -113,81 +132,274 @@ export default async function NewLeasePage() {
               </CardContent>
             </Card>
 
+            {/* Property Selection */}
             <Card>
               <CardHeader>
-                <CardTitle>Propriétaire (Bailleur)</CardTitle>
+                <CardTitle>Bien immobilier</CardTitle>
+                <CardDescription>
+                  Sélectionnez le bien concerné par le bail
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="landlord_name">Nom complet *</Label>
-                  <Input
-                    id="landlord_name"
-                    name="landlord_name"
-                    placeholder="Jean Dupont"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="landlord_address">Adresse *</Label>
-                  <Textarea
-                    id="landlord_address"
-                    name="landlord_address"
-                    placeholder="123 rue de la Paix, 75001 Paris"
-                    rows={3}
-                    required
-                  />
+                  <Label htmlFor="property_id">Propriété *</Label>
+                  {properties && properties.length > 0 ? (
+                    <Select name="property_id" required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un bien" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {properties.map((property: any) => (
+                          <SelectItem key={property.id} value={property.id}>
+                            {property.address_line1}, {property.city} ({property.postal_code})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="text-sm text-muted-foreground p-4 border rounded-md">
+                      Aucun bien disponible.{' '}
+                      <Link href="/dashboard/properties/new" className="text-primary hover:underline">
+                        Créer un bien
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
 
+            {/* Lessor (Bailleur) */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Bailleur (Propriétaire)</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="lessor_entity_type">Type *</Label>
+                  <Select name="lessor_entity_type" required defaultValue="individual">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Type d'entité" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="individual">Particulier</SelectItem>
+                      <SelectItem value="company">Société</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Individual fields */}
+                <div className="space-y-4" data-entity="individual">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="lessor_title">Civilité</Label>
+                      <Select name="lessor_title">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Civilité" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="M">M.</SelectItem>
+                          <SelectItem value="MME">Mme</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="lessor_first_name">Prénom *</Label>
+                      <Input
+                        id="lessor_first_name"
+                        name="lessor_first_name"
+                        placeholder="Jean"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lessor_last_name">Nom *</Label>
+                      <Input
+                        id="lessor_last_name"
+                        name="lessor_last_name"
+                        placeholder="Dupont"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Company fields */}
+                <div className="space-y-4" data-entity="company">
+                  <div className="space-y-2">
+                    <Label htmlFor="lessor_company_name">Raison sociale *</Label>
+                    <Input
+                      id="lessor_company_name"
+                      name="lessor_company_name"
+                      placeholder="Ma Société SARL"
+                    />
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="lessor_legal_form">Forme juridique</Label>
+                      <Input
+                        id="lessor_legal_form"
+                        name="lessor_legal_form"
+                        placeholder="SARL"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lessor_siret">SIRET</Label>
+                      <Input
+                        id="lessor_siret"
+                        name="lessor_siret"
+                        placeholder="12345678901234"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Common address fields */}
+                <div className="space-y-2">
+                  <Label htmlFor="lessor_address_line1">Adresse *</Label>
+                  <Input
+                    id="lessor_address_line1"
+                    name="lessor_address_line1"
+                    placeholder="123 rue de la Paix"
+                    required
+                  />
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="lessor_postal_code">Code postal *</Label>
+                    <Input
+                      id="lessor_postal_code"
+                      name="lessor_postal_code"
+                      placeholder="75001"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lessor_city">Ville *</Label>
+                    <Input
+                      id="lessor_city"
+                      name="lessor_city"
+                      placeholder="Paris"
+                      required
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Lessee (Locataire) */}
             <Card>
               <CardHeader>
                 <CardTitle>Locataire</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="tenant_name">Nom complet *</Label>
-                  <Input
-                    id="tenant_name"
-                    name="tenant_name"
-                    placeholder="Marie Martin"
-                    required
-                  />
+                  <Label htmlFor="lessee_entity_type">Type *</Label>
+                  <Select name="lessee_entity_type" required defaultValue="individual">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Type d'entité" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="individual">Particulier</SelectItem>
+                      <SelectItem value="company">Société</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="tenant_address">Adresse</Label>
-                  <Textarea
-                    id="tenant_address"
-                    name="tenant_address"
-                    placeholder="45 avenue des Champs, 75008 Paris"
-                    rows={3}
-                  />
-                </div>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Bien immobilier</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+                {/* Individual fields */}
+                <div className="space-y-4" data-entity="individual">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="lessee_title">Civilité</Label>
+                      <Select name="lessee_title">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Civilité" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="M">M.</SelectItem>
+                          <SelectItem value="MME">Mme</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="lessee_first_name">Prénom *</Label>
+                      <Input
+                        id="lessee_first_name"
+                        name="lessee_first_name"
+                        placeholder="Marie"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lessee_last_name">Nom *</Label>
+                      <Input
+                        id="lessee_last_name"
+                        name="lessee_last_name"
+                        placeholder="Martin"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Company fields */}
+                <div className="space-y-4" data-entity="company">
+                  <div className="space-y-2">
+                    <Label htmlFor="lessee_company_name">Raison sociale *</Label>
+                    <Input
+                      id="lessee_company_name"
+                      name="lessee_company_name"
+                      placeholder="Entreprise SAS"
+                    />
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="lessee_legal_form">Forme juridique</Label>
+                      <Input
+                        id="lessee_legal_form"
+                        name="lessee_legal_form"
+                        placeholder="SAS"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lessee_siret">SIRET</Label>
+                      <Input
+                        id="lessee_siret"
+                        name="lessee_siret"
+                        placeholder="12345678901234"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Common address fields */}
                 <div className="space-y-2">
-                  <Label htmlFor="property_address">Adresse du bien *</Label>
-                  <Textarea
-                    id="property_address"
-                    name="property_address"
-                    placeholder="10 boulevard Voltaire, 75011 Paris"
-                    rows={3}
+                  <Label htmlFor="lessee_address_line1">Adresse *</Label>
+                  <Input
+                    id="lessee_address_line1"
+                    name="lessee_address_line1"
+                    placeholder="45 avenue des Champs"
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="property_type">Type de bien</Label>
-                  <Input
-                    id="property_type"
-                    name="property_type"
-                    placeholder="Appartement T3, 65m²"
-                  />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="lessee_postal_code">Code postal *</Label>
+                    <Input
+                      id="lessee_postal_code"
+                      name="lessee_postal_code"
+                      placeholder="75008"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lessee_city">Ville *</Label>
+                    <Input
+                      id="lessee_city"
+                      name="lessee_city"
+                      placeholder="Paris"
+                      required
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>

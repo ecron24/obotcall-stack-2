@@ -9,11 +9,13 @@ import {
   FileType,
   Settings,
   Shield,
+  Building2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navigation = [
   { name: 'Tableau de bord', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Propriétés', href: '/dashboard/properties', icon: Building2 },
   { name: 'Mes Baux', href: '/dashboard/leases', icon: FileText },
   { name: 'Templates', href: '/dashboard/templates', icon: FileType },
   { name: 'Crédits', href: '/dashboard/credits', icon: CreditCard },
