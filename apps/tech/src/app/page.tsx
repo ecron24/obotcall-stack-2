@@ -24,7 +24,7 @@ export default function HomePage() {
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-x-6">
               <Button size="lg" asChild className="w-full sm:w-auto">
-                <Link href="/contact">
+                <Link href="/signup">
                   Démarrer gratuitement
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -166,7 +166,7 @@ export default function HomePage() {
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-x-6">
                 <Button size="lg" asChild className="w-full sm:w-auto">
-                  <Link href="/contact">
+                  <Link href="/signup">
                     Essayer gratuitement
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
