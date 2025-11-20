@@ -1,5 +1,24 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
+// Type definitions for API responses
+interface LoginResponse {
+  access_token: string
+  user: {
+    id: string
+    email: string
+    full_name: string
+    role: string
+  }
+  tenant: {
+    id: string
+    slug: string
+    name: string
+    subscription_plan: string
+  }
+}
+
+interface RegisterResponse extends LoginResponse {}
+
 class ApiClient {
   private baseUrl: string
   private token: string | null = null
@@ -43,15 +62,15 @@ class ApiClient {
   }
 
   // Auth
-  async register(data: any) {
-    return this.request('/api/auth/register', {
+  async register(data: any): Promise<RegisterResponse> {
+    return this.request<RegisterResponse>('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     })
   }
 
-  async login(data: any) {
-    return this.request('/api/auth/login', {
+  async login(data: any): Promise<LoginResponse> {
+    return this.request<LoginResponse>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
     })
