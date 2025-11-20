@@ -645,24 +645,36 @@ CREATE INDEX idx_invoices_interventions ON inter_app.invoices USING gin(interven
 -- RLS
 ALTER TABLE inter_app.invoices ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can only see invoices from their tenants
-CREATE POLICY invoices_tenant_isolation ON inter_app.invoices
-    FOR ALL
+-- Policy: Users can only see/insert/delete invoices from their tenants
+CREATE POLICY invoices_select ON inter_app.invoices
+    FOR SELECT
     USING (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
 
--- Policy: Only owner can modify paid invoices
-CREATE POLICY invoices_paid_protection ON inter_app.invoices
+CREATE POLICY invoices_insert ON inter_app.invoices
+    FOR INSERT
+    WITH CHECK (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
+
+CREATE POLICY invoices_delete ON inter_app.invoices
+    FOR DELETE
+    USING (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
+
+-- Policy: Combined tenant isolation + paid protection for updates
+CREATE POLICY invoices_update ON inter_app.invoices
     FOR UPDATE
     USING (
-        payment_status != 'paid' OR
-        created_by = (select auth.uid()) OR
-        EXISTS (
-            SELECT 1 FROM public.user_tenant_roles
-            WHERE user_id = auth.uid()
-            AND tenant_id = invoices.tenant_id
-            AND role IN ('owner', 'admin')
+        tenant_id IN (SELECT unnest(get_current_user_tenant_ids()))
+        AND (
+            payment_status != 'paid' OR
+            created_by = (select auth.uid()) OR
+            EXISTS (
+                SELECT 1 FROM public.user_tenant_roles
+                WHERE user_id = (select auth.uid())
+                AND tenant_id = invoices.tenant_id
+                AND role IN ('owner', 'admin')
+            )
         )
-    );
+    )
+    WITH CHECK (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
 
 -- Function: Auto-generate invoice number
 CREATE OR REPLACE FUNCTION inter_app.generate_invoice_number(p_tenant_id uuid)

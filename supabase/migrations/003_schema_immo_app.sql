@@ -895,8 +895,29 @@ CREATE POLICY countries_read ON immo_app.countries
     FOR SELECT
     USING (true); -- Public read
 
-CREATE POLICY countries_write ON immo_app.countries
-    FOR ALL
+CREATE POLICY countries_insert ON immo_app.countries
+    FOR INSERT
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.user_tenant_roles
+        WHERE user_id = (select auth.uid())
+          AND role IN ('owner', 'admin')
+    ));
+
+CREATE POLICY countries_update ON immo_app.countries
+    FOR UPDATE
+    USING (EXISTS (
+        SELECT 1 FROM public.user_tenant_roles
+        WHERE user_id = (select auth.uid())
+          AND role IN ('owner', 'admin')
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.user_tenant_roles
+        WHERE user_id = (select auth.uid())
+          AND role IN ('owner', 'admin')
+    ));
+
+CREATE POLICY countries_delete ON immo_app.countries
+    FOR DELETE
     USING (EXISTS (
         SELECT 1 FROM public.user_tenant_roles
         WHERE user_id = (select auth.uid())
@@ -926,10 +947,18 @@ CREATE POLICY lease_templates_read ON immo_app.lease_templates
         tenant_id IN (SELECT unnest(get_current_user_tenant_ids()))
     );
 
-CREATE POLICY lease_templates_write ON immo_app.lease_templates
-    FOR ALL
+CREATE POLICY lease_templates_insert ON immo_app.lease_templates
+    FOR INSERT
+    WITH CHECK (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
+
+CREATE POLICY lease_templates_update ON immo_app.lease_templates
+    FOR UPDATE
     USING (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())))
     WITH CHECK (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
+
+CREATE POLICY lease_templates_delete ON immo_app.lease_templates
+    FOR DELETE
+    USING (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
 
 -- Template fields: Via template
 CREATE POLICY template_fields_access ON immo_app.template_fields
