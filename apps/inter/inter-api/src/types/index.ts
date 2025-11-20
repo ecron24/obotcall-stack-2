@@ -6,8 +6,19 @@ export enum SubscriptionPlan {
   ENTERPRISE = 'enterprise'
 }
 
-// Plan features mapping
-export const PLAN_FEATURES = {
+// Plan features mapping with proper types
+export const PLAN_FEATURES: Record<SubscriptionPlan, {
+  name: string
+  price: number | null
+  maxUsers: number
+  features: string[]
+  limits: {
+    interventions: number
+    clients: number
+    devis?: number
+    factures?: number
+  }
+}> = {
   [SubscriptionPlan.FREE]: {
     name: 'Free',
     price: 0,
@@ -54,7 +65,7 @@ export const PLAN_FEATURES = {
       factures: -1
     }
   }
-} as const
+}
 
 // User Roles
 export enum UserRole {
