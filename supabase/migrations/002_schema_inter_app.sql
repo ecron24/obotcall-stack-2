@@ -310,7 +310,7 @@ CREATE INDEX idx_equipment_tenant_id ON inter_app.equipment(tenant_id) WHERE del
 CREATE INDEX idx_equipment_client_id ON inter_app.equipment(client_id) WHERE deleted_at IS NULL;
 CREATE INDEX idx_equipment_serial_number ON inter_app.equipment(serial_number) WHERE serial_number IS NOT NULL AND deleted_at IS NULL;
 CREATE INDEX idx_equipment_next_maintenance ON inter_app.equipment(next_maintenance_date) WHERE status = 'active' AND deleted_at IS NULL;
-CREATE INDEX idx_equipment_warranty ON inter_app.equipment(warranty_end_date) WHERE warranty_end_date >= CURRENT_DATE AND deleted_at IS NULL;
+CREATE INDEX idx_equipment_warranty ON inter_app.equipment(warranty_end_date) WHERE deleted_at IS NULL;
 
 -- RLS
 ALTER TABLE inter_app.equipment ENABLE ROW LEVEL SECURITY;
