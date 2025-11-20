@@ -899,7 +899,7 @@ CREATE POLICY countries_write ON immo_app.countries
     FOR ALL
     USING (EXISTS (
         SELECT 1 FROM public.user_tenant_roles
-        WHERE user_id = auth.uid()
+        WHERE user_id = (select auth.uid())
           AND role IN ('owner', 'admin')
     ));
 

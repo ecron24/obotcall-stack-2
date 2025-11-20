@@ -655,7 +655,7 @@ CREATE POLICY invoices_paid_protection ON inter_app.invoices
     FOR UPDATE
     USING (
         payment_status != 'paid' OR
-        created_by = auth.uid() OR
+        created_by = (select auth.uid()) OR
         EXISTS (
             SELECT 1 FROM public.user_tenant_roles
             WHERE user_id = auth.uid()
