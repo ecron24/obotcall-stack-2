@@ -927,8 +927,9 @@ CREATE POLICY lease_templates_read ON immo_app.lease_templates
     );
 
 CREATE POLICY lease_templates_write ON immo_app.lease_templates
-    FOR INSERT OR UPDATE OR DELETE
-    USING (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
+    FOR ALL
+    USING (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())))
+    WITH CHECK (tenant_id IN (SELECT unnest(get_current_user_tenant_ids())));
 
 -- Template fields: Via template
 CREATE POLICY template_fields_access ON immo_app.template_fields
