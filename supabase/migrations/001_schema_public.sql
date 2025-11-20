@@ -258,11 +258,25 @@ FOR EACH ROW EXECUTE FUNCTION reset_failed_login_attempts();
 -- RLS
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "users_can_view_own_profile"
+-- Combined SELECT policy: users can view own profile OR admins can view tenant users
+CREATE POLICY "users_select"
 ON public.users
 FOR SELECT
 TO authenticated
-USING (id = (select auth.uid()));
+USING (
+    id = (select auth.uid())
+    OR id IN (
+        SELECT utr.user_id
+        FROM public.user_tenant_roles utr
+        WHERE utr.tenant_id IN (
+            SELECT tenant_id
+            FROM public.user_tenant_roles
+            WHERE user_id = (select auth.uid())
+            AND role IN ('owner', 'admin')
+            AND is_active = true
+        )
+    )
+);
 
 CREATE POLICY "users_can_update_own_profile"
 ON public.users
@@ -270,8 +284,6 @@ FOR UPDATE
 TO authenticated
 USING (id = (select auth.uid()))
 WITH CHECK (id = (select auth.uid()));
-
--- Policy "admins_can_view_tenant_users" ajoutée après user_tenant_roles
 
 -- =====================================================
 -- 6. TABLE : user_tenant_roles (Rôles utilisateurs)
@@ -354,18 +366,14 @@ SET search_path = public, pg_temp;
 -- RLS
 ALTER TABLE public.user_tenant_roles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "users_can_view_own_roles"
-ON public.user_tenant_roles
-FOR SELECT
-TO authenticated
-USING (user_id = (select auth.uid()));
-
-CREATE POLICY "admins_can_view_tenant_roles"
+-- Combined SELECT policy: users can view own roles OR admins/owners can view tenant roles
+CREATE POLICY "user_tenant_roles_select"
 ON public.user_tenant_roles
 FOR SELECT
 TO authenticated
 USING (
-    tenant_id IN (
+    user_id = (select auth.uid())
+    OR tenant_id IN (
         SELECT tenant_id
         FROM public.user_tenant_roles
         WHERE user_id = (select auth.uid())
@@ -374,9 +382,25 @@ USING (
     )
 );
 
-CREATE POLICY "owners_can_manage_roles"
+-- Only owners can insert roles
+CREATE POLICY "user_tenant_roles_insert"
 ON public.user_tenant_roles
-FOR ALL
+FOR INSERT
+TO authenticated
+WITH CHECK (
+    tenant_id IN (
+        SELECT tenant_id
+        FROM public.user_tenant_roles
+        WHERE user_id = (select auth.uid())
+        AND role = 'owner'
+        AND is_active = true
+    )
+);
+
+-- Only owners can update roles
+CREATE POLICY "user_tenant_roles_update"
+ON public.user_tenant_roles
+FOR UPDATE
 TO authenticated
 USING (
     tenant_id IN (
@@ -388,6 +412,21 @@ USING (
     )
 )
 WITH CHECK (
+    tenant_id IN (
+        SELECT tenant_id
+        FROM public.user_tenant_roles
+        WHERE user_id = (select auth.uid())
+        AND role = 'owner'
+        AND is_active = true
+    )
+);
+
+-- Only owners can delete roles
+CREATE POLICY "user_tenant_roles_delete"
+ON public.user_tenant_roles
+FOR DELETE
+TO authenticated
+USING (
     tenant_id IN (
         SELECT tenant_id
         FROM public.user_tenant_roles
@@ -429,25 +468,6 @@ WITH CHECK (
         WHERE user_id = (select auth.uid())
         AND role = 'owner'
         AND is_active = true
-    )
-);
-
--- Policy pour USERS (ajoutée ici après user_tenant_roles)
-CREATE POLICY "admins_can_view_tenant_users"
-ON public.users
-FOR SELECT
-TO authenticated
-USING (
-    id IN (
-        SELECT utr.user_id
-        FROM public.user_tenant_roles utr
-        WHERE utr.tenant_id IN (
-            SELECT tenant_id
-            FROM public.user_tenant_roles
-            WHERE user_id = (select auth.uid())
-            AND role IN ('owner', 'admin')
-            AND is_active = true
-        )
     )
 );
 
