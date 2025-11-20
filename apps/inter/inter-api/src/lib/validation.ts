@@ -17,8 +17,8 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Le mot de passe est requis')
 })
 
-// Client schemas
-export const createClientSchema = z.object({
+// Client schemas - Base schema without validation
+const clientBaseSchema = z.object({
   type: z.enum(['individual', 'company']),
   first_name: z.string().min(1).optional().nullable(),
   last_name: z.string().min(1).optional().nullable(),
@@ -34,7 +34,9 @@ export const createClientSchema = z.object({
   vat_number: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
   tags: z.array(z.string()).optional().nullable()
-}).refine((data) => {
+})
+
+export const createClientSchema = clientBaseSchema.refine((data) => {
   if (data.type === 'individual') {
     return data.first_name && data.last_name
   } else {
@@ -44,7 +46,7 @@ export const createClientSchema = z.object({
   message: 'Pour un particulier, prénom et nom sont requis. Pour une entreprise, le nom de société est requis.'
 })
 
-export const updateClientSchema = createClientSchema.partial()
+export const updateClientSchema = clientBaseSchema.partial()
 
 // Intervention schemas
 export const createInterventionSchema = z.object({

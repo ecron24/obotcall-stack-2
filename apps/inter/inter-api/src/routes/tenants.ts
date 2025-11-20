@@ -183,11 +183,11 @@ tenants.get('/me/subscription', async (c) => {
         },
         devis: {
           current: devisCount || 0,
-          limit: currentPlan.limits.devis
+          limit: currentPlan.limits.devis ?? null
         },
         factures: {
           current: facturesCount || 0,
-          limit: currentPlan.limits.factures
+          limit: currentPlan.limits.factures ?? null
         }
       }
     })

@@ -52,10 +52,10 @@ export const checkUsageLimit = (resource: 'interventions' | 'clients' | 'devis' 
     const { tenant } = getAuth(c)
 
     const planFeatures = PLAN_FEATURES[tenant.subscription_plan]
-    const limit = planFeatures.limits[resource]
+    const limit = planFeatures.limits[resource as keyof typeof planFeatures.limits]
 
-    // -1 means unlimited
-    if (limit === -1) {
+    // If limit is undefined or -1, means unlimited
+    if (limit === undefined || limit === -1) {
       return await next()
     }
 
