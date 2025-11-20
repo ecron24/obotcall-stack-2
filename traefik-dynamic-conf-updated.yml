@@ -1,0 +1,427 @@
+# traefik/dynamic_conf.yml
+# Configuration dynamique avec support gros fichiers et CORS pour n8n
+# ✅ MISE À JOUR : Support de 2 instances Supabase (OPPSYS + OBOTCALL)
+
+http:
+  middlewares:
+    # Middleware pour gros fichiers
+    big-files:
+      buffering:
+        maxRequestBodyBytes: 524288000   # 500MB
+        maxResponseBodyBytes: 524288000  # 500MB
+        memRequestBodyBytes: 52428800    # 50MB en mémoire
+        memResponseBodyBytes: 52428800   # 50MB en mémoire
+        retryExpression: "IsNetworkError() && Attempts() <= 2"
+
+    # ✅ MODIFIÉ : Middleware CORS dédié pour n8n avec fix CORS
+    n8n-cors:
+      headers:
+        accessControlAllowOriginList:
+          - "https://app.oppsys.io"
+          - "https://admin.oppsys.io"
+          - "http://localhost:3000"
+          - "*"
+        accessControlAllowMethods: "GET,POST,PUT,DELETE,OPTIONS,HEAD"
+        accessControlAllowHeaders: "Content-Type,Authorization,X-Requested-With,Accept,Origin"
+        accessControlAllowCredentials: true
+        accessControlMaxAge: "86400"
+        addVaryHeader: true
+        customResponseHeaders:
+          Access-Control-Allow-Origin: "*"
+          Access-Control-Allow-Methods: "GET,POST,PUT,DELETE,OPTIONS,HEAD"
+          Access-Control-Allow-Headers: "Content-Type,Authorization,X-Requested-With,Accept,Origin"
+
+    # ✅ MODIFIÉ : Support de 2 instances Supabase (OPPSYS + OBOTCALL)
+    securityHeaders:
+      headers:
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        permissionsPolicy: "geolocation=(), microphone=()"
+        contentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://zwvzkmundpcoidwanoau.supabase.co wss://zwvzkmundpcoidwanoau.supabase.co https://gpewkappvozjuxnzfekp.supabase.co wss://gpewkappvozjuxnzfekp.supabase.co https://api.oppsys.io https://n8n.oppsys.io"
+        referrerPolicy: "strict-origin-when-cross-origin"
+        forceSTSHeader: true
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        customResponseHeaders:
+          X-Frame-Options: "DENY"
+          X-Content-Type-Options: "nosniff"
+          X-XSS-Protection: "1; mode=block"
+
+    # ✅ AJOUTÉ : Middleware pour gérer les requêtes OPTIONS
+    n8n-options:
+      headers:
+        customResponseHeaders:
+          Access-Control-Allow-Origin: "*"
+          Access-Control-Allow-Methods: "GET,POST,PUT,DELETE,OPTIONS,HEAD"
+          Access-Control-Allow-Headers: "Content-Type,Authorization,X-Requested-With,Accept,Origin"
+          Access-Control-Max-Age: "86400"
+
+    # ✅ MODIFIÉ : n8n-complete avec gestion OPTIONS
+    n8n-complete:
+      chain:
+        middlewares:
+          - n8n-options
+          - n8n-security
+          - big-files
+          - n8n-cors
+          - n8n-spa-fallback
+
+    # ✅ MODIFIÉ : n8n-security avec CORS
+    n8n-security:
+      headers:
+        frameDeny: false
+        customRequestHeaders:
+          X-Forwarded-For: ""
+          X-Forwarded-Proto: "https"
+          X-Forwarded-Host: "n8n.oppsys.io"
+          Upgrade: "websocket"
+          Origin: "https://n8n.oppsys.io"
+        customResponseHeaders:
+          X-Frame-Options: "SAMEORIGIN"
+          X-Content-Type-Options: "nosniff"
+          X-XSS-Protection: "1; mode=block"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+          Access-Control-Allow-Origin: "*"
+          Access-Control-Allow-Methods: "GET,POST,PUT,DELETE,OPTIONS"
+          Access-Control-Allow-Headers: "Content-Type,Authorization"
+        forceSTSHeader: true
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+
+    forwarded-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+    spa-middleware:
+      headers:
+        customResponseHeaders:
+          Cache-Control: "no-store, no-cache, must-revalidate"
+          Permissions-Policy: "geolocation=(), microphone=(), camera=()"
+
+    # ✅ MODIFIÉ : Support de 2 instances Supabase (OPPSYS + OBOTCALL)
+    supabase-cors:
+      headers:
+        accessControlAllowOriginList:
+          - "https://zwvzkmundpcoidwanoau.supabase.co"
+          - "https://gpewkappvozjuxnzfekp.supabase.co"
+        accessControlAllowMethods: "GET,POST,PUT,DELETE,OPTIONS"
+        accessControlAllowHeaders: "*"
+        accessControlAllowCredentials: true
+        accessControlMaxAge: "100"
+        addVaryHeader: true
+
+    admin-api-cors:
+      headers:
+        accessControlAllowOriginList:
+          - "https://app.oppsys.io"
+          - "http://localhost:3000"
+          - "https://admin.oppsys.io"
+        accessControlAllowMethods: "GET,POST,DELETE,PUT,PATCH,OPTIONS"
+        accessControlAllowHeaders: "Content-Type,x-admin-email,Authorization"
+        accessControlAllowCredentials: true
+        accessControlMaxAge: "3600"
+        addVaryHeader: true
+
+    api-cors-big-files:
+      chain:
+        middlewares:
+          - api-cors
+          - big-files
+
+    api-cors:
+      headers:
+        accessControlAllowOriginList:
+          - "https://app.oppsys.io"
+          - "https://admin.oppsys.io"
+          - "http://localhost:3000"
+          - "https://oppsys.io"
+        accessControlAllowMethods: "GET,POST,PUT,DELETE,OPTIONS"
+        accessControlAllowHeaders: "*"
+        accessControlAllowCredentials: true
+        accessControlMaxAge: "3600"
+        addVaryHeader: true
+
+    n8n-spa-fallback:
+      errors:
+        status:
+          - "404"
+        service: n8n
+        query: /
+
+    website-redirect:
+      redirectRegex:
+        regex: "^https://www\\.oppsys\\.io(.*)"
+        replacement: "https://oppsys.io${1}"
+        permanent: true
+
+  routers:
+    # ===== REDIRECTION GLOBALE HTTP → HTTPS =====
+    web-router:
+      rule: "HostRegexp(`{host:.+}`)"
+      entryPoints:
+        - web
+      middlewares:
+        - redirect-to-https
+      service: noop@internal
+
+    # ===== API BACKEND =====
+    api-router:
+      rule: "Host(`api.oppsys.io`)"
+      service: admin-api
+      middlewares:
+        - api-cors-big-files
+        - securityHeaders
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+
+    app-api:
+      rule: "Host(`app.oppsys.io`) && PathPrefix(`/api`)"
+      service: admin-api
+      middlewares:
+        - api-cors-big-files
+        - securityHeaders
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+
+    # ===== WEBSITE MARKETING =====
+    website-router:
+      rule: "Host(`oppsys.io`) || Host(`www.oppsys.io`)"
+      service: oppsys-website
+      middlewares:
+        - securityHeaders
+        - website-redirect
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+
+    # ===== FRONTEND CLIENT APP =====
+    app-client:
+      rule: "Host(`app.oppsys.io`)"
+      service: react-app
+      middlewares:
+        - securityHeaders
+        - supabase-cors
+        - spa-middleware
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+
+    # ===== FRONTEND ADMIN =====
+    admin-frontend:
+      rule: "Host(`admin.oppsys.io`)"
+      service: admin-frontend
+      middlewares:
+        - securityHeaders
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+
+    # ✅ AJOUTÉ : Router spécifique pour webhooks N8N
+    n8n-webhooks:
+      rule: "Host(`n8n.oppsys.io`) && PathPrefix(`/webhook`)"
+      service: n8n
+      middlewares:
+        - n8n-options
+        - n8n-cors
+        - big-files
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      priority: 200
+
+    # ===== N8N WORKFLOWS =====
+    n8n:
+      rule: "Host(`n8n.oppsys.io`)"
+      service: n8n
+      middlewares:
+        - n8n-complete
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      priority: 100
+
+    # ========================================
+    # ✅ OBOTCALL STACK - 5 APPS
+    # ========================================
+
+    # Delmas App - sys.obotcall.tech
+    obotcall-delmas:
+      rule: "Host(`sys.obotcall.tech`)"
+      service: obotcall-delmas
+      middlewares:
+        - securityHeaders
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      priority: 100
+
+    # ✅ NOUVEAU : Tech App - app.obotcall.tech
+    obotcall-tech:
+      rule: "Host(`app.obotcall.tech`)"
+      service: obotcall-tech
+      middlewares:
+        - securityHeaders
+        - supabase-cors
+        - spa-middleware
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      priority: 100
+
+    # ✅ NOUVEAU : Inter App - inter.app.obotcall.tech
+    obotcall-inter:
+      rule: "Host(`inter.app.obotcall.tech`)"
+      service: obotcall-inter
+      middlewares:
+        - securityHeaders
+        - supabase-cors
+        - spa-middleware
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      priority: 100
+
+    # ✅ NOUVEAU : Immo App - immo.app.obotcall.tech
+    obotcall-immo:
+      rule: "Host(`immo.app.obotcall.tech`)"
+      service: obotcall-immo
+      middlewares:
+        - securityHeaders
+        - supabase-cors
+        - spa-middleware
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      priority: 100
+
+    # ✅ NOUVEAU : Agent App - agent.app.obotcall.tech
+    obotcall-agent:
+      rule: "Host(`agent.app.obotcall.tech`)"
+      service: obotcall-agent
+      middlewares:
+        - securityHeaders
+        - supabase-cors
+        - spa-middleware
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      priority: 100
+
+  services:
+    # ===== BACKEND API =====
+    admin-api:
+      loadBalancer:
+        servers:
+          - url: "http://infrastructure-admin-api-1:4000"
+        responseForwarding:
+          flushInterval: "100ms"
+        healthCheck:
+          path: "/health"
+          interval: "30s"
+          timeout: "10s"
+        passHostHeader: true
+
+    # ===== WEBSITE MARKETING =====
+    oppsys-website:
+      loadBalancer:
+        servers:
+          - url: "http://oppsys-website:3000"
+
+    # ===== FRONTEND CLIENT =====
+    react-app:
+      loadBalancer:
+        servers:
+          - url: "http://infrastructure-oppsys-client-1:80"
+
+    # ===== FRONTEND ADMIN =====
+    admin-frontend:
+      loadBalancer:
+        servers:
+          - url: "http://oppsys-admin:80"
+
+    # ===== N8N =====
+    n8n:
+      loadBalancer:
+        servers:
+          - url: "http://n8n-stack-n8n-1:5678"
+        responseForwarding:
+          flushInterval: "100ms"
+        passHostHeader: true
+
+    # ========================================
+    # ✅ OBOTCALL SERVICES - 5 SERVICES
+    # ========================================
+
+    # Delmas App
+    obotcall-delmas:
+      loadBalancer:
+        servers:
+          - url: "http://obotcall-delmas:3000"
+        passHostHeader: true
+
+    # ✅ NOUVEAU : Tech App
+    obotcall-tech:
+      loadBalancer:
+        servers:
+          - url: "http://obotcall-tech:3000"
+        passHostHeader: true
+        healthCheck:
+          path: "/api/health"
+          interval: "30s"
+          timeout: "10s"
+
+    # ✅ NOUVEAU : Inter App
+    obotcall-inter:
+      loadBalancer:
+        servers:
+          - url: "http://obotcall-inter:3001"
+        passHostHeader: true
+        healthCheck:
+          path: "/api/health"
+          interval: "30s"
+          timeout: "10s"
+
+    # ✅ NOUVEAU : Immo App
+    obotcall-immo:
+      loadBalancer:
+        servers:
+          - url: "http://obotcall-immo:3002"
+        passHostHeader: true
+        healthCheck:
+          path: "/api/health"
+          interval: "30s"
+          timeout: "10s"
+
+    # ✅ NOUVEAU : Agent App
+    obotcall-agent:
+      loadBalancer:
+        servers:
+          - url: "http://obotcall-agent:3003"
+        passHostHeader: true
+        healthCheck:
+          path: "/api/health"
+          interval: "30s"
+          timeout: "10s"
