@@ -262,14 +262,14 @@ CREATE POLICY "users_can_view_own_profile"
 ON public.users
 FOR SELECT
 TO authenticated
-USING (id = auth.uid());
+USING (id = (select auth.uid()));
 
 CREATE POLICY "users_can_update_own_profile"
 ON public.users
 FOR UPDATE
 TO authenticated
-USING (id = auth.uid())
-WITH CHECK (id = auth.uid());
+USING (id = (select auth.uid()))
+WITH CHECK (id = (select auth.uid()));
 
 -- Policy "admins_can_view_tenant_users" ajoutée après user_tenant_roles
 
@@ -345,7 +345,7 @@ CREATE OR REPLACE FUNCTION get_current_user_tenant_ids()
 RETURNS uuid[] AS $$
     SELECT ARRAY_AGG(tenant_id)
     FROM public.user_tenant_roles
-    WHERE user_id = auth.uid()
+    WHERE user_id = (select auth.uid())
     AND is_active = true
     AND (valid_until IS NULL OR valid_until > now());
 $$ LANGUAGE sql SECURITY DEFINER
@@ -358,7 +358,7 @@ CREATE POLICY "users_can_view_own_roles"
 ON public.user_tenant_roles
 FOR SELECT
 TO authenticated
-USING (user_id = auth.uid());
+USING (user_id = (select auth.uid()));
 
 CREATE POLICY "admins_can_view_tenant_roles"
 ON public.user_tenant_roles
@@ -368,7 +368,7 @@ USING (
     tenant_id IN (
         SELECT tenant_id
         FROM public.user_tenant_roles
-        WHERE user_id = auth.uid()
+        WHERE user_id = (select auth.uid())
         AND role IN ('owner', 'admin')
         AND is_active = true
     )
@@ -382,7 +382,7 @@ USING (
     tenant_id IN (
         SELECT tenant_id
         FROM public.user_tenant_roles
-        WHERE user_id = auth.uid()
+        WHERE user_id = (select auth.uid())
         AND role = 'owner'
         AND is_active = true
     )
@@ -391,7 +391,7 @@ WITH CHECK (
     tenant_id IN (
         SELECT tenant_id
         FROM public.user_tenant_roles
-        WHERE user_id = auth.uid()
+        WHERE user_id = (select auth.uid())
         AND role = 'owner'
         AND is_active = true
     )
@@ -417,7 +417,7 @@ USING (
     id IN (
         SELECT tenant_id
         FROM public.user_tenant_roles
-        WHERE user_id = auth.uid()
+        WHERE user_id = (select auth.uid())
         AND role = 'owner'
         AND is_active = true
     )
@@ -426,7 +426,7 @@ WITH CHECK (
     id IN (
         SELECT tenant_id
         FROM public.user_tenant_roles
-        WHERE user_id = auth.uid()
+        WHERE user_id = (select auth.uid())
         AND role = 'owner'
         AND is_active = true
     )
@@ -444,7 +444,7 @@ USING (
         WHERE utr.tenant_id IN (
             SELECT tenant_id
             FROM public.user_tenant_roles
-            WHERE user_id = auth.uid()
+            WHERE user_id = (select auth.uid())
             AND role IN ('owner', 'admin')
             AND is_active = true
         )
@@ -514,7 +514,7 @@ USING (
     tenant_id IN (
         SELECT tenant_id
         FROM public.user_tenant_roles
-        WHERE user_id = auth.uid()
+        WHERE user_id = (select auth.uid())
         AND role = 'owner'
         AND is_active = true
     )
@@ -523,7 +523,7 @@ WITH CHECK (
     tenant_id IN (
         SELECT tenant_id
         FROM public.user_tenant_roles
-        WHERE user_id = auth.uid()
+        WHERE user_id = (select auth.uid())
         AND role = 'owner'
         AND is_active = true
     )
@@ -627,7 +627,7 @@ USING (
     tenant_id IN (
         SELECT tenant_id
         FROM public.user_tenant_roles
-        WHERE user_id = auth.uid()
+        WHERE user_id = (select auth.uid())
         AND role = 'owner'
         AND is_active = true
     )
@@ -636,7 +636,7 @@ WITH CHECK (
     tenant_id IN (
         SELECT tenant_id
         FROM public.user_tenant_roles
-        WHERE user_id = auth.uid()
+        WHERE user_id = (select auth.uid())
         AND role = 'owner'
         AND is_active = true
     )
@@ -724,7 +724,7 @@ USING (
     tenant_id IN (
         SELECT tenant_id
         FROM public.user_tenant_roles
-        WHERE user_id = auth.uid()
+        WHERE user_id = (select auth.uid())
         AND role IN ('owner', 'admin')
         AND is_active = true
     )
@@ -770,7 +770,7 @@ CREATE POLICY "users_can_view_own_revoked_tokens"
 ON public.revoked_tokens
 FOR SELECT
 TO authenticated
-USING (user_id = auth.uid());
+USING (user_id = (select auth.uid()));
 
 -- =====================================================
 -- FIN MIGRATION 001
