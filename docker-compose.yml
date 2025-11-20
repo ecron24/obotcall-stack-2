@@ -32,13 +32,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.obotcall-tech.rule=Host(`app.obotcall.tech`)"
-      - "traefik.http.routers.obotcall-tech.entrypoints=websecure"
-      - "traefik.http.routers.obotcall-tech.tls.certresolver=letsencrypt"
-      - "traefik.http.services.obotcall-tech.loadbalancer.server.port=3000"
-      - "traefik.docker.network=docker_oppsys-network"
 
   # ===================================
   # 🔧 Inter (Interventions)
@@ -68,13 +61,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.obotcall-inter.rule=Host(`inter.app.obotcall.tech`)"
-      - "traefik.http.routers.obotcall-inter.entrypoints=websecure"
-      - "traefik.http.routers.obotcall-inter.tls.certresolver=letsencrypt"
-      - "traefik.http.services.obotcall-inter.loadbalancer.server.port=3001"
-      - "traefik.docker.network=docker_oppsys-network"
 
   # API Inter
   inter-api:
@@ -127,13 +113,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.obotcall-immo.rule=Host(`immo.app.obotcall.tech`)"
-      - "traefik.http.routers.obotcall-immo.entrypoints=websecure"
-      - "traefik.http.routers.obotcall-immo.tls.certresolver=letsencrypt"
-      - "traefik.http.services.obotcall-immo.loadbalancer.server.port=3002"
-      - "traefik.docker.network=docker_oppsys-network"
     profiles:
       - immo
       - all
@@ -193,13 +172,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.obotcall-agent.rule=Host(`agent.app.obotcall.tech`)"
-      - "traefik.http.routers.obotcall-agent.entrypoints=websecure"
-      - "traefik.http.routers.obotcall-agent.tls.certresolver=letsencrypt"
-      - "traefik.http.services.obotcall-agent.loadbalancer.server.port=3003"
-      - "traefik.docker.network=docker_oppsys-network"
     profiles:
       - agent
       - all
