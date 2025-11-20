@@ -711,7 +711,8 @@ BEGIN
     );
     RETURN COALESCE(NEW, OLD);
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public, pg_temp;
 
 -- RLS
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
