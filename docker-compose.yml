@@ -2,28 +2,30 @@ version: '3.8'
 
 services:
   # ===================================
-  # 🏠 Web (Hub principal)
+  # 🌐 Tech (Site vitrine)
   # ===================================
-  web:
+  tech:
     build:
-      context: ./apps/web
+      context: ./apps/tech
       dockerfile: Dockerfile
-    container_name: obotcall-web
+    container_name: obotcall-tech
     restart: unless-stopped
     environment:
       - NODE_ENV=production
+      - PORT=3000
       - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
       - JWT_SECRET=${JWT_SECRET}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - NEXTAUTH_URL=https://app.obotcall.tech
+      - STRIPE_PUBLIC_KEY=${STRIPE_PUBLIC_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
     env_file:
       - .env
     networks:
       - obotcall-network
-    depends_on:
-      - web-api
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
       interval: 30s
@@ -32,36 +34,11 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.obotcall-web.rule=Host(`app.obotcall.tech`)"
-      - "traefik.http.routers.obotcall-web.entrypoints=websecure"
-      - "traefik.http.routers.obotcall-web.tls.certresolver=letsencrypt"
-      - "traefik.http.services.obotcall-web.loadbalancer.server.port=3000"
+      - "traefik.http.routers.obotcall-tech.rule=Host(`app.obotcall.tech`)"
+      - "traefik.http.routers.obotcall-tech.entrypoints=websecure"
+      - "traefik.http.routers.obotcall-tech.tls.certresolver=letsencrypt"
+      - "traefik.http.services.obotcall-tech.loadbalancer.server.port=3000"
       - "traefik.docker.network=docker_oppsys-network"
-
-  # API Web (Backend Hub)
-  web-api:
-    build:
-      context: ./apps/web/api
-      dockerfile: Dockerfile
-    container_name: obotcall-web-api
-    restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-      - PORT=3010
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-      - JWT_SECRET=${JWT_SECRET}
-    env_file:
-      - .env
-    networks:
-      - obotcall-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3010/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    profiles:
-      - all
 
   # ===================================
   # 🔧 Inter (Interventions)
@@ -145,6 +122,11 @@ services:
       - obotcall-network
     depends_on:
       - immo-api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.obotcall-immo.rule=Host(`immo.app.obotcall.tech`)"
@@ -169,10 +151,16 @@ services:
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
       - JWT_SECRET=${JWT_SECRET}
+      - CORS_ORIGIN=http://localhost:3002,https://immo.app.obotcall.tech
     env_file:
       - .env
     networks:
       - obotcall-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3012/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     profiles:
       - immo
       - all
@@ -200,6 +188,11 @@ services:
       - obotcall-network
     depends_on:
       - agent-api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.obotcall-agent.rule=Host(`agent.app.obotcall.tech`)"
@@ -224,67 +217,18 @@ services:
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
       - JWT_SECRET=${JWT_SECRET}
+      - CORS_ORIGIN=http://localhost:3003,https://agent.app.obotcall.tech
     env_file:
       - .env
     networks:
       - obotcall-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3013/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     profiles:
       - agent
-      - all
-
-  # ===================================
-  # 📋 Assist (Assistant)
-  # ===================================
-  assist:
-    build:
-      context: ./apps/assist
-      dockerfile: Dockerfile
-    container_name: obotcall-assist
-    restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-      - PORT=3004
-      - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-      - NEXT_PUBLIC_API_URL=http://assist-api:3014
-      - JWT_SECRET=${JWT_SECRET}
-    env_file:
-      - .env
-    networks:
-      - obotcall-network
-    depends_on:
-      - assist-api
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.obotcall-assist.rule=Host(`assist.app.obotcall.tech`)"
-      - "traefik.http.routers.obotcall-assist.entrypoints=websecure"
-      - "traefik.http.routers.obotcall-assist.tls.certresolver=letsencrypt"
-      - "traefik.http.services.obotcall-assist.loadbalancer.server.port=3004"
-      - "traefik.docker.network=docker_oppsys-network"
-    profiles:
-      - assist
-      - all
-
-  # API Assist
-  assist-api:
-    build:
-      context: ./apps/assist/api
-      dockerfile: Dockerfile
-    container_name: obotcall-assist-api
-    restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-      - PORT=3014
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-      - JWT_SECRET=${JWT_SECRET}
-    env_file:
-      - .env
-    networks:
-      - obotcall-network
-    profiles:
-      - assist
       - all
 
 networks:
@@ -293,8 +237,7 @@ networks:
     name: docker_oppsys-network
 
 volumes:
-  web_data:
+  tech_data:
   inter_data:
   immo_data:
   agent_data:
-  assist_data:
