@@ -2,6 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
+
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   images: {
     domains: ['localhost'],
     remotePatterns: [

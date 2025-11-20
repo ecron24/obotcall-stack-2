@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   description: 'Plateforme SaaS multi-tenant pour la gestion d\'interventions',
 }
 
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default function RootLayout({
   children,
 }: {
