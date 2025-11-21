@@ -5,12 +5,9 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Agent CRM - Courtage en Assurance',
-  description: 'Application de gestion pour courtiers en assurance',
+  title: 'Immo-App - Gestion Immobilière',
+  description: 'Application de gestion immobilière SaaS',
 }
-// Force dynamic rendering to prevent static generation issues
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
 
 // Force dynamic rendering to prevent static generation issues
 export const dynamic = 'force-dynamic'
