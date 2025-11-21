@@ -100,7 +100,7 @@ export default function NewTemplatePage() {
             <CardHeader>
               <CardTitle>Contenu du template</CardTitle>
               <CardDescription>
-                Utilisez {{`{field_name}`}} pour les champs dynamiques
+                Utilisez {'{field_name}'} pour les champs dynamiques
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -110,7 +110,7 @@ export default function NewTemplatePage() {
                   id="content"
                   name="content"
                   rows={15}
-                  placeholder="CONTRAT DE LOCATION&#10;&#10;Entre les soussignés:&#10;{{landlord_name}}, propriétaire...&#10;&#10;Et {{tenant_name}}, locataire..."
+                  placeholder="CONTRAT DE LOCATION\n\nEntre les soussignés:\n{landlord_name}, propriétaire...\n\nEt {tenant_name}, locataire..."
                   required
                 />
               </div>

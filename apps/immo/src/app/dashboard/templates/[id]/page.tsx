@@ -176,7 +176,7 @@ export default async function TemplateDetailPage({
             <CardHeader>
               <CardTitle>Contenu du template</CardTitle>
               <CardDescription>
-                Utilisez {{`{field_name}`}} pour les champs dynamiques
+                Utilisez {'{field_name}'} pour les champs dynamiques
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
