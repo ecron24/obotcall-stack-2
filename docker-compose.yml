@@ -40,6 +40,10 @@ services:
     build:
       context: ./apps/inter
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
+        - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_INTER_API_URL}
     container_name: obotcall-inter
     restart: unless-stopped
     environment:
@@ -48,7 +52,7 @@ services:
       - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-      - NEXT_PUBLIC_API_URL=http://inter-api:3011
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_INTER_API_URL}
       - JWT_SECRET=${JWT_SECRET}
     env_file:
       - .env
@@ -75,6 +79,7 @@ services:
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
       - JWT_SECRET=${JWT_SECRET}
+      - CORS_ORIGIN=http://localhost:3001,https://inter-app.app.obotcall.tech
     env_file:
       - .env
     networks:
@@ -92,6 +97,10 @@ services:
     build:
       context: ./apps/immo
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
+        - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_IMMO_API_URL}
     container_name: obotcall-immo
     restart: unless-stopped
     environment:
@@ -100,7 +109,7 @@ services:
       - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-      - NEXT_PUBLIC_API_URL=http://immo-api:3012
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_IMMO_API_URL}
       - JWT_SECRET=${JWT_SECRET}
     env_file:
       - .env
@@ -151,6 +160,10 @@ services:
     build:
       context: ./apps/agent
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
+        - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_AGENT_API_URL}
     container_name: obotcall-agent
     restart: unless-stopped
     environment:
@@ -159,7 +172,7 @@ services:
       - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-      - NEXT_PUBLIC_API_URL=http://agent-api:3013
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_AGENT_API_URL}
       - JWT_SECRET=${JWT_SECRET}
     env_file:
       - .env
@@ -205,8 +218,8 @@ services:
 
 networks:
   obotcall-network:
-    external: true
     name: docker_oppsys-network
+    driver: bridge
 
 volumes:
   tech_data:
