@@ -54,6 +54,11 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // Allow health check endpoint without authentication
+  if (request.nextUrl.pathname === '/api/health') {
+    return response
+  }
+
   const {
     data: { session },
   } = await supabase.auth.getSession()
