@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # ===================================
   # 🌐 Tech (Site vitrine)
@@ -218,8 +216,8 @@ services:
 
 networks:
   obotcall-network:
+    external: true
     name: docker_oppsys-network
-    driver: bridge
 
 volumes:
   tech_data:
