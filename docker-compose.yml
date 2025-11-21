@@ -48,7 +48,7 @@ services:
       - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-      - NEXT_PUBLIC_API_URL=http://inter-api:3011
+      - NEXT_PUBLIC_API_URL=https://api.inter.app.obotcall.tech
       - JWT_SECRET=${JWT_SECRET}
     env_file:
       - .env
@@ -100,7 +100,7 @@ services:
       - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-      - NEXT_PUBLIC_API_URL=http://immo-api:3012
+      - NEXT_PUBLIC_API_URL=https://api.immo.app.obotcall.tech
       - JWT_SECRET=${JWT_SECRET}
     env_file:
       - .env
@@ -159,7 +159,7 @@ services:
       - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-      - NEXT_PUBLIC_API_URL=http://agent-api:3013
+      - NEXT_PUBLIC_API_URL=https://api.agent.app.obotcall.tech
       - JWT_SECRET=${JWT_SECRET}
     env_file:
       - .env
