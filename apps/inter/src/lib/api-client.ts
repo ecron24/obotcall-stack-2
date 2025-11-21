@@ -1,4 +1,5 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+// API Client uses same domain - requests go through Next.js API routes which proxy to Hono backend
+const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
 // Type definitions for API responses
 interface LoginResponse {
