@@ -160,6 +160,22 @@ http:
         replacement: "https://oppsys.io${1}"
         permanent: true
 
+    # ✅ NOUVEAU : CORS pour les APIs OBOTCALL (inter, immo, agent)
+    obotcall-api-cors:
+      headers:
+        accessControlAllowOriginList:
+          - "https://inter.app.obotcall.tech"
+          - "https://immo.app.obotcall.tech"
+          - "https://agent.app.obotcall.tech"
+          - "http://localhost:3001"
+          - "http://localhost:3002"
+          - "http://localhost:3003"
+        accessControlAllowMethods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        accessControlAllowHeaders: "Content-Type,Authorization,X-Requested-With,Accept,Origin"
+        accessControlAllowCredentials: true
+        accessControlMaxAge: "3600"
+        addVaryHeader: true
+
   routers:
     # ===== REDIRECTION GLOBALE HTTP → HTTPS =====
     web-router:
@@ -327,6 +343,46 @@ http:
         certResolver: letsencrypt
       priority: 100
 
+    # ========================================
+    # ✅ OBOTCALL BACKEND APIs
+    # ========================================
+
+    # ✅ NOUVEAU : Inter API - api.inter.app.obotcall.tech
+    obotcall-inter-api:
+      rule: "Host(`api.inter.app.obotcall.tech`)"
+      service: obotcall-inter-api
+      middlewares:
+        - obotcall-api-cors
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      priority: 150
+
+    # ✅ NOUVEAU : Immo API - api.immo.app.obotcall.tech
+    obotcall-immo-api:
+      rule: "Host(`api.immo.app.obotcall.tech`)"
+      service: obotcall-immo-api
+      middlewares:
+        - obotcall-api-cors
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      priority: 150
+
+    # ✅ NOUVEAU : Agent API - api.agent.app.obotcall.tech
+    obotcall-agent-api:
+      rule: "Host(`api.agent.app.obotcall.tech`)"
+      service: obotcall-agent-api
+      middlewares:
+        - obotcall-api-cors
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+      priority: 150
+
   services:
     # ===== BACKEND API =====
     admin-api:
@@ -420,5 +476,42 @@ http:
         passHostHeader: true
         healthCheck:
           path: "/api/health"
+          interval: "30s"
+          timeout: "10s"
+
+    # ========================================
+    # ✅ OBOTCALL BACKEND APIs - 3 SERVICES
+    # ========================================
+
+    # ✅ NOUVEAU : Inter API
+    obotcall-inter-api:
+      loadBalancer:
+        servers:
+          - url: "http://obotcall-inter-api:3011"
+        passHostHeader: true
+        healthCheck:
+          path: "/health"
+          interval: "30s"
+          timeout: "10s"
+
+    # ✅ NOUVEAU : Immo API
+    obotcall-immo-api:
+      loadBalancer:
+        servers:
+          - url: "http://obotcall-immo-api:3012"
+        passHostHeader: true
+        healthCheck:
+          path: "/health"
+          interval: "30s"
+          timeout: "10s"
+
+    # ✅ NOUVEAU : Agent API
+    obotcall-agent-api:
+      loadBalancer:
+        servers:
+          - url: "http://obotcall-agent-api:3013"
+        passHostHeader: true
+        healthCheck:
+          path: "/health"
           interval: "30s"
           timeout: "10s"
