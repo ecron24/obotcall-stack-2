@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   description: 'Application de gestion pour courtiers en assurance',
 }
 
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default function RootLayout({
   children,
 }: {
