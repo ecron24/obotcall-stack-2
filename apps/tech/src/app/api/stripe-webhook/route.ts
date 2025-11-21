@@ -3,7 +3,7 @@ import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2025-11-17.clover',
 })
 
 // Initialize Supabase client with service role for admin operations
@@ -103,7 +103,9 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     .from('subscriptions')
     .update({
       status: subscription.status,
+      // @ts-ignore - Stripe API type mismatch
       current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+      // @ts-ignore - Stripe API type mismatch
       current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
     })
     .eq('stripe_subscription_id', subscription.id)

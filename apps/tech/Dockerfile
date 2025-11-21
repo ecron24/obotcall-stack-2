@@ -22,6 +22,12 @@ COPY . .
 
 # Build de l'application Next.js
 ENV NEXT_TELEMETRY_DISABLED 1
+# ✅ AJOUTÉ : Variables d'environnement dummy pour le build
+ENV STRIPE_SECRET_KEY=sk_test_dummy_key_for_build_only
+ENV NEXT_PUBLIC_SUPABASE_URL=https://dummy.supabase.co
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy_anon_key_for_build_only
+ENV SUPABASE_SERVICE_ROLE_KEY=dummy_service_role_key_for_build_only
+
 RUN npm run build
 
 # Stage 3: Runner
