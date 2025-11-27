@@ -23,10 +23,15 @@ COPY . .
 # Build de l'application Next.js
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Variables d'environnement dummy pour le build
-ENV NEXT_PUBLIC_SUPABASE_URL=https://dummy.supabase.co
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy_anon_key_for_build_only
-ENV NEXT_PUBLIC_API_URL=http://agent-api:3013
+# ✅ CORRIGÉ : Accepter les build args depuis docker-compose
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_API_URL
+
+# Définir les variables d'environnement pour le build
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 RUN npm run build
 
@@ -36,6 +41,9 @@ WORKDIR /app
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
+
+# Installer curl pour les health checks
+RUN apk add --no-cache curl
 
 # Créer un utilisateur non-root
 RUN addgroup --system --gid 1001 nodejs

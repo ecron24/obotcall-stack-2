@@ -28,6 +28,9 @@ WORKDIR /app
 
 ENV NODE_ENV production
 
+# Installer curl pour les health checks
+RUN apk add --no-cache curl
+
 # Créer un utilisateur non-root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 hono
