@@ -52,9 +52,10 @@ auth.post('/register', async (c) => {
       .insert({
         slug: validated.tenant_slug,
         name: validated.tenant_name,
-        subscription_plan: SubscriptionPlan.FREE,
-        subscription_status: 'trial',
-        trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString() // 14 days trial
+        app_type: 'inter',
+        country_code: 'FR',
+        is_active: true,
+        created_by: authData.user.id
       })
       .select()
       .single()
@@ -69,17 +70,13 @@ auth.post('/register', async (c) => {
       }, 500)
     }
 
-    // Create user record
+    // Create user record in public.users
     const { data: user, error: userError } = await supabaseAdmin
       .from('users')
       .insert({
         id: authData.user.id,
-        tenant_id: tenant.id,
         email: validated.email,
-        full_name: validated.full_name,
-        role: UserRole.OWNER,
-        is_active: true,
-        email_verified: true
+        full_name: validated.full_name
       })
       .select()
       .single()
@@ -95,6 +92,28 @@ auth.post('/register', async (c) => {
       }, 500)
     }
 
+    // Link user to tenant with owner role
+    const { error: roleError } = await supabaseAdmin
+      .from('user_tenant_roles')
+      .insert({
+        user_id: user.id,
+        tenant_id: tenant.id,
+        role: 'owner',
+        created_by: user.id
+      })
+
+    if (roleError) {
+      // Rollback: delete user, tenant and auth user
+      await supabaseAdmin.from('users').delete().eq('id', user.id)
+      await supabaseAdmin.from('tenants').delete().eq('id', tenant.id)
+      await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
+      console.error('Role assignment error:', roleError)
+      return c.json({
+        error: 'Registration Failed',
+        message: 'Impossible d\'assigner le rôle'
+      }, 500)
+    }
+
     // Generate access token
     const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'magiclink',
@@ -107,13 +126,13 @@ auth.post('/register', async (c) => {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
-        role: user.role
+        role: 'owner'
       },
       tenant: {
         id: tenant.id,
         slug: tenant.slug,
         name: tenant.name,
-        subscription_plan: tenant.subscription_plan
+        app_type: tenant.app_type
       }
     }, 201)
   } catch (error: any) {
@@ -157,7 +176,7 @@ auth.post('/login', async (c) => {
     // Get user details
     const { data: user, error: userError } = await supabaseAdmin
       .from('users')
-      .select('*, tenants(*)')
+      .select('*')
       .eq('id', data.user.id)
       .single()
 
@@ -165,6 +184,21 @@ auth.post('/login', async (c) => {
       return c.json({
         error: 'Authentication Failed',
         message: 'Utilisateur non trouvé'
+      }, 401)
+    }
+
+    // Get user's tenant and role
+    const { data: userTenantRole, error: roleError } = await supabaseAdmin
+      .from('user_tenant_roles')
+      .select('*, tenants(*)')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .single()
+
+    if (roleError || !userTenantRole) {
+      return c.json({
+        error: 'Authentication Failed',
+        message: 'Aucun tenant actif trouvé pour cet utilisateur'
       }, 401)
     }
 
@@ -177,10 +211,10 @@ auth.post('/login', async (c) => {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
-        role: user.role,
-        tenant_id: user.tenant_id
+        role: userTenantRole.role,
+        tenant_id: userTenantRole.tenant_id
       },
-      tenant: user.tenants
+      tenant: userTenantRole.tenants
     })
   } catch (error: any) {
     console.error('Login error:', error)
