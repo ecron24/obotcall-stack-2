@@ -50,12 +50,7 @@ services:
       - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-<<<<<<< HEAD
-      - NEXT_PUBLIC_API_URL=
-      - INTER_API_URL=http://inter-api:3011
-=======
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_INTER_API_URL}
->>>>>>> claude/analyze-builder-connections-01HYTmyPb35hpUGLMdWaPqX3
       - JWT_SECRET=${JWT_SECRET}
     env_file:
       - .env
@@ -112,12 +107,7 @@ services:
       - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-<<<<<<< HEAD
-      - NEXT_PUBLIC_API_URL=
-      - IMMO_API_URL=http://immo-api:3012
-=======
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_IMMO_API_URL}
->>>>>>> claude/analyze-builder-connections-01HYTmyPb35hpUGLMdWaPqX3
       - JWT_SECRET=${JWT_SECRET}
     env_file:
       - .env
@@ -180,12 +170,7 @@ services:
       - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-<<<<<<< HEAD
-      - NEXT_PUBLIC_API_URL=
-      - AGENT_API_URL=http://agent-api:3013
-=======
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_AGENT_API_URL}
->>>>>>> claude/analyze-builder-connections-01HYTmyPb35hpUGLMdWaPqX3
       - JWT_SECRET=${JWT_SECRET}
     env_file:
       - .env
