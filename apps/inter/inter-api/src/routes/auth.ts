@@ -46,31 +46,7 @@ auth.post('/register', async (c) => {
       }, 400)
     }
 
-    // Create tenant
-    const { data: tenant, error: tenantError } = await supabaseAdmin
-      .from('tenants')
-      .insert({
-        slug: validated.tenant_slug,
-        name: validated.tenant_name,
-        app_type: 'inter_app',
-        country_code: 'FR',
-        is_active: true,
-        created_by: authData.user.id
-      })
-      .select()
-      .single()
-
-    if (tenantError || !tenant) {
-      // Rollback: delete auth user
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
-      console.error('Tenant creation error:', tenantError)
-      return c.json({
-        error: 'Registration Failed',
-        message: 'Impossible de créer l\'organisation'
-      }, 500)
-    }
-
-    // Create user record in public.users
+    // Create user record in public.users FIRST (before tenant)
     const { data: user, error: userError } = await supabaseAdmin
       .from('users')
       .insert({
@@ -82,13 +58,37 @@ auth.post('/register', async (c) => {
       .single()
 
     if (userError || !user) {
-      // Rollback: delete tenant and auth user
-      await supabaseAdmin.from('tenants').delete().eq('id', tenant.id)
+      // Rollback: delete auth user
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
       console.error('User creation error:', userError)
       return c.json({
         error: 'Registration Failed',
         message: 'Impossible de créer l\'utilisateur'
+      }, 500)
+    }
+
+    // Create tenant AFTER user exists
+    const { data: tenant, error: tenantError } = await supabaseAdmin
+      .from('tenants')
+      .insert({
+        slug: validated.tenant_slug,
+        name: validated.tenant_name,
+        app_type: 'inter_app',
+        country_code: 'FR',
+        is_active: true,
+        created_by: user.id
+      })
+      .select()
+      .single()
+
+    if (tenantError || !tenant) {
+      // Rollback: delete user and auth user
+      await supabaseAdmin.from('users').delete().eq('id', user.id)
+      await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
+      console.error('Tenant creation error:', tenantError)
+      return c.json({
+        error: 'Registration Failed',
+        message: 'Impossible de créer l\'organisation'
       }, 500)
     }
 
@@ -114,19 +114,28 @@ auth.post('/register', async (c) => {
       }, 500)
     }
 
-    // Generate access token
+    // Generate session tokens for immediate login
     const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'magiclink',
       email: validated.email
     })
 
+    if (sessionError || !sessionData) {
+      console.error('Session generation error:', sessionError)
+      // Don't fail registration, user can still login manually
+    }
+
     return c.json({
       message: 'Inscription réussie',
+      access_token: sessionData?.properties?.access_token,
+      refresh_token: sessionData?.properties?.refresh_token,
+      expires_at: sessionData?.properties?.expires_at,
       user: {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
-        role: 'owner'
+        role: 'owner',
+        tenant_id: tenant.id
       },
       tenant: {
         id: tenant.id,
