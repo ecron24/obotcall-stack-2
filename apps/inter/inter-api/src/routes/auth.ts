@@ -114,22 +114,38 @@ auth.post('/register', async (c) => {
       }, 500)
     }
 
-    // Generate session tokens for immediate login
-    const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'magiclink',
-      email: validated.email
+    // Sign in the user to get session tokens
+    const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
+      email: validated.email,
+      password: validated.password
     })
 
-    if (sessionError || !sessionData) {
-      console.error('Session generation error:', sessionError)
-      // Don't fail registration, user can still login manually
+    if (signInError || !signInData.session) {
+      console.error('Auto sign-in error:', signInError)
+      // Registration succeeded but auto sign-in failed, user can login manually
+      return c.json({
+        message: 'Inscription réussie. Veuillez vous connecter.',
+        user: {
+          id: user.id,
+          email: user.email,
+          full_name: user.full_name,
+          role: 'owner',
+          tenant_id: tenant.id
+        },
+        tenant: {
+          id: tenant.id,
+          slug: tenant.slug,
+          name: tenant.name,
+          app_type: tenant.app_type
+        }
+      }, 201)
     }
 
     return c.json({
       message: 'Inscription réussie',
-      access_token: sessionData?.properties?.access_token,
-      refresh_token: sessionData?.properties?.refresh_token,
-      expires_at: sessionData?.properties?.expires_at,
+      access_token: signInData.session.access_token,
+      refresh_token: signInData.session.refresh_token,
+      expires_at: signInData.session.expires_at,
       user: {
         id: user.id,
         email: user.email,
