@@ -52,7 +52,7 @@ auth.post('/register', async (c) => {
       .insert({
         slug: validated.tenant_slug,
         name: validated.tenant_name,
-        app_type: 'inter',
+        app_type: 'inter_app',
         country_code: 'FR',
         is_active: true,
         created_by: authData.user.id
