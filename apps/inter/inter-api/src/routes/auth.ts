@@ -95,6 +95,7 @@ auth.post('/register', async (c) => {
       slug: validated.tenant_slug,
       name: validated.tenant_name,
       app_type: 'inter_app',
+      country_code: 'FR',
       created_by: user.id
     })
 
@@ -104,9 +105,9 @@ auth.post('/register', async (c) => {
         slug: validated.tenant_slug,
         name: validated.tenant_name,
         app_type: 'inter_app',
+        country_code: 'FR',
         is_active: true,
         created_by: user.id
-        // Removed country_code temporarily to avoid FK constraint
       })
       .select()
       .single()
