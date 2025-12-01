@@ -47,6 +47,12 @@ auth.post('/register', async (c) => {
     }
 
     // Create user record in public.users FIRST (before tenant)
+    console.log('Creating user in public.users:', {
+      id: authData.user.id,
+      email: validated.email,
+      full_name: validated.full_name
+    })
+
     const { data: user, error: userError } = await supabaseAdmin
       .from('users')
       .insert({
@@ -57,26 +63,50 @@ auth.post('/register', async (c) => {
       .select()
       .single()
 
+    console.log('User creation result:', {
+      user,
+      userError,
+      hasUser: !!user,
+      hasError: !!userError
+    })
+
     if (userError || !user) {
       // Rollback: delete auth user
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
       console.error('User creation error:', userError)
       return c.json({
         error: 'Registration Failed',
-        message: 'Impossible de créer l\'utilisateur'
+        message: 'Impossible de créer l\'utilisateur',
+        details: userError?.message || 'Unknown error'
       }, 500)
     }
 
+    // Verify user was created
+    const { data: verifyUser, error: verifyError } = await supabaseAdmin
+      .from('users')
+      .select('id')
+      .eq('id', user.id)
+      .single()
+
+    console.log('User verification:', { verifyUser, verifyError })
+
     // Create tenant AFTER user exists
+    console.log('Creating tenant:', {
+      slug: validated.tenant_slug,
+      name: validated.tenant_name,
+      app_type: 'inter_app',
+      created_by: user.id
+    })
+
     const { data: tenant, error: tenantError } = await supabaseAdmin
       .from('tenants')
       .insert({
         slug: validated.tenant_slug,
         name: validated.tenant_name,
         app_type: 'inter_app',
-        country_code: 'FR',
         is_active: true,
         created_by: user.id
+        // Removed country_code temporarily to avoid FK constraint
       })
       .select()
       .single()
