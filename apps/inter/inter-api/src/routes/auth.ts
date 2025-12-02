@@ -57,8 +57,7 @@ auth.post('/register', async (c) => {
         subscription_plan: SubscriptionPlan.FREE,
         subscription_status: 'trial',
         trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days trial
-        current_users_count: 1,
-        current_interventions_count: 0
+        current_users_count: 1
       })
       .select()
       .single()
