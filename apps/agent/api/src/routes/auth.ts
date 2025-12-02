@@ -53,11 +53,7 @@ auth.post('/register', async (c) => {
         slug: validated.tenant_slug,
         name: validated.tenant_name,
         app_type: 'agent_app',
-        country_code: 'FR', // Default to France
-        subscription_plan: SubscriptionPlan.FREE,
-        subscription_status: 'trial',
-        trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days trial
-        current_users_count: 1
+        country_code: 'FR' // Default to France
       })
       .select()
       .single()
@@ -137,8 +133,7 @@ auth.post('/register', async (c) => {
       tenant: {
         id: tenant.id,
         slug: tenant.slug,
-        name: tenant.name,
-        subscription_plan: tenant.subscription_plan
+        name: tenant.name
       }
     }, 201)
   } catch (error: any) {
