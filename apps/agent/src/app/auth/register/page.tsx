@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { apiClient } from '@/lib/api-client'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -25,29 +26,19 @@ export default function RegisterPage() {
     const tenant_slug = formData.get('tenant_slug') as string
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-          full_name,
-          tenant_name,
-          tenant_slug,
-        }),
+      const response = await apiClient.register({
+        email,
+        password,
+        full_name,
+        tenant_name,
+        tenant_slug,
       })
 
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.message || 'Erreur lors de l\'inscription')
-      }
-
-      const data = await response.json()
-
       // Store token
-      localStorage.setItem('access_token', data.access_token)
-      localStorage.setItem('user', JSON.stringify(data.user))
-      localStorage.setItem('tenant', JSON.stringify(data.tenant))
+      apiClient.setToken(response.access_token)
+      localStorage.setItem('access_token', response.access_token)
+      localStorage.setItem('user', JSON.stringify(response.user))
+      localStorage.setItem('tenant', JSON.stringify(response.tenant))
 
       router.push('/dashboard')
     } catch (err: any) {
