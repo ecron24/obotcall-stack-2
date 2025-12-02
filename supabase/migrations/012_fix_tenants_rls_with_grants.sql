@@ -81,7 +81,7 @@ USING (
 DO $$
 BEGIN
     RAISE NOTICE 'RLS enabled on tenants: %', (
-        SELECT row_security::text
+        SELECT rowsecurity::text
         FROM pg_tables
         WHERE schemaname = 'public' AND tablename = 'tenants'
     );
