@@ -53,6 +53,7 @@ auth.post('/register', async (c) => {
         slug: validated.tenant_slug,
         name: validated.tenant_name,
         app_type: 'immo_app',
+        country_code: 'FR', // Default to France
         subscription_plan: SubscriptionPlan.FREE,
         subscription_status: 'trial',
         trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days trial
