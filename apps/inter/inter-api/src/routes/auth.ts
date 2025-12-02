@@ -169,11 +169,15 @@ auth.post('/login', async (c) => {
     })
 
     if (error || !data.user) {
+      console.error('Auth sign in error:', error)
       return c.json({
         error: 'Authentication Failed',
-        message: 'Email ou mot de passe incorrect'
+        message: 'Email ou mot de passe incorrect',
+        details: error?.message
       }, 401)
     }
+
+    console.log('Auth successful, user ID:', data.user.id)
 
     // Get user details
     const { data: user, error: userError } = await supabaseAdmin
@@ -183,9 +187,13 @@ auth.post('/login', async (c) => {
       .single()
 
     if (userError || !user) {
+      console.error('User lookup error:', userError)
+      console.log('Looking for user ID:', data.user.id)
       return c.json({
         error: 'Authentication Failed',
-        message: 'Utilisateur non trouvé'
+        message: 'Utilisateur non trouvé dans la base de données',
+        details: userError?.message,
+        userId: data.user.id
       }, 401)
     }
 
@@ -198,9 +206,13 @@ auth.post('/login', async (c) => {
       .single()
 
     if (roleError || !userRole) {
+      console.error('Role lookup error:', roleError)
+      console.log('Looking for active role for user ID:', data.user.id)
       return c.json({
         error: 'Authentication Failed',
-        message: 'Aucun rôle actif trouvé'
+        message: 'Aucun rôle actif trouvé pour cet utilisateur',
+        details: roleError?.message,
+        userId: data.user.id
       }, 401)
     }
 
