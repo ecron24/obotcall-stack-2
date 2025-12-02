@@ -8,7 +8,7 @@ export const registerSchema = z.object({
   tenant_slug: z.string()
     .min(3, 'Le slug doit contenir au moins 3 caractères')
     .max(50, 'Le slug ne peut pas dépasser 50 caractères')
-    .regex(/^[a-z0-9-]+$/, 'Le slug ne peut contenir que des lettres minuscules, chiffres et tirets'),
+    .regex(/^[a-z0-9\-]+$/, 'Le slug ne peut contenir que des lettres minuscules, chiffres et tirets'),
   tenant_name: z.string().min(2, 'Le nom de l\'organisation doit contenir au moins 2 caractères')
 })
 
