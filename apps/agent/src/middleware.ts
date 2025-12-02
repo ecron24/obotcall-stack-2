@@ -63,13 +63,13 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // Redirect to login if not authenticated
-  if (!session && !request.nextUrl.pathname.startsWith('/auth/login')) {
+  // Redirect to login if not authenticated (allow all /auth pages)
+  if (!session && !request.nextUrl.pathname.startsWith('/auth')) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
-  // Redirect to dashboard if authenticated and trying to access login
-  if (session && request.nextUrl.pathname.startsWith('/auth/login')) {
+  // Redirect to dashboard if authenticated and trying to access auth pages
+  if (session && request.nextUrl.pathname.startsWith('/auth')) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
