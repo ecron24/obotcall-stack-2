@@ -116,14 +116,36 @@ auth.post('/register', async (c) => {
       }, 500)
     }
 
-    // Generate access token
-    const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'magiclink',
-      email: validated.email
+    // Create session to get access token
+    const { data: session, error: sessionError } = await supabaseAdmin.auth.signInWithPassword({
+      email: validated.email,
+      password: validated.password
     })
+
+    if (sessionError || !session.session) {
+      console.error('Session creation error:', sessionError)
+      // Registration succeeded but no session - user will need to login manually
+      return c.json({
+        message: 'Inscription réussie',
+        user: {
+          id: user.id,
+          email: user.email,
+          full_name: user.full_name,
+          role: userRole.role
+        },
+        tenant: {
+          id: tenant.id,
+          slug: tenant.slug,
+          name: tenant.name
+        }
+      }, 201)
+    }
 
     return c.json({
       message: 'Inscription réussie',
+      access_token: session.session.access_token,
+      refresh_token: session.session.refresh_token,
+      expires_at: session.session.expires_at,
       user: {
         id: user.id,
         email: user.email,
@@ -133,8 +155,7 @@ auth.post('/register', async (c) => {
       tenant: {
         id: tenant.id,
         slug: tenant.slug,
-        name: tenant.name,
-        subscription_plan: tenant.subscription_plan
+        name: tenant.name
       }
     }, 201)
   } catch (error: any) {
