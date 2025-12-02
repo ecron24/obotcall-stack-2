@@ -71,17 +71,13 @@ auth.post('/register', async (c) => {
       }, 500)
     }
 
-    // Create user record
+    // Create user record (without tenant_id and role - those are in user_tenant_roles)
     const { data: user, error: userError } = await supabaseAdmin
       .from('users')
       .insert({
         id: authData.user.id,
-        tenant_id: tenant.id,
         email: validated.email,
-        full_name: validated.full_name,
-        role: UserRole.OWNER,
-        is_active: true,
-        email_verified: true
+        full_name: validated.full_name
       })
       .select()
       .single()
@@ -93,7 +89,33 @@ auth.post('/register', async (c) => {
       console.error('User creation error:', userError)
       return c.json({
         error: 'Registration Failed',
-        message: 'Impossible de créer l\'utilisateur'
+        message: 'Impossible de créer l\'utilisateur',
+        details: userError?.message
+      }, 500)
+    }
+
+    // Create user-tenant role
+    const { data: userRole, error: roleError } = await supabaseAdmin
+      .from('user_tenant_roles')
+      .insert({
+        user_id: authData.user.id,
+        tenant_id: tenant.id,
+        role: UserRole.OWNER,
+        is_active: true
+      })
+      .select()
+      .single()
+
+    if (roleError || !userRole) {
+      // Rollback: delete user, tenant and auth user
+      await supabaseAdmin.from('users').delete().eq('id', authData.user.id)
+      await supabaseAdmin.from('tenants').delete().eq('id', tenant.id)
+      await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
+      console.error('Role creation error:', roleError)
+      return c.json({
+        error: 'Registration Failed',
+        message: 'Impossible de créer le rôle utilisateur',
+        details: roleError?.message
       }, 500)
     }
 
@@ -109,7 +131,7 @@ auth.post('/register', async (c) => {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
-        role: user.role
+        role: userRole.role
       },
       tenant: {
         id: tenant.id,
@@ -159,7 +181,7 @@ auth.post('/login', async (c) => {
     // Get user details
     const { data: user, error: userError } = await supabaseAdmin
       .from('users')
-      .select('*, tenants(*)')
+      .select('*')
       .eq('id', data.user.id)
       .single()
 
@@ -167,6 +189,21 @@ auth.post('/login', async (c) => {
       return c.json({
         error: 'Authentication Failed',
         message: 'Utilisateur non trouvé'
+      }, 401)
+    }
+
+    // Get user's tenant role
+    const { data: userRole, error: roleError } = await supabaseAdmin
+      .from('user_tenant_roles')
+      .select('*, tenants(*)')
+      .eq('user_id', data.user.id)
+      .eq('is_active', true)
+      .single()
+
+    if (roleError || !userRole) {
+      return c.json({
+        error: 'Authentication Failed',
+        message: 'Aucun rôle actif trouvé'
       }, 401)
     }
 
@@ -179,10 +216,10 @@ auth.post('/login', async (c) => {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
-        role: user.role,
-        tenant_id: user.tenant_id
+        role: userRole.role,
+        tenant_id: userRole.tenant_id
       },
-      tenant: user.tenants
+      tenant: userRole.tenants
     })
   } catch (error: any) {
     console.error('Login error:', error)
