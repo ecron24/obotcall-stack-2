@@ -46,75 +46,33 @@ auth.post('/register', async (c) => {
       }, 400)
     }
 
-    // Create tenant with app_type = 'immo_app'
-    const { data: tenant, error: tenantError } = await supabaseAdmin
-      .from('tenants')
-      .insert({
-        slug: validated.tenant_slug,
-        name: validated.tenant_name,
-        app_type: 'immo_app',
-        country_code: 'FR' // Default to France
+    // Call PostgreSQL function to create tenant, user and role
+    // This function uses SECURITY DEFINER to bypass RLS securely
+    const { data: registrationData, error: registrationError } = await supabaseAdmin
+      .rpc('register_user_and_tenant', {
+        p_user_id: authData.user.id,
+        p_email: validated.email,
+        p_full_name: validated.full_name,
+        p_tenant_name: validated.tenant_name,
+        p_tenant_slug: validated.tenant_slug,
+        p_app_type: 'immo_app'
       })
-      .select()
-      .single()
 
-    if (tenantError || !tenant) {
+    if (registrationError || !registrationData) {
       // Rollback: delete auth user
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
-      console.error('Tenant creation error:', tenantError)
+      console.error('Registration function error:', registrationError)
       return c.json({
         error: 'Registration Failed',
-        message: 'Impossible de créer l\'organisation'
+        message: 'Impossible de créer l\'organisation',
+        details: registrationError?.message
       }, 500)
     }
 
-    // Create user record (without tenant_id and role - those are in user_tenant_roles)
-    const { data: user, error: userError } = await supabaseAdmin
-      .from('users')
-      .insert({
-        id: authData.user.id,
-        email: validated.email,
-        full_name: validated.full_name
-      })
-      .select()
-      .single()
-
-    if (userError || !user) {
-      // Rollback: delete tenant and auth user
-      await supabaseAdmin.from('tenants').delete().eq('id', tenant.id)
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
-      console.error('User creation error:', userError)
-      return c.json({
-        error: 'Registration Failed',
-        message: 'Impossible de créer l\'utilisateur',
-        details: userError?.message
-      }, 500)
-    }
-
-    // Create user-tenant role
-    const { data: userRole, error: roleError } = await supabaseAdmin
-      .from('user_tenant_roles')
-      .insert({
-        user_id: authData.user.id,
-        tenant_id: tenant.id,
-        role: UserRole.OWNER,
-        is_active: true
-      })
-      .select()
-      .single()
-
-    if (roleError || !userRole) {
-      // Rollback: delete user, tenant and auth user
-      await supabaseAdmin.from('users').delete().eq('id', authData.user.id)
-      await supabaseAdmin.from('tenants').delete().eq('id', tenant.id)
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
-      console.error('Role creation error:', roleError)
-      return c.json({
-        error: 'Registration Failed',
-        message: 'Impossible de créer le rôle utilisateur',
-        details: roleError?.message
-      }, 500)
-    }
+    // Extract data from function result
+    const user = registrationData.user
+    const tenant = registrationData.tenant
+    const userRole = registrationData.role
 
     // Create session to get access token
     const { data: session, error: sessionError } = await supabaseAdmin.auth.signInWithPassword({
