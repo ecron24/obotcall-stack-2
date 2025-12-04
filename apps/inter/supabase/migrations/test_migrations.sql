@@ -167,17 +167,25 @@ BEGIN
 END $$;
 
 -- Test 7: Afficher les business types
-RAISE NOTICE '============================================';
-RAISE NOTICE 'Business types disponibles:';
-RAISE NOTICE '============================================';
+DO $$
+BEGIN
+  RAISE NOTICE '============================================';
+  RAISE NOTICE 'Business types disponibles:';
+  RAISE NOTICE '============================================';
+END $$;
+
 SELECT emoji || ' ' || name || ' (' || code || ')' as business_type
 FROM public.business_types
 ORDER BY name;
 
 -- Test 8: Compter interventions types par métier
-RAISE NOTICE '============================================';
-RAISE NOTICE 'Types d''interventions par métier:';
-RAISE NOTICE '============================================';
+DO $$
+BEGIN
+  RAISE NOTICE '============================================';
+  RAISE NOTICE 'Types d''interventions par métier:';
+  RAISE NOTICE '============================================';
+END $$;
+
 SELECT
   bt.emoji || ' ' || bt.name as metier,
   COUNT(it.id) as nb_types
@@ -186,6 +194,9 @@ LEFT JOIN public.intervention_types it ON it.business_type_id = bt.id
 GROUP BY bt.id, bt.name, bt.emoji
 ORDER BY bt.name;
 
-RAISE NOTICE '============================================';
-RAISE NOTICE 'TESTS TERMINÉS';
-RAISE NOTICE '============================================';
+DO $$
+BEGIN
+  RAISE NOTICE '============================================';
+  RAISE NOTICE 'TESTS TERMINÉS';
+  RAISE NOTICE '============================================';
+END $$;
