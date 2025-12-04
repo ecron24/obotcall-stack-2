@@ -7,18 +7,26 @@
 -- ============================================
 
 -- Business types
+DROP POLICY IF EXISTS "business_types_select_all" ON public.business_types;
 DROP POLICY IF EXISTS "business_types_admin_all" ON public.business_types;
+DROP POLICY IF EXISTS "business_types_public_read" ON public.business_types;
 
 -- Intervention types
+DROP POLICY IF EXISTS "intervention_types_select_by_business" ON public.intervention_types;
 DROP POLICY IF EXISTS "intervention_types_admin_all" ON public.intervention_types;
 
 -- Product categories
+DROP POLICY IF EXISTS "product_categories_select_by_business" ON public.product_categories;
 DROP POLICY IF EXISTS "product_categories_admin_all" ON public.product_categories;
 
 -- Products
+DROP POLICY IF EXISTS "products_select_by_business" ON public.products;
 DROP POLICY IF EXISTS "products_insert_admin_owner" ON public.products;
 DROP POLICY IF EXISTS "products_update_admin_owner" ON public.products;
 DROP POLICY IF EXISTS "products_delete_admin_owner" ON public.products;
+DROP POLICY IF EXISTS "products_insert_owner_or_admin" ON public.products;
+DROP POLICY IF EXISTS "products_update_owner_or_admin" ON public.products;
+DROP POLICY IF EXISTS "products_delete_owner_or_admin" ON public.products;
 
 -- ============================================
 -- CRÉATION DES POLICIES SÉCURISÉES
