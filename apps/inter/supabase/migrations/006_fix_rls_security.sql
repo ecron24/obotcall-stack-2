@@ -142,15 +142,12 @@ WITH CHECK (
     OR auth.jwt() ->> 'role' = 'service_role'
   )
   OR
-  -- Ou utilisateur owner/admin du tenant avec le bon business_type_id
+  -- Ou utilisateur du tenant avec le bon business_type_id
   (
     business_type_id IN (
-      SELECT t.business_type_id
-      FROM public.tenants t
-      INNER JOIN public.users u ON u.tenant_id = t.id
-      WHERE t.id::text = auth.jwt() ->> 'tenant_id'
-        AND u.id = auth.uid()
-        AND u.role IN ('owner', 'admin')
+      SELECT business_type_id
+      FROM public.tenants
+      WHERE id::text = auth.jwt() ->> 'tenant_id'
     )
   )
 );
@@ -170,12 +167,9 @@ USING (
   OR
   (
     business_type_id IN (
-      SELECT t.business_type_id
-      FROM public.tenants t
-      INNER JOIN public.users u ON u.tenant_id = t.id
-      WHERE t.id::text = auth.jwt() ->> 'tenant_id'
-        AND u.id = auth.uid()
-        AND u.role IN ('owner', 'admin')
+      SELECT business_type_id
+      FROM public.tenants
+      WHERE id::text = auth.jwt() ->> 'tenant_id'
     )
   )
 )
@@ -190,12 +184,9 @@ WITH CHECK (
   OR
   (
     business_type_id IN (
-      SELECT t.business_type_id
-      FROM public.tenants t
-      INNER JOIN public.users u ON u.tenant_id = t.id
-      WHERE t.id::text = auth.jwt() ->> 'tenant_id'
-        AND u.id = auth.uid()
-        AND u.role IN ('owner', 'admin')
+      SELECT business_type_id
+      FROM public.tenants
+      WHERE id::text = auth.jwt() ->> 'tenant_id'
     )
   )
 );
@@ -215,12 +206,9 @@ USING (
   OR
   (
     business_type_id IN (
-      SELECT t.business_type_id
-      FROM public.tenants t
-      INNER JOIN public.users u ON u.tenant_id = t.id
-      WHERE t.id::text = auth.jwt() ->> 'tenant_id'
-        AND u.id = auth.uid()
-        AND u.role IN ('owner', 'admin')
+      SELECT business_type_id
+      FROM public.tenants
+      WHERE id::text = auth.jwt() ->> 'tenant_id'
     )
   )
 );
@@ -239,10 +227,10 @@ COMMENT ON POLICY "product_categories_admin_all" ON public.product_categories IS
 'Admin all operations - Uses app_metadata (secure, not user-editable)';
 
 COMMENT ON POLICY "products_insert_owner_or_admin" ON public.products IS
-'Insert: tenant owner or admin via app_metadata (secure)';
+'Insert: tenant members or admin via app_metadata (secure, non user-editable)';
 
 COMMENT ON POLICY "products_update_owner_or_admin" ON public.products IS
-'Update: tenant owner or admin via app_metadata (secure)';
+'Update: tenant members or admin via app_metadata (secure, non user-editable)';
 
 COMMENT ON POLICY "products_delete_owner_or_admin" ON public.products IS
-'Delete: tenant owner or admin via app_metadata (secure)';
+'Delete: tenant members or admin via app_metadata (secure, non user-editable)';
