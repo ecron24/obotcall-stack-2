@@ -11,6 +11,12 @@ export function Header() {
   const handleLogout = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
+
+    // Clean up any legacy localStorage data
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('user')
+    localStorage.removeItem('tenant')
+
     router.push('/auth/login')
     router.refresh()
   }

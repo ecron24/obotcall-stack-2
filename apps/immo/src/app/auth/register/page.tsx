@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { apiClient } from '@/lib/api-client'
+import { createClient } from '@/lib/supabase/client'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -26,6 +27,7 @@ export default function RegisterPage() {
     const tenant_slug = formData.get('tenant_slug') as string
 
     try {
+      // Call backend API to create user and tenant
       const response = await apiClient.register({
         email,
         password,
@@ -34,13 +36,23 @@ export default function RegisterPage() {
         tenant_slug,
       })
 
-      // Store token
-      apiClient.setToken(response.access_token)
-      localStorage.setItem('access_token', response.access_token)
-      localStorage.setItem('user', JSON.stringify(response.user))
-      localStorage.setItem('tenant', JSON.stringify(response.tenant))
+      // Establish Supabase session with tokens from backend
+      // Supabase will handle token storage and automatic refresh
+      const supabase = createClient()
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: response.access_token,
+        refresh_token: response.refresh_token,
+      })
 
+      if (sessionError) {
+        console.error('Session creation error:', sessionError)
+        setError('Inscription réussie mais erreur de session. Veuillez vous connecter.')
+        return
+      }
+
+      // Session established - redirect to dashboard
       router.push('/dashboard')
+      router.refresh()
     } catch (err: any) {
       setError(err.message || 'Erreur lors de l\'inscription')
     } finally {

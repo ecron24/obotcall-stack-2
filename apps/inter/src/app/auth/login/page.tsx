@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { apiClient } from '@/lib/api-client'
+import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -23,15 +23,23 @@ export default function LoginPage() {
     const password = formData.get('password') as string
 
     try {
-      const response = await apiClient.login({ email, password })
+      // Use Supabase Auth directly for login
+      const supabase = createClient()
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-      // Store token
-      apiClient.setToken(response.access_token)
-      localStorage.setItem('access_token', response.access_token)
-      localStorage.setItem('user', JSON.stringify(response.user))
-      localStorage.setItem('tenant', JSON.stringify(response.tenant))
+      if (signInError) {
+        setError(signInError.message === 'Invalid login credentials'
+          ? 'Email ou mot de passe incorrect'
+          : signInError.message)
+        return
+      }
 
+      // Session established - redirect to dashboard
       router.push('/dashboard')
+      router.refresh()
     } catch (err: any) {
       setError(err.message || 'Erreur de connexion')
     } finally {

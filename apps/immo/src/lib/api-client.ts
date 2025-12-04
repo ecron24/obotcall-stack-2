@@ -1,3 +1,5 @@
+import { createClient } from '@/lib/supabase/client'
+
 // API Client uses same domain - requests go through Next.js API routes which proxy to Hono backend
 const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
@@ -22,31 +24,34 @@ interface RegisterResponse extends LoginResponse {}
 
 class ApiClient {
   private baseUrl: string
-  private token: string | null = null
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl
   }
 
-  setToken(token: string) {
-    this.token = token
-  }
-
-  clearToken() {
-    this.token = null
+  /**
+   * Get the current access token from Supabase Auth
+   * This ensures we always use the latest token (including refreshed ones)
+   */
+  private async getToken(): Promise<string | null> {
+    const supabase = createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    return session?.access_token || null
   }
 
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
+    const token = await this.getToken()
+
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       ...options.headers,
     }
 
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
     }
 
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
