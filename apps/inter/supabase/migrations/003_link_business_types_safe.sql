@@ -65,16 +65,15 @@ COMMENT ON COLUMN inter_app.interventions.reference IS 'Référence unique (ex: 
 -- =============================================
 
 -- Vue pour mapper l'ancienne structure vers la nouvelle
+-- Simple vue qui mappe intervention_number vers reference_computed
 CREATE OR REPLACE VIEW inter_app.interventions_compat AS
 SELECT
   i.*,
   -- Mapper intervention_number vers reference si reference est NULL
-  COALESCE(i.reference, i.intervention_number) as reference_computed,
-  -- Calculer totaux compatibles (si les colonnes existent)
-  COALESCE(i.labor_cost, 0) + COALESCE(i.parts_cost, 0) + COALESCE(i.travel_cost, 0) as total_cost_computed
+  COALESCE(i.reference, i.intervention_number) as reference_computed
 FROM inter_app.interventions i;
 
-COMMENT ON VIEW inter_app.interventions_compat IS 'Vue de compatibilité entre ancienne et nouvelle structure - Mappe intervention_number vers reference';
+COMMENT ON VIEW inter_app.interventions_compat IS 'Vue de compatibilité - Mappe intervention_number vers reference pour API';
 
 -- =============================================
 -- 4. Fonction pour générer référence intervention
