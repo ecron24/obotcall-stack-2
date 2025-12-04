@@ -9,11 +9,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    if (token) {
-      apiClient.setToken(token)
-      loadStats()
-    }
+    // ApiClient récupère automatiquement le token depuis Supabase
+    loadStats()
   }, [])
 
   const loadStats = async () => {
