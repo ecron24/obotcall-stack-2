@@ -144,7 +144,7 @@ ON CONFLICT (id) DO NOTHING;
 -- =============================================
 
 -- 🏊 PISCINISTE (9 types)
-INSERT INTO public.intervention_types (id, business_type_id, code, name, description, default_duration_minutes, color, icon, display_order, is_active)
+INSERT INTO public.intervention_types (id, business_type_id, code, name, description, default_duration, color, emoji, display_order, is_active)
 VALUES
   ('10000000-0000-0000-0001-000000000001', '00000000-0000-0000-0001-000000000001', 'pool_maintenance', 'Entretien piscine', 'Entretien courant de la piscine', 120, '#00a8ff', '🏊', 1, true),
   ('10000000-0000-0000-0001-000000000002', '00000000-0000-0000-0001-000000000001', 'pool_opening', 'Mise en service', 'Ouverture/mise en service de piscine', 240, '#4cd137', '🌊', 2, true),
@@ -158,7 +158,7 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- 🔧 PLOMBERIE (8 types)
-INSERT INTO public.intervention_types (id, business_type_id, code, name, description, default_duration_minutes, color, icon, display_order, is_active)
+INSERT INTO public.intervention_types (id, business_type_id, code, name, description, default_duration, color, emoji, display_order, is_active)
 VALUES
   ('10000000-0000-0000-0002-000000000001', '00000000-0000-0000-0001-000000000002', 'plumb_leak_repair', 'Réparation fuite', 'Réparation de fuite d''eau', 120, '#e84118', '💧', 1, true),
   ('10000000-0000-0000-0002-000000000002', '00000000-0000-0000-0001-000000000002', 'plumb_unclogging', 'Débouchage', 'Débouchage canalisations', 90, '#4cd137', '🚿', 2, true),
@@ -171,7 +171,7 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- 🐀 DÉRATISATION (7 types)
-INSERT INTO public.intervention_types (id, business_type_id, code, name, description, default_duration_minutes, color, icon, display_order, is_active)
+INSERT INTO public.intervention_types (id, business_type_id, code, name, description, default_duration, color, emoji, display_order, is_active)
 VALUES
   ('10000000-0000-0000-0003-000000000001', '00000000-0000-0000-0001-000000000003', 'pest_rat_treatment', 'Traitement rats', 'Dératisation - traitement rats', 120, '#e84118', '🐀', 1, true),
   ('10000000-0000-0000-0003-000000000002', '00000000-0000-0000-0001-000000000003', 'pest_mice_treatment', 'Traitement souris', 'Dératisation - traitement souris', 90, '#e67e22', '🐭', 2, true),
@@ -183,7 +183,7 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- 🚗 GARAGISTE (9 types)
-INSERT INTO public.intervention_types (id, business_type_id, code, name, description, default_duration_minutes, color, icon, display_order, is_active)
+INSERT INTO public.intervention_types (id, business_type_id, code, name, description, default_duration, color, emoji, display_order, is_active)
 VALUES
   ('10000000-0000-0000-0004-000000000001', '00000000-0000-0000-0001-000000000004', 'auto_maintenance', 'Entretien', 'Entretien courant du véhicule', 120, '#44bd32', '🔧', 1, true),
   ('10000000-0000-0000-0004-000000000002', '00000000-0000-0000-0001-000000000004', 'auto_repair', 'Réparation', 'Réparation mécanique', 180, '#e84118', '⚙️', 2, true),
@@ -197,7 +197,7 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- ⚡ ÉLECTRICIEN (8 types)
-INSERT INTO public.intervention_types (id, business_type_id, code, name, description, default_duration_minutes, color, icon, display_order, is_active)
+INSERT INTO public.intervention_types (id, business_type_id, code, name, description, default_duration, color, emoji, display_order, is_active)
 VALUES
   ('10000000-0000-0000-0005-000000000001', '00000000-0000-0000-0001-000000000005', 'elec_installation', 'Installation', 'Installation électrique', 180, '#0097e6', '⚡', 1, true),
   ('10000000-0000-0000-0005-000000000002', '00000000-0000-0000-0001-000000000005', 'elec_repair', 'Réparation', 'Réparation panne électrique', 120, '#e84118', '🔧', 2, true),
@@ -210,7 +210,7 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- 🌡️ CHAUFFAGISTE (6 types)
-INSERT INTO public.intervention_types (id, business_type_id, code, name, description, default_duration_minutes, color, icon, display_order, is_active)
+INSERT INTO public.intervention_types (id, business_type_id, code, name, description, default_duration, color, emoji, display_order, is_active)
 VALUES
   ('10000000-0000-0000-0006-000000000001', '00000000-0000-0000-0001-000000000006', 'hvac_boiler_maintenance', 'Entretien chaudière', 'Entretien annuel chaudière', 120, '#44bd32', '🔥', 1, true),
   ('10000000-0000-0000-0006-000000000002', '00000000-0000-0000-0001-000000000006', 'hvac_boiler_repair', 'Réparation chaudière', 'Réparation panne chaudière', 150, '#e84118', '🔧', 2, true),
