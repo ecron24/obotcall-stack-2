@@ -142,13 +142,15 @@ WITH CHECK (
     OR auth.jwt() ->> 'role' = 'service_role'
   )
   OR
-  -- Ou propriétaire du tenant avec le bon business_type_id
+  -- Ou utilisateur owner/admin du tenant avec le bon business_type_id
   (
     business_type_id IN (
       SELECT t.business_type_id
       FROM public.tenants t
+      INNER JOIN public.users u ON u.tenant_id = t.id
       WHERE t.id::text = auth.jwt() ->> 'tenant_id'
-        AND t.owner_id = auth.uid()
+        AND u.id = auth.uid()
+        AND u.role IN ('owner', 'admin')
     )
   )
 );
@@ -170,8 +172,10 @@ USING (
     business_type_id IN (
       SELECT t.business_type_id
       FROM public.tenants t
+      INNER JOIN public.users u ON u.tenant_id = t.id
       WHERE t.id::text = auth.jwt() ->> 'tenant_id'
-        AND t.owner_id = auth.uid()
+        AND u.id = auth.uid()
+        AND u.role IN ('owner', 'admin')
     )
   )
 )
@@ -188,8 +192,10 @@ WITH CHECK (
     business_type_id IN (
       SELECT t.business_type_id
       FROM public.tenants t
+      INNER JOIN public.users u ON u.tenant_id = t.id
       WHERE t.id::text = auth.jwt() ->> 'tenant_id'
-        AND t.owner_id = auth.uid()
+        AND u.id = auth.uid()
+        AND u.role IN ('owner', 'admin')
     )
   )
 );
@@ -211,8 +217,10 @@ USING (
     business_type_id IN (
       SELECT t.business_type_id
       FROM public.tenants t
+      INNER JOIN public.users u ON u.tenant_id = t.id
       WHERE t.id::text = auth.jwt() ->> 'tenant_id'
-        AND t.owner_id = auth.uid()
+        AND u.id = auth.uid()
+        AND u.role IN ('owner', 'admin')
     )
   )
 );
