@@ -30,25 +30,37 @@ Inter-app a été transformée en plateforme multi-métiers capable de supporter
 
 ### 🗄️ Base de données (Supabase)
 
-| Fichier | Description | Tables créées |
-|---------|-------------|---------------|
-| `apps/inter/supabase/migrations/002_multi_trade_schema.sql` | Schéma complet multi-métiers | 9 nouvelles tables + 2 modifiées |
-| `apps/inter/supabase/migrations/003_seed_business_types.sql` | Données initiales (seeds) | 6 métiers + 44 types d'interventions + produits exemples |
+| Fichier | Description | Taille | Status |
+|---------|-------------|--------|--------|
+| `apps/inter/supabase/migrations/002_multi_trade_tables_safe.sql` | Nouvelles tables multi-métiers (SAFE) | 13KB | ✅ Ready |
+| `apps/inter/supabase/migrations/003_link_business_types_safe.sql` | Liaison avec existant (SAFE) | 10KB | ✅ Ready |
+| `apps/inter/supabase/migrations/004_seed_business_types_safe.sql` | Données initiales (seeds) | 31KB | ✅ Ready |
+| `apps/inter/supabase/migrations/test_migrations.sql` | Script de test validation | 5KB | ✅ Ready |
+| `apps/inter/supabase/migrations/ROLLBACK_multi_trade.sql` | Rollback complet (si besoin) | 4KB | ✅ Ready |
+| `apps/inter/supabase/migrations/README_MIGRATIONS.md` | Guide complet migrations | 15KB | ✅ Ready |
 
-**Nouvelles tables créées :**
-1. `business_types` - Types de métiers (pisciniste, plombier, etc.)
-2. `intervention_types` - Types d'interventions par métier
-3. `product_categories` - Catégories de produits hiérarchiques
-4. `products` - Catalogue produits/services par métier
-5. `intervention_items` - Produits utilisés dans interventions (avec totaux auto-calculés)
-6. `intervention_type_assignments` - Liaison many-to-many interventions ↔ types
-7. `technicians` - Techniciens/staff de l'entreprise
-8. `pricing_configs` - Configuration tarifs par tenant
-9. `company_settings` - Paramètres et infos légales entreprise
+**Nouvelles tables créées (Migration 002) :**
+1. `public.business_types` - Types de métiers (pisciniste, plombier, etc.)
+2. `public.intervention_types` - Types d'interventions par métier
+3. `public.product_categories` - Catégories de produits hiérarchiques
+4. `public.products` - Catalogue produits/services par métier
+5. `inter_app.intervention_items` - Produits utilisés dans interventions (avec totaux auto-calculés)
+6. `inter_app.intervention_type_assignments` - Liaison many-to-many interventions ↔ types
+7. `inter_app.pricing_configs` - Configuration tarifs par tenant
+8. `inter_app.company_settings` - Paramètres et infos légales entreprise
 
-**Tables modifiées :**
-- `tenants` → Ajout `business_type_id`
-- `interventions` → Ajout 9 colonnes (reference, labor_hours, labor_rate, travel_fee, totaux, etc.)
+**Modifications (Migration 003) :**
+- `public.tenants` → Ajout `business_type_id` (NULL pour agent_app et immo_app)
+- `inter_app.interventions` → Ajout 4 colonnes (reference, client_present, client_signed_at, started_at)
+- Vue `inter_app.interventions_compat` → Compatibilité intervention_number ↔ reference
+- Fonctions de migration et recalcul automatique
+- Triggers pour recalcul totaux sur modification items
+
+**Seeds (Migration 004) :**
+- ✅ 6 business types avec configurations complètes
+- ✅ 47 intervention types (9+8+7+9+8+6)
+- ✅ 32 product categories
+- ✅ 40+ sample products avec prix et stock
 
 ### 🔥 API Backend (Hono)
 
@@ -101,9 +113,9 @@ DELETE /api/intervention-items/:id              # Supprimer item
 - ✅ Isolation totale par business_type_id
 
 #### 2. **Types d'interventions**
-- ✅ 44 types d'interventions pré-configurés (6-9 par métier)
+- ✅ 47 types d'interventions pré-configurés (9+8+7+9+8+6 par métier)
 - ✅ Filtrage automatique selon le métier du tenant
-- ✅ Attributs : emoji, couleur, durée estimée, priorité par défaut
+- ✅ Attributs : emoji, couleur, durée estimée, ordre d'affichage
 - ✅ Liaison many-to-many avec interventions
 
 #### 3. **Catalogue produits**
@@ -146,50 +158,100 @@ DELETE /api/intervention-items/:id              # Supprimer item
 
 ## 🔧 Migrations SQL
 
+### ⚠️ IMPORTANT: Migrations SAFE
+
+Les migrations utilisent:
+- ✅ `CREATE TABLE IF NOT EXISTS` (pas d'erreur si table existe)
+- ✅ `ALTER TABLE ADD COLUMN IF NOT EXISTS` (pas d'erreur si colonne existe)
+- ✅ `INSERT ... ON CONFLICT DO NOTHING` (rejouable)
+- ✅ **Aucune modification destructive** des tables existantes
+- ✅ **100% compatible** avec agent_app et immo_app (business_type_id NULL)
+
 ### Comment appliquer les migrations
 
-**Sur Supabase Dashboard (recommandé) :**
-
-1. Aller sur votre projet Supabase
-2. Ouvrir **SQL Editor**
-3. Exécuter dans l'ordre :
-
-```sql
--- 1. Schéma multi-trade (tables + triggers)
--- Copier/coller le contenu de : apps/inter/supabase/migrations/002_multi_trade_schema.sql
-
--- 2. Seeds (données initiales)
--- Copier/coller le contenu de : apps/inter/supabase/migrations/003_seed_business_types.sql
-```
-
-**Via Supabase CLI (alternatif) :**
+#### Méthode 1: Via Supabase CLI (Recommandé)
 
 ```bash
 cd apps/inter
 
-# Push migrations
-supabase db push
+# 1. Se connecter
+npx supabase login
 
-# Ou manuellement
-supabase db reset  # Reset + apply all migrations
+# 2. Lier au projet
+npx supabase link --project-ref YOUR_PROJECT_REF
+
+# 3. Push migrations
+npx supabase db push
+
+# 4. Tester
+npx supabase db execute -f supabase/migrations/test_migrations.sql
+```
+
+#### Méthode 2: Via SQL Editor (Supabase Dashboard)
+
+1. Aller sur votre projet Supabase
+2. Ouvrir **SQL Editor**
+3. Exécuter **dans l'ordre** :
+
+```sql
+-- 1. Créer nouvelles tables (13KB)
+-- Copier/coller: apps/inter/supabase/migrations/002_multi_trade_tables_safe.sql
+
+-- 2. Lier avec l'existant (10KB)
+-- Copier/coller: apps/inter/supabase/migrations/003_link_business_types_safe.sql
+
+-- 3. Insérer données initiales (31KB)
+-- Copier/coller: apps/inter/supabase/migrations/004_seed_business_types_safe.sql
+
+-- 4. Valider (optionnel)
+-- Copier/coller: apps/inter/supabase/migrations/test_migrations.sql
 ```
 
 ### Vérification post-migration
 
 ```sql
 -- Vérifier les tables créées
-SELECT table_name
+SELECT table_schema || '.' || table_name as table_name
 FROM information_schema.tables
-WHERE table_schema = 'public'
-AND table_name IN ('business_types', 'intervention_types', 'products', 'intervention_items');
+WHERE (table_schema = 'public' AND table_name IN ('business_types', 'intervention_types', 'product_categories', 'products'))
+   OR (table_schema = 'inter_app' AND table_name IN ('intervention_items', 'pricing_configs'));
 
 -- Vérifier les seeds
-SELECT code, name, emoji FROM business_types;
--- Doit retourner 6 métiers
+SELECT code, name, emoji FROM public.business_types ORDER BY name;
+-- Attendu: 6 métiers
 
-SELECT COUNT(*) FROM intervention_types;
--- Doit retourner ~44 types
+SELECT COUNT(*) as nb_intervention_types FROM public.intervention_types;
+-- Attendu: 47 types
+
+SELECT COUNT(*) as nb_categories FROM public.product_categories;
+-- Attendu: 32 catégories
+
+SELECT COUNT(*) as nb_products FROM public.products WHERE is_active = true;
+-- Attendu: 40+ produits
 ```
+
+### Rollback (si nécessaire)
+
+⚠️ **ATTENTION:** Le rollback supprime toutes les tables et données créées !
+
+```bash
+# Via CLI
+npx supabase db execute -f supabase/migrations/ROLLBACK_multi_trade.sql
+
+# Via SQL Editor
+# Copier/coller: apps/inter/supabase/migrations/ROLLBACK_multi_trade.sql
+```
+
+### 📚 Documentation complète
+
+➡️ **Voir le guide détaillé:** `apps/inter/supabase/migrations/README_MIGRATIONS.md`
+
+Ce guide contient:
+- ✅ Description détaillée de chaque migration
+- ✅ Instructions d'application pas à pas
+- ✅ Scripts de test et validation
+- ✅ Procédure de rollback
+- ✅ Dépannage et FAQ
 
 ---
 
