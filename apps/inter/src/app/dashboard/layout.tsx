@@ -7,7 +7,10 @@ import { useEffect, useState } from 'react'
 const navigation = [
   { name: 'Tableau de bord', href: '/dashboard', icon: '📊' },
   { name: 'Interventions', href: '/dashboard/interventions', icon: '🔧' },
+  { name: 'Prospects', href: '/dashboard/prospects', icon: '🎯' },
   { name: 'Clients', href: '/dashboard/clients', icon: '👥' },
+  { name: 'Factures', href: '/dashboard/factures', icon: '📄' },
+  { name: 'Calendrier', href: '/dashboard/calendrier', icon: '📅' },
   { name: 'Techniciens', href: '/dashboard/technicians', icon: '👷' },
   { name: 'Produits', href: '/dashboard/products', icon: '📦' },
   { name: 'Paramètres', href: '/dashboard/settings', icon: '⚙️' },
