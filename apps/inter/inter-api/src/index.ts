@@ -11,6 +11,10 @@ import clientsRoutes from './routes/clients.js'
 import devisRoutes from './routes/devis.js'
 import facturesRoutes from './routes/factures.js'
 import tenantsRoutes from './routes/tenants.js'
+import businessTypesRoutes from './routes/business-types.js'
+import interventionTypesRoutes from './routes/intervention-types.js'
+import productsRoutes from './routes/products.js'
+import interventionItemsRoutes from './routes/intervention-items.js'
 
 // Middleware
 import { authMiddleware } from './middleware/auth.js'
@@ -38,13 +42,17 @@ app.get('/health', (c) => {
 
 // Public routes (no auth)
 app.route('/api/auth', authRoutes)
+app.route('/api/business-types', businessTypesRoutes) // Public for registration
 
 // Protected routes (auth required)
 app.use('/api/*', authMiddleware)
 app.use('/api/*', rateLimiter())
 
 app.route('/api/interventions', interventionsRoutes)
+app.route('/api/intervention-items', interventionItemsRoutes)
+app.route('/api/intervention-types', interventionTypesRoutes)
 app.route('/api/clients', clientsRoutes)
+app.route('/api/products', productsRoutes)
 app.route('/api/devis', devisRoutes)
 app.route('/api/factures', facturesRoutes)
 app.route('/api/tenants', tenantsRoutes)
