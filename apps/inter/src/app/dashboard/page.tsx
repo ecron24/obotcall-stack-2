@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { getDashboardStats } from '@/lib/actions/stats'
 
 interface DashboardStats {
   interventions: {
@@ -51,52 +52,35 @@ export default function DashboardPage() {
         setUser(JSON.parse(userStr))
       }
 
-      // Données par défaut (affichées immédiatement)
-      const defaultStats = {
-        interventions: {
-          today: 0,
-          week: 0,
-          month: 0,
-          in_progress: 0,
-          scheduled: 0,
-          completed_this_month: 0
-        },
-        clients: {
-          total: 0,
-          active: 0,
-          new_this_month: 0
-        },
-        technicians: {
-          total: 0,
-          active: 0,
-          avg_rating: 0
-        }
-      }
-
-      setStats(defaultStats)
       setLoading(false)
 
-      // Charger les statistiques réelles en arrière-plan
+      // Charger les statistiques via Server Action
       try {
-        const response = await fetch(`${API_URL}/api/dashboard/stats`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+        const data = await getDashboardStats()
+        setStats(data)
+      } catch (apiErr) {
+        console.error('Error loading stats:', apiErr)
+        // Données par défaut en cas d'erreur
+        setStats({
+          interventions: {
+            today: 0,
+            week: 0,
+            month: 0,
+            in_progress: 0,
+            scheduled: 0,
+            completed_this_month: 0
+          },
+          clients: {
+            total: 0,
+            active: 0,
+            new_this_month: 0
+          },
+          technicians: {
+            total: 0,
+            active: 0,
+            avg_rating: 0
           }
         })
-
-        if (response.status === 401) {
-          router.push('/auth/login')
-          return
-        }
-
-        if (response.ok) {
-          const data = await response.json()
-          setStats(data)
-        }
-      } catch (apiErr) {
-        console.error('API stats error:', apiErr)
-        // Garder les stats par défaut
       }
     } catch (err) {
       console.error('Error loading dashboard:', err)
