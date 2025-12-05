@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { getClients } from '@/lib/actions/clients'
 
 interface Client {
   id: string
@@ -43,24 +44,8 @@ export default function ClientsPage() {
         return
       }
 
-      const response = await fetch(`${API_URL}/api/clients`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (response.status === 401) {
-        router.push('/auth/login')
-        return
-      }
-
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement des clients')
-      }
-
-      const data = await response.json()
-      setClients(Array.isArray(data) ? data : [])
+      const data = await getClients()
+      setClients(data as any || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue')
       console.error('Error fetching clients:', err)

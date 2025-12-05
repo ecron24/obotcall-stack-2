@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { getCalendarInterventions } from '@/lib/actions/interventions'
 
 interface CalendarIntervention {
   id: string
@@ -62,27 +63,11 @@ export default function CalendrierPage() {
       const startDate = getViewStartDate()
       const endDate = getViewEndDate()
 
-      const response = await fetch(
-        `${API_URL}/api/interventions?start_date=${startDate.toISOString()}&end_date=${endDate.toISOString()}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
+      const data = await getCalendarInterventions(
+        startDate.toISOString(),
+        endDate.toISOString()
       )
-
-      if (response.status === 401) {
-        router.push('/auth/login')
-        return
-      }
-
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement du calendrier')
-      }
-
-      const data = await response.json()
-      setInterventions(Array.isArray(data) ? data : [])
+      setInterventions(data as any || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue')
       console.error('Error fetching calendar:', err)

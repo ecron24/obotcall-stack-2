@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { getInterventions } from '@/lib/actions/interventions'
 
 interface Intervention {
   id: string
@@ -38,27 +39,12 @@ export default function InterventionsPage() {
         return
       }
 
-      const response = await fetch(`${API_URL}/api/interventions`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (response.status === 401) {
-        router.push('/auth/login')
-        return
-      }
-
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement des interventions')
-      }
-
-      const data = await response.json()
-      setInterventions(Array.isArray(data) ? data : [])
+      const data = await getInterventions()
+      setInterventions(data as any || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue')
       console.error('Error fetching interventions:', err)
+      setInterventions([])
     } finally {
       setLoading(false)
     }

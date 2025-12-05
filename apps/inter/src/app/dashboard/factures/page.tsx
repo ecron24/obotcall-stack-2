@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { getInvoices } from '@/lib/actions/invoices'
 
 interface Invoice {
   id: string
@@ -47,24 +48,8 @@ export default function FacturesPage() {
         return
       }
 
-      const response = await fetch(`${API_URL}/api/invoices`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (response.status === 401) {
-        router.push('/auth/login')
-        return
-      }
-
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement des factures')
-      }
-
-      const data = await response.json()
-      setInvoices(Array.isArray(data) ? data : [])
+      const data = await getInvoices()
+      setInvoices(data as any || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue')
       console.error('Error fetching invoices:', err)
