@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { Product, ProductFilters, ProductCategory } from '@/types'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+import { getProducts, getProduct as getProductAction, getProductCategories } from '@/lib/actions/products'
 
 export function useProducts(filters?: ProductFilters) {
   const [products, setProducts] = useState<Product[]>([])
@@ -17,28 +16,26 @@ export function useProducts(filters?: ProductFilters) {
       setLoading(true)
       setError(null)
 
-      // Construire les params de query
-      const params = new URLSearchParams()
-      if (filters?.type) params.set('type', filters.type)
-      if (filters?.category_id) params.set('category_id', filters.category_id)
-      if (filters?.search) params.set('search', filters.search)
-      if (filters?.is_active !== undefined) params.set('is_active', String(filters.is_active))
+      // Appeler la Server Action
+      const data = await getProducts(filters?.is_active)
 
-      const queryString = params.toString()
-      const url = `${API_URL}/api/products${queryString ? `?${queryString}` : ''}`
-
-      const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch products')
+      // Filtrer côté client pour les autres critères (à améliorer plus tard)
+      let filteredData = data
+      if (filters?.type) {
+        filteredData = filteredData.filter(p => p.type === filters.type)
+      }
+      if (filters?.category_id) {
+        filteredData = filteredData.filter(p => p.category_id === filters.category_id)
+      }
+      if (filters?.search) {
+        const searchLower = filters.search.toLowerCase()
+        filteredData = filteredData.filter(p =>
+          p.name?.toLowerCase().includes(searchLower) ||
+          p.description?.toLowerCase().includes(searchLower)
+        )
       }
 
-      const data = await response.json()
-      setProducts(data)
+      setProducts(filteredData as any)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')
       console.error('Error fetching products:', err)
@@ -74,18 +71,8 @@ export function useProduct(id: string) {
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`${API_URL}/api/products/${id}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch product')
-      }
-
-      const data = await response.json()
-      setProduct(data)
+      const data = await getProductAction(id)
+      setProduct(data as any)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')
       console.error('Error fetching product:', err)
@@ -116,18 +103,8 @@ export function useProductCategories() {
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`${API_URL}/api/products/categories/list`, {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch categories')
-      }
-
-      const data = await response.json()
-      setCategories(data)
+      const data = await getProductCategories()
+      setCategories(data as any)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')
       console.error('Error fetching categories:', err)

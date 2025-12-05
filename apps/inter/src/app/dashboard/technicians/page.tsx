@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { getTechnicians } from '@/lib/actions/technicians'
 
 interface Technician {
   id: string
@@ -39,24 +40,8 @@ export default function TechniciansPage() {
         return
       }
 
-      const response = await fetch(`${API_URL}/api/technicians`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (response.status === 401) {
-        router.push('/auth/login')
-        return
-      }
-
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement des techniciens')
-      }
-
-      const data = await response.json()
-      setTechnicians(Array.isArray(data) ? data : [])
+      const data = await getTechnicians()
+      setTechnicians(data as any || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue')
       console.error('Error fetching technicians:', err)
