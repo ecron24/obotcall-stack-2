@@ -39,8 +39,6 @@ export default function DashboardPage() {
 
   const loadDashboard = async () => {
     try {
-      setLoading(true)
-
       const token = localStorage.getItem('access_token')
       if (!token) {
         router.push('/auth/login')
@@ -53,27 +51,8 @@ export default function DashboardPage() {
         setUser(JSON.parse(userStr))
       }
 
-      // Charger les statistiques
-      const response = await fetch(`${API_URL}/api/dashboard/stats`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (response.status === 401) {
-        router.push('/auth/login')
-        return
-      }
-
-      if (response.ok) {
-        const data = await response.json()
-        setStats(data)
-      }
-    } catch (err) {
-      console.error('Error loading dashboard:', err)
-      // Données par défaut en cas d'erreur
-      setStats({
+      // Données par défaut (affichées immédiatement)
+      const defaultStats = {
         interventions: {
           today: 0,
           week: 0,
@@ -92,8 +71,35 @@ export default function DashboardPage() {
           active: 0,
           avg_rating: 0
         }
-      })
-    } finally {
+      }
+
+      setStats(defaultStats)
+      setLoading(false)
+
+      // Charger les statistiques réelles en arrière-plan
+      try {
+        const response = await fetch(`${API_URL}/api/dashboard/stats`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if (response.status === 401) {
+          router.push('/auth/login')
+          return
+        }
+
+        if (response.ok) {
+          const data = await response.json()
+          setStats(data)
+        }
+      } catch (apiErr) {
+        console.error('API stats error:', apiErr)
+        // Garder les stats par défaut
+      }
+    } catch (err) {
+      console.error('Error loading dashboard:', err)
       setLoading(false)
     }
   }
