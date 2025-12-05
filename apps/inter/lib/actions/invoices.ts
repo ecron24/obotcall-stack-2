@@ -11,7 +11,7 @@ export const getInvoice = cache(async (id: string) => {
     const supabase = createServerClient()
 
     const { data, error } = await supabase
-      .schema('inter_app_public')
+      .schema('inter_app')
       .from('invoices')
       .select(`
         *,
@@ -41,7 +41,7 @@ export const getInvoices = cache(async () => {
     const supabase = createServerClient()
 
     const { data, error } = await supabase
-      .schema('inter_app_public')
+      .schema('inter_app')
       .from('invoices')
       .select(`
         *,

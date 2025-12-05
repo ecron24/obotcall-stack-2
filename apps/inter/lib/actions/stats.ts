@@ -41,19 +41,19 @@ export const getDashboardStats = cache(async (): Promise<DashboardStats> => {
 
     // Récupérer toutes les interventions
     const { data: interventions } = await supabase
-      .schema('inter_app_public')
+      .schema('inter_app')
       .from('interventions')
       .select('*')
 
     // Récupérer tous les clients
     const { data: clients } = await supabase
-      .schema('inter_app_public')
+      .schema('inter_app')
       .from('clients')
       .select('*')
 
     // Récupérer tous les techniciens
     const { data: technicians } = await supabase
-      .schema('inter_app_public')
+      .schema('inter_app')
       .from('users')
       .select('*')
       .eq('role', 'technician')

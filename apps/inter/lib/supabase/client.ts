@@ -7,8 +7,8 @@ export function createClient() {
   )
 }
 
-// Helper pour requêtes sur le schéma inter_app_public (multi-métiers)
+// Helper pour requêtes sur le schéma inter_app (multi-métiers)
 export function fromInterApp(table: string) {
   const client = createClient()
-  return client.schema('inter_app_public').from(table)
+  return client.schema('inter_app').from(table)
 }

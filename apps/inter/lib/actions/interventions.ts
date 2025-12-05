@@ -12,7 +12,7 @@ export const getIntervention = cache(async (id: string) => {
     const supabase = createServerClient()
 
     const { data, error } = await supabase
-      .schema('inter_app_public')
+      .schema('inter_app')
       .from('interventions')
       .select(`
         *,
@@ -42,7 +42,7 @@ export const getInterventions = cache(async () => {
     const supabase = createServerClient()
 
     const { data, error } = await supabase
-      .schema('inter_app_public')
+      .schema('inter_app')
       .from('interventions')
       .select(`
         *,
@@ -72,7 +72,7 @@ export const getCalendarInterventions = cache(async (startDate: string, endDate:
     const supabase = createServerClient()
 
     const { data, error } = await supabase
-      .schema('inter_app_public')
+      .schema('inter_app')
       .from('interventions')
       .select(`
         *,

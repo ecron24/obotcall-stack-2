@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Inter-App utilise Supabase comme backend (base de données PostgreSQL + authentification) avec un schéma dédié `inter_app_public` pour le système multi-métiers.
+Inter-App utilise Supabase comme backend (base de données PostgreSQL + authentification) avec un schéma dédié `inter_app` pour le système multi-métiers.
 
 ## Prérequis
 
@@ -33,16 +33,16 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 
 ### 2. Schéma de base de données
 
-Le schéma `inter_app_public` doit être créé dans Supabase. Exécutez les migrations suivantes :
+Le schéma `inter_app` doit être créé dans Supabase. Exécutez les migrations suivantes :
 
 #### Migration 001 - Schéma de base
 
 ```sql
--- Créer le schéma inter_app_public
-CREATE SCHEMA IF NOT EXISTS inter_app_public;
+-- Créer le schéma inter_app
+CREATE SCHEMA IF NOT EXISTS inter_app;
 
 -- Activer Row Level Security
-ALTER DEFAULT PRIVILEGES IN SCHEMA inter_app_public GRANT ALL ON TABLES TO authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA inter_app GRANT ALL ON TABLES TO authenticated;
 ```
 
 #### Migration 002 - Tables principales
@@ -115,15 +115,15 @@ Activez RLS sur toutes les tables et créez des policies pour sécuriser l'accè
 
 ```sql
 -- Exemple pour la table clients
-ALTER TABLE inter_app_public.clients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE inter_app.clients ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view their own clients"
-  ON inter_app_public.clients
+  ON inter_app.clients
   FOR SELECT
   USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can insert their own clients"
-  ON inter_app_public.clients
+  ON inter_app.clients
   FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 ```
@@ -134,7 +134,7 @@ Si vous migrez depuis delmas-app :
 
 1. Exportez les données du schéma `piscine_delmas_public`
 2. Adaptez les références de schéma
-3. Importez dans `inter_app_public`
+3. Importez dans `inter_app`
 4. Ajoutez la colonne `business_type_id` aux tables nécessaires
 
 ## Troubleshooting

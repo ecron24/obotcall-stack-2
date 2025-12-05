@@ -27,8 +27,8 @@ export function createServerClient() {
 // Alias pour compatibilité
 export const createClient = createServerClient
 
-// Helper pour requêtes sur le schéma inter_app_public (multi-métiers)
+// Helper pour requêtes sur le schéma inter_app (multi-métiers)
 export function fromInterApp(table: string) {
   const client = createServerClient()
-  return client.schema('inter_app_public').from(table)
+  return client.schema('inter_app').from(table)
 }

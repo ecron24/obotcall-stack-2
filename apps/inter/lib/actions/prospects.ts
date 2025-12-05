@@ -11,7 +11,7 @@ export const getProspect = cache(async (id: string) => {
     const supabase = createServerClient()
 
     const { data, error } = await supabase
-      .schema('inter_app_public')
+      .schema('inter_app')
       .from('prospects')
       .select('*')
       .eq('id', id)
@@ -37,7 +37,7 @@ export const getProspects = cache(async () => {
     const supabase = createServerClient()
 
     const { data, error } = await supabase
-      .schema('inter_app_public')
+      .schema('inter_app')
       .from('prospects')
       .select('*')
       .order('created_at', { ascending: false })

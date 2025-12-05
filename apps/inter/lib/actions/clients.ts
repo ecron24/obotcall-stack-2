@@ -11,7 +11,7 @@ export const getClient = cache(async (id: string) => {
     const supabase = createServerClient()
 
     const { data, error } = await supabase
-      .schema('inter_app_public')
+      .schema('inter_app')
       .from('clients')
       .select('*')
       .eq('id', id)
@@ -37,7 +37,7 @@ export const getClients = cache(async () => {
     const supabase = createServerClient()
 
     const { data, error } = await supabase
-      .schema('inter_app_public')
+      .schema('inter_app')
       .from('clients')
       .select('*')
       .order('created_at', { ascending: false })
@@ -62,7 +62,7 @@ export const searchClients = cache(async (query: string) => {
     const supabase = createServerClient()
 
     const { data, error } = await supabase
-      .schema('inter_app_public')
+      .schema('inter_app')
       .from('clients')
       .select('*')
       .or(`name.ilike.%${query}%,email.ilike.%${query}%,phone.ilike.%${query}%`)
