@@ -3,21 +3,17 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { InterventionTypeSelector, ProductCatalog } from '@/components/business'
+import { ProductCatalog } from '@/components/business'
+
+interface InterventionType {
+  id: string
+  code: string
+  name: string
+  emoji: string
+  business_type_id: string
+}
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-
-const INTERVENTION_TYPES = [
-  { id: 'maintenance', label: 'Entretien', icon: '🔧' },
-  { id: 'repair', label: 'Réparation', icon: '🛠️' },
-  { id: 'installation', label: 'Installation', icon: '⚙️' },
-  { id: 'urgent', label: 'Urgence', icon: '🚨' },
-  { id: 'diagnostic', label: 'Diagnostic', icon: '🔍' },
-  { id: 'cleaning', label: 'Nettoyage', icon: '🧹' },
-  { id: 'winterizing', label: 'Hivernage', icon: '❄️' },
-  { id: 'reopen', label: 'Remise en service', icon: '🔄' },
-  { id: 'other', label: 'Autre', icon: '📋' },
-]
 
 export default function NewInterventionFormPage() {
   const router = useRouter()
@@ -27,7 +23,8 @@ export default function NewInterventionFormPage() {
 
   const [loading, setLoading] = useState(false)
   const [client, setClient] = useState<any>(null)
-  const [businessType, setBusinessType] = useState<string>('') // Ex: 'pisciniste', 'plombier', etc.
+  const [businessType, setBusinessType] = useState<any>(null) // Objet complet business type
+  const [interventionTypes, setInterventionTypes] = useState<InterventionType[]>([])
 
   // Form data - Client
   const [clientForm, setClientForm] = useState({
@@ -109,16 +106,31 @@ export default function NewInterventionFormPage() {
     }
   }
 
-  const loadBusinessType = () => {
-    // Charger le type de métier depuis localStorage ou API
-    const stored = localStorage.getItem('selected_business_type')
-    if (stored) {
-      const business = JSON.parse(stored)
-      setBusinessType(business.code) // Ex: 'pisciniste', 'plombier'
-      setInterventionForm(prev => ({
-        ...prev,
-        taux_horaire: business.default_labor_rate?.toString() || '45.00'
-      }))
+  const loadBusinessType = async () => {
+    try {
+      // Charger le type de métier depuis localStorage
+      const stored = localStorage.getItem('selected_business_type')
+      if (stored) {
+        const business = JSON.parse(stored)
+        setBusinessType(business)
+        setInterventionForm(prev => ({
+          ...prev,
+          taux_horaire: business.default_labor_rate?.toString() || '45.00'
+        }))
+
+        // Charger les types d'intervention pour ce métier
+        const token = localStorage.getItem('access_token')
+        const response = await fetch(`${API_URL}/api/intervention-types?business_type_id=${business.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+
+        if (response.ok) {
+          const types = await response.json()
+          setInterventionTypes(Array.isArray(types) ? types : [])
+        }
+      }
+    } catch (err) {
+      console.error('Error loading business type:', err)
     }
   }
 
@@ -552,27 +564,33 @@ export default function NewInterventionFormPage() {
             </div>
           </div>
 
-          {/* Types d'intervention */}
+          {/* Types d'intervention - Chargés dynamiquement selon le métier */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Type(s) d'intervention <span className="text-red-500">*</span>
             </label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {INTERVENTION_TYPES.map(type => (
-                <button
-                  key={type.id}
-                  type="button"
-                  onClick={() => toggleInterventionType(type.id)}
-                  className={`p-3 border-2 rounded-lg text-sm font-medium transition-colors ${
-                    interventionForm.intervention_types.includes(type.id)
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
-                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                  }`}
-                >
-                  <div className="text-xl mb-1">{type.icon}</div>
-                  {type.label}
-                </button>
-              ))}
+            {interventionTypes.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="text-sm text-gray-500 mt-2">Chargement des types...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {interventionTypes.map(type => (
+                  <button
+                    key={type.id}
+                    type="button"
+                    onClick={() => toggleInterventionType(type.id)}
+                    className={`p-3 border-2 rounded-lg text-sm font-medium transition-colors ${
+                      interventionForm.intervention_types.includes(type.id)
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    <div className="text-xl mb-1">{type.emoji}</div>
+                    {type.name}
+                  </button>
+                ))}
             </div>
             {interventionForm.intervention_types.length === 0 && (
               <p className="text-sm text-gray-500 mt-2">
