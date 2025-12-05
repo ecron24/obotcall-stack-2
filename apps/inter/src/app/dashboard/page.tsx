@@ -18,12 +18,6 @@ interface DashboardStats {
     active: number
     new_this_month: number
   }
-  factures: {
-    total_revenue: number
-    pending_amount: number
-    paid_this_month: number
-    overdue: number
-  }
   technicians: {
     total: number
     active: number
@@ -75,34 +69,6 @@ export default function DashboardPage() {
       if (response.ok) {
         const data = await response.json()
         setStats(data)
-      } else {
-        // Fallback avec données simulées pour le développement
-        setStats({
-          interventions: {
-            today: 3,
-            week: 12,
-            month: 45,
-            in_progress: 5,
-            scheduled: 8,
-            completed_this_month: 32
-          },
-          clients: {
-            total: 156,
-            active: 89,
-            new_this_month: 7
-          },
-          factures: {
-            total_revenue: 125000,
-            pending_amount: 15000,
-            paid_this_month: 28500,
-            overdue: 3
-          },
-          technicians: {
-            total: 8,
-            active: 6,
-            avg_rating: 4.7
-          }
-        })
       }
     } catch (err) {
       console.error('Error loading dashboard:', err)
@@ -121,12 +87,6 @@ export default function DashboardPage() {
           active: 0,
           new_this_month: 0
         },
-        factures: {
-          total_revenue: 0,
-          pending_amount: 0,
-          paid_this_month: 0,
-          overdue: 0
-        },
         technicians: {
           total: 0,
           active: 0,
@@ -136,15 +96,6 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(price)
   }
 
   if (loading) {
@@ -214,47 +165,6 @@ export default function DashboardPage() {
               <p className="text-xs text-gray-500 mt-1">À venir</p>
             </div>
             <div className="text-4xl">🗓️</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats financières */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* CA total */}
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-sm p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-green-100">Chiffre d'affaires</p>
-              <p className="text-3xl font-bold mt-1">{formatPrice(stats.factures.total_revenue)}</p>
-              <p className="text-xs text-green-100 mt-1">Total encaissé</p>
-            </div>
-            <div className="text-4xl">💰</div>
-          </div>
-        </div>
-
-        {/* CA ce mois */}
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-blue-100">Ce mois-ci</p>
-              <p className="text-3xl font-bold mt-1">{formatPrice(stats.factures.paid_this_month)}</p>
-              <p className="text-xs text-blue-100 mt-1">Factures payées</p>
-            </div>
-            <div className="text-4xl">📈</div>
-          </div>
-        </div>
-
-        {/* En attente */}
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-sm p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-orange-100">En attente</p>
-              <p className="text-3xl font-bold mt-1">{formatPrice(stats.factures.pending_amount)}</p>
-              <p className="text-xs text-orange-100 mt-1">
-                {stats.factures.overdue > 0 && `${stats.factures.overdue} en retard`}
-              </p>
-            </div>
-            <div className="text-4xl">⏳</div>
           </div>
         </div>
       </div>
