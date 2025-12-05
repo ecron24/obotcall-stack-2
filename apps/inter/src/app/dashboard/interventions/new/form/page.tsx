@@ -591,7 +591,8 @@ export default function NewInterventionFormPage() {
                     {type.name}
                   </button>
                 ))}
-            </div>
+              </div>
+            )}
             {interventionForm.intervention_types.length === 0 && (
               <p className="text-sm text-gray-500 mt-2">
                 Sélectionnez au moins un type d'intervention
