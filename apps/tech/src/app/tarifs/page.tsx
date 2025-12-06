@@ -71,7 +71,7 @@ export default function TarifsPage() {
                     </div>
                   </div>
                   <Button className="w-full" variant="outline" asChild>
-                    <Link href="/signup">Commencer</Link>
+                    <Link href="/select-product">Commencer</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -116,7 +116,7 @@ export default function TarifsPage() {
                     </div>
                   </div>
                   <Button className="w-full" asChild>
-                    <Link href="/signup">Commencer</Link>
+                    <Link href="/select-product">Commencer</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -153,7 +153,7 @@ export default function TarifsPage() {
                     </div>
                   </div>
                   <Button className="w-full" variant="outline" asChild>
-                    <Link href="/signup">Nous contacter</Link>
+                    <Link href="/select-product">Nous contacter</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -208,7 +208,7 @@ export default function TarifsPage() {
                     </div>
                   </div>
                   <Button className="w-full" variant="outline" asChild>
-                    <Link href="/signup">Commencer</Link>
+                    <Link href="/select-product">Commencer</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -253,7 +253,7 @@ export default function TarifsPage() {
                     </div>
                   </div>
                   <Button className="w-full" asChild>
-                    <Link href="/signup">Commencer</Link>
+                    <Link href="/select-product">Commencer</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -290,7 +290,7 @@ export default function TarifsPage() {
                     </div>
                   </div>
                   <Button className="w-full" variant="outline" asChild>
-                    <Link href="/signup">Nous contacter</Link>
+                    <Link href="/select-product">Nous contacter</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -344,7 +344,7 @@ export default function TarifsPage() {
                     </div>
                   </div>
                   <Button className="w-full" variant="outline" asChild>
-                    <Link href="/signup">Acheter</Link>
+                    <Link href="/select-product">Acheter</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -384,7 +384,7 @@ export default function TarifsPage() {
                     </div>
                   </div>
                   <Button className="w-full" asChild>
-                    <Link href="/signup">Acheter</Link>
+                    <Link href="/select-product">Acheter</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -424,7 +424,7 @@ export default function TarifsPage() {
                     </div>
                   </div>
                   <Button className="w-full" variant="outline" asChild>
-                    <Link href="/signup">Acheter</Link>
+                    <Link href="/select-product">Acheter</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -505,7 +505,7 @@ export default function TarifsPage() {
               </p>
               <div className="mt-10">
                 <Button size="lg" asChild>
-                  <Link href="/signup">
+                  <Link href="/select-product">
                     Essayer gratuitement
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>

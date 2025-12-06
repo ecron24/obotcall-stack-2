@@ -87,7 +87,7 @@ export default function ProduitsPage() {
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button asChild className="w-full sm:w-auto">
-                    <Link href="/signup">
+                    <Link href="/select-product">
                       Essayer Inter
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
@@ -192,7 +192,7 @@ export default function ProduitsPage() {
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button asChild className="w-full sm:w-auto">
-                    <Link href="/signup">
+                    <Link href="/select-product">
                       Essayer Agent
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
@@ -297,7 +297,7 @@ export default function ProduitsPage() {
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button asChild className="w-full sm:w-auto">
-                    <Link href="/signup">
+                    <Link href="/select-product">
                       Essayer Immo
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
@@ -358,7 +358,7 @@ export default function ProduitsPage() {
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-x-6">
                 <Button size="lg" asChild className="w-full sm:w-auto">
-                  <Link href="/signup">
+                  <Link href="/select-product">
                     Nous contacter
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
