@@ -3,7 +3,16 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { getUserSettings, updateUserSettings, type UserSettings } from '@/lib/actions/settings'
+
+interface UserSettings {
+  id: string
+  email: string
+  full_name: string
+  role: string
+  notifications_enabled: boolean
+  language: string
+  avatar_url?: string
+}
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -14,11 +23,24 @@ export default function SettingsPage() {
     loadUserSettings()
   }, [])
 
-  const loadUserSettings = async () => {
+  const loadUserSettings = () => {
     try {
       setLoading(true)
-      const data = await getUserSettings()
-      setUser(data)
+
+      // Récupérer depuis localStorage
+      const userStr = localStorage.getItem('user')
+      if (userStr) {
+        const userData = JSON.parse(userStr)
+        setUser({
+          id: userData.id || '',
+          email: userData.email || '',
+          full_name: userData.full_name || userData.name || userData.email || '',
+          role: userData.role || 'user',
+          notifications_enabled: userData.notifications_enabled ?? true,
+          language: userData.language || 'fr',
+          avatar_url: userData.avatar_url
+        })
+      }
     } catch (err) {
       console.error('Error loading user settings:', err)
     } finally {
@@ -26,26 +48,34 @@ export default function SettingsPage() {
     }
   }
 
-  const toggleNotifications = async () => {
+  const toggleNotifications = () => {
     if (!user) return
 
     try {
-      const updated = await updateUserSettings({
-        notifications_enabled: !user.notifications_enabled
-      })
-      setUser({ ...user, notifications_enabled: updated.notifications_enabled })
+      const updatedUser = { ...user, notifications_enabled: !user.notifications_enabled }
+      setUser(updatedUser)
+
+      // Sauvegarder dans localStorage
+      localStorage.setItem('user', JSON.stringify(updatedUser))
+
+      // TODO: Sauvegarder aussi dans Supabase via API si nécessaire
     } catch (err) {
       console.error('Error toggling notifications:', err)
       alert('❌ Erreur lors de la mise à jour des notifications')
     }
   }
 
-  const handleLanguageChange = async (language: string) => {
+  const handleLanguageChange = (language: string) => {
     if (!user) return
 
     try {
-      const updated = await updateUserSettings({ language })
-      setUser({ ...user, language: updated.language })
+      const updatedUser = { ...user, language }
+      setUser(updatedUser)
+
+      // Sauvegarder dans localStorage
+      localStorage.setItem('user', JSON.stringify(updatedUser))
+
+      // TODO: Sauvegarder aussi dans Supabase via API si nécessaire
     } catch (err) {
       console.error('Error updating language:', err)
       alert('❌ Erreur lors de la mise à jour de la langue')
