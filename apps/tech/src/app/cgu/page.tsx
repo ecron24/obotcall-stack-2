@@ -25,9 +25,9 @@ export default function CGUPage() {
                     l'utilisation des services ObotCall comprenant :
                   </p>
                   <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                    <li><strong>Inter :</strong> Standard téléphonique intelligent</li>
+                    <li><strong>Inter :</strong> Gestion d'interventions multi-métiers</li>
                     <li><strong>Agent :</strong> CRM pour courtiers d'assurance</li>
-                    <li><strong>Immo :</strong> Générateur de baux professionnels</li>
+                    <li><strong>Immo :</strong> Gestion locative</li>
                   </ul>
                   <p>
                     En accédant et en utilisant nos services, vous acceptez sans réserve les
@@ -83,13 +83,13 @@ export default function CGUPage() {
                   <CardTitle>4. Description des Services</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <h4 className="font-semibold">4.1 Inter - Standard téléphonique</h4>
+                  <h4 className="font-semibold">4.1 Inter - Gestion d'interventions multi-métiers</h4>
                   <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4">
-                    <li>Gestion des appels entrants et sortants</li>
-                    <li>Routage intelligent et personnalisable</li>
-                    <li>Enregistrement et archivage des conversations</li>
-                    <li>Statistiques et analytics en temps réel</li>
-                    <li>Intégration avec outils tiers (N8N)</li>
+                    <li>Gestion des interventions et devis</li>
+                    <li>Planning et calendrier multi-techniciens</li>
+                    <li>Facturation et documents professionnels</li>
+                    <li>Catalogue produits et services personnalisé</li>
+                    <li>Suivi clients et historique d'interventions</li>
                   </ul>
 
                   <h4 className="font-semibold mt-4">4.2 Agent - CRM Courtier</h4>
@@ -101,9 +101,10 @@ export default function CGUPage() {
                     <li>GED intégrée</li>
                   </ul>
 
-                  <h4 className="font-semibold mt-4">4.3 Immo - Générateur de baux</h4>
+                  <h4 className="font-semibold mt-4">4.3 Immo - Gestion locative</h4>
                   <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4">
-                    <li>Templates multi-pays et multi-langues</li>
+                    <li>Gestion des biens et locataires</li>
+                    <li>Génération de baux multi-pays et multi-langues</li>
                     <li>Personnalisation des modèles</li>
                     <li>Génération PDF professionnelle</li>
                     <li>Système de crédits prépayés</li>

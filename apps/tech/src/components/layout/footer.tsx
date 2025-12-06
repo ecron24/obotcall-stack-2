@@ -17,7 +17,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/produits#inter" className="text-muted-foreground hover:text-foreground">
-                  Inter - Standard téléphonique
+                  Inter - Gestion d'interventions
                 </Link>
               </li>
               <li>
@@ -27,7 +27,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/produits#immo" className="text-muted-foreground hover:text-foreground">
-                  Immo - Générateur de baux
+                  Immo - Gestion locative
                 </Link>
               </li>
             </ul>
