@@ -38,48 +38,48 @@ export default function ProduitsPage() {
               <div>
                 <Badge className="mb-4">Inter</Badge>
                 <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-                  Standard téléphonique intelligent
+                  Gestion d&apos;interventions multi-métiers
                 </h2>
                 <p className="text-lg text-muted-foreground mb-6">
-                  Transformez votre gestion téléphonique avec une solution moderne et
-                  intelligente. Inter vous permet de gérer tous vos appels professionnels
-                  avec une efficacité sans précédent.
+                  Solution complète pour piscinistes, plombiers, électriciens, garagistes et
+                  tous les métiers d&apos;intervention. Gérez vos interventions, devis, factures
+                  et planning en toute simplicité.
                 </p>
 
                 <div className="space-y-4 mb-8">
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Routage intelligent des appels</p>
+                      <p className="font-medium">Gestion complète des interventions</p>
                       <p className="text-sm text-muted-foreground">
-                        Distribuez automatiquement les appels selon vos règles métier
+                        Planifiez, suivez et facturez toutes vos interventions terrain
                       </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Statistiques et analytics</p>
+                      <p className="font-medium">Devis et facturation</p>
                       <p className="text-sm text-muted-foreground">
-                        Analysez vos performances avec des tableaux de bord détaillés
+                        Créez rapidement des devis professionnels et transformez-les en factures
                       </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Enregistrements et archivage</p>
+                      <p className="font-medium">Planning multi-techniciens</p>
                       <p className="text-sm text-muted-foreground">
-                        Conservez une trace de toutes vos conversations importantes
+                        Organisez les interventions de votre équipe avec un planning intelligent
                       </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Intégration N8N</p>
+                      <p className="font-medium">Gestion clients et équipements</p>
                       <p className="text-sm text-muted-foreground">
-                        Automatisez vos workflows et connectez vos outils existants
+                        Base de données clients complète avec historique des interventions
                       </p>
                     </div>
                   </div>
@@ -103,27 +103,31 @@ export default function ProduitsPage() {
                   <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900 mb-4">
                     <Phone className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <CardTitle className="text-2xl">Cas d'usage</CardTitle>
+                  <CardTitle className="text-2xl">Métiers supportés</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h4 className="font-semibold mb-2">Service client</h4>
+                    <h4 className="font-semibold mb-2">🏊 Piscinistes</h4>
                     <p className="text-sm text-muted-foreground">
-                      Gérez efficacement les appels entrants de vos clients avec distribution
-                      automatique et files d'attente intelligentes
+                      Entretien, maintenance, réparation et installation de piscines
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">Équipes commerciales</h4>
+                    <h4 className="font-semibold mb-2">🔧 Plombiers</h4>
                     <p className="text-sm text-muted-foreground">
-                      Suivez les performances de vos commerciaux et optimisez vos campagnes
-                      d'appels sortants
+                      Dépannages, installations sanitaires, chauffage et climatisation
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">PME et startups</h4>
+                    <h4 className="font-semibold mb-2">⚡ Électriciens</h4>
                     <p className="text-sm text-muted-foreground">
-                      Adoptez un système téléphonique professionnel sans infrastructure complexe
+                      Installations électriques, dépannages et mises aux normes
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">🚗 Garagistes & autres métiers</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Tous les métiers d&apos;intervention terrain et de maintenance
                     </p>
                   </div>
                 </CardContent>
@@ -244,47 +248,48 @@ export default function ProduitsPage() {
               <div>
                 <Badge className="mb-4 bg-green-600">Immo</Badge>
                 <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-                  Générateur de baux professionnels
+                  Gestion locative et baux immobiliers
                 </h2>
                 <p className="text-lg text-muted-foreground mb-6">
-                  Créez des contrats de location conformes et professionnels en quelques
-                  minutes. Immo vous fait gagner un temps précieux dans la gestion locative.
+                  Solution complète pour gérer votre patrimoine immobilier : baux, contrats de
+                  vente, locataires, quittances et documents. Templates conformes et génération
+                  PDF automatique.
                 </p>
 
                 <div className="space-y-4 mb-8">
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Support multi-pays</p>
+                      <p className="font-medium">Gestion complète des biens</p>
                       <p className="text-sm text-muted-foreground">
-                        8 pays européens supportés avec conformité légale locale
+                        Centralisez tous vos biens immobiliers avec leurs caractéristiques
                       </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Templates personnalisables</p>
+                      <p className="font-medium">Baux et contrats automatisés</p>
                       <p className="text-sm text-muted-foreground">
-                        Créez vos propres modèles avec champs dynamiques
+                        Templates conformes pour baux résidentiels, commerciaux et contrats de vente
                       </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Génération PDF instantanée</p>
+                      <p className="font-medium">Gestion locataires et quittances</p>
                       <p className="text-sm text-muted-foreground">
-                        Exportez vos baux au format PDF professionnel en un clic
+                        Suivez vos locataires, générez les quittances et gérez les paiements
                       </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Système de crédits flexible</p>
+                      <p className="font-medium">Multi-propriétaires et agences</p>
                       <p className="text-sm text-muted-foreground">
-                        Payez uniquement pour les baux que vous générez
+                        Gérez plusieurs propriétaires ou plusieurs agences immobilières
                       </p>
                     </div>
                   </div>
@@ -308,31 +313,31 @@ export default function ProduitsPage() {
                   <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900 mb-4">
                     <FileText className="h-8 w-8 text-green-600 dark:text-green-400" />
                   </div>
-                  <CardTitle className="text-2xl">Types de baux</CardTitle>
+                  <CardTitle className="text-2xl">Modules inclus</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h4 className="font-semibold mb-2">Bail résidentiel</h4>
+                    <h4 className="font-semibold mb-2">Gestion des biens</h4>
                     <p className="text-sm text-muted-foreground">
-                      Pour locations d'habitation principale avec toutes les clauses légales
+                      Propriétés, appartements, commerces avec toutes leurs caractéristiques
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">Bail commercial</h4>
+                    <h4 className="font-semibold mb-2">Baux et contrats</h4>
                     <p className="text-sm text-muted-foreground">
-                      Locations professionnelles et commerciales avec spécificités métier
+                      Templates conformes pour baux résidentiels, commerciaux et contrats de vente
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">Bail mixte</h4>
+                    <h4 className="font-semibold mb-2">Gestion locataires</h4>
                     <p className="text-sm text-muted-foreground">
-                      Combinaison habitation et activité professionnelle
+                      Fiches locataires, quittances automatiques, suivi des paiements
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">Bail saisonnier</h4>
+                    <h4 className="font-semibold mb-2">Documents et GED</h4>
                     <p className="text-sm text-muted-foreground">
-                      Locations de courte durée pour vacances et séjours temporaires
+                      Stockage sécurisé, génération PDF, historique complet
                     </p>
                   </div>
                 </CardContent>
