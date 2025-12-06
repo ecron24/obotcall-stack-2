@@ -20,7 +20,7 @@ type Plan = {
 const products = {
   inter: {
     name: 'Inter',
-    description: 'Gestion d'interventions multi-métiers',
+    description: 'Gestion d\'interventions multi-métiers',
     icon: Phone,
     color: 'blue',
     plans: [
