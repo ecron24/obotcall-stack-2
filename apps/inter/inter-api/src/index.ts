@@ -25,8 +25,18 @@ const app = new Hono()
 // Global middleware
 app.use('*', logger())
 app.use('*', prettyJSON())
+
+// CORS configuration with proper defaults
+const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'https://inter.app.obotcall.tech',
+  'https://app.obotcall.tech',
+  'https://tech.obotcall.tech',
+]
+
 app.use('*', cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3001'],
+  origin: allowedOrigins,
   credentials: true,
 }))
 
