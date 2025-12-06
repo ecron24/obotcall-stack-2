@@ -1,20 +1,34 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { apiClient } from '@/lib/api-client'
 import { BusinessTypeSelector } from '@/components/business'
+import { useBusinessTypes } from '@/hooks'
 import type { BusinessType } from '@/types'
 
 export default function RegisterPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const { businessTypes, loading: loadingBusinessTypes } = useBusinessTypes()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [selectedBusiness, setSelectedBusiness] = useState<BusinessType | null>(null)
+
+  // Pre-select business from query params
+  useEffect(() => {
+    const businessId = searchParams.get('business')
+    if (businessId && businessTypes.length > 0) {
+      const business = businessTypes.find(b => b.id === businessId)
+      if (business) {
+        setSelectedBusiness(business)
+      }
+    }
+  }, [searchParams, businessTypes])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -143,25 +157,44 @@ export default function RegisterPage() {
             {/* Sélecteur de métier */}
             <div className="space-y-2 pt-2">
               <label className="text-sm font-medium">Type d'activité *</label>
-              <BusinessTypeSelector
-                onChange={(business) => setSelectedBusiness(business)}
-                disabled={loading}
-                className="mt-2"
-              />
-              {selectedBusiness && (
-                <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{selectedBusiness.emoji}</span>
-                    <div>
-                      <div className="text-sm font-semibold text-blue-900">
-                        {selectedBusiness.name}
+
+              {selectedBusiness ? (
+                // Métier pré-sélectionné depuis l'URL - affichage simplifié
+                <div className="space-y-2">
+                  <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{selectedBusiness.emoji}</span>
+                        <div>
+                          <div className="text-base font-semibold text-blue-900">
+                            {selectedBusiness.name}
+                          </div>
+                          <div className="text-sm text-blue-700">
+                            Taux horaire: {selectedBusiness.default_labor_rate}€/h • Déplacement: {selectedBusiness.default_travel_fee}€
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-xs text-blue-700">
-                        Taux horaire: {selectedBusiness.default_labor_rate}€/h
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBusiness(null)}
+                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                        disabled={loading}
+                      >
+                        Modifier
+                      </button>
                     </div>
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    Vous pouvez modifier votre choix en cliquant sur "Modifier"
+                  </p>
                 </div>
+              ) : (
+                // Pas de métier pré-sélectionné - afficher le sélecteur complet
+                <BusinessTypeSelector
+                  onChange={(business) => setSelectedBusiness(business)}
+                  disabled={loading}
+                  className="mt-2"
+                />
               )}
             </div>
           </CardContent>
