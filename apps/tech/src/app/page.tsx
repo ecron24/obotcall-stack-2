@@ -19,8 +19,8 @@ export default function HomePage() {
             </h1>
             <p className="mt-6 text-lg leading-8 text-muted-foreground">
               ObotCall accompagne votre transformation digitale avec trois solutions métier
-              complètes : standard téléphonique intelligent, CRM pour courtiers et générateur
-              de baux professionnels.
+              complètes : gestion d'interventions multi-métiers, CRM pour courtiers et gestion
+              locative immobilière.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-x-6">
               <Button size="lg" asChild className="w-full sm:w-auto">
@@ -56,12 +56,12 @@ export default function HomePage() {
                     <Phone className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <CardTitle className="mt-4">Inter</CardTitle>
-                  <CardDescription>Standard téléphonique intelligent</CardDescription>
+                  <CardDescription>Gestion d'interventions multi-métiers</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Gérez vos appels professionnels avec intelligence : routage avancé,
-                    enregistrements, statistiques et intégration N8N.
+                    Solution complète pour piscinistes, plombiers, électriciens, garagistes...
+                    Gérez interventions, devis, factures et planning.
                   </p>
                   <Button variant="outline" size="sm" asChild>
                     <Link href="/produits#inter">En savoir plus →</Link>
@@ -94,12 +94,12 @@ export default function HomePage() {
                     <FileText className="h-6 w-6 text-green-600 dark:text-green-400" />
                   </div>
                   <CardTitle className="mt-4">Immo</CardTitle>
-                  <CardDescription>Générateur de baux professionnels</CardDescription>
+                  <CardDescription>Gestion locative et baux immobiliers</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Créez des baux conformes en quelques clics : templates multi-pays,
-                    génération PDF, gestion des crédits.
+                    Gérez votre patrimoine : baux, contrats de vente, locataires, quittances.
+                    Templates conformes, génération PDF automatique.
                   </p>
                   <Button variant="outline" size="sm" asChild>
                     <Link href="/produits#immo">En savoir plus →</Link>

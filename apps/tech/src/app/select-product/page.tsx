@@ -20,7 +20,7 @@ type Plan = {
 const products = {
   inter: {
     name: 'Inter',
-    description: 'Standard téléphonique intelligent',
+    description: 'Gestion d'interventions multi-métiers',
     icon: Phone,
     color: 'blue',
     plans: [
@@ -29,14 +29,14 @@ const products = {
         name: 'Starter',
         price: '29€/mois',
         priceId: 'STRIPE_INTER_STARTER_PRICE_ID',
-        features: ['5 utilisateurs', '1000 minutes/mois', 'Routage basique', 'Support email'],
+        features: ['1 utilisateur', 'Interventions illimitées', 'Devis & Factures', 'Planning basique', 'Support email'],
       },
       {
         id: 'pro',
         name: 'Pro',
         price: '99€/mois',
         priceId: 'STRIPE_INTER_PRO_PRICE_ID',
-        features: ['20 utilisateurs', '5000 minutes/mois', 'Routage intelligent', 'Intégration N8N', 'Support prioritaire'],
+        features: ['Utilisateurs illimités', 'Tout Starter +', 'Planning avancé', 'Multi-techniciens', 'Intégration Google Calendar', 'Support prioritaire'],
       },
     ],
   },
@@ -64,30 +64,30 @@ const products = {
   },
   immo: {
     name: 'Immo',
-    description: 'Générateur de baux professionnels',
+    description: 'Gestion locative et baux immobiliers',
     icon: FileText,
     color: 'green',
     plans: [
       {
         id: 'starter',
         name: 'Starter',
-        price: '10€',
+        price: '19€/mois',
         priceId: 'STRIPE_IMMO_STARTER_PRICE_ID',
-        features: ['10 crédits', '1€ par bail', 'Templates standards', 'Génération PDF'],
+        features: ['10 biens', 'Baux et contrats', 'Quittances', 'Gestion locataires', 'Support email'],
       },
       {
         id: 'pro',
         name: 'Pro',
-        price: '50€',
+        price: '49€/mois',
         priceId: 'STRIPE_IMMO_PRO_PRICE_ID',
-        features: ['60 crédits', '0,83€ par bail', 'Templates personnalisés', 'Multi-pays', 'Support prioritaire'],
+        features: ['Biens illimités', 'Tout Starter +', 'Multi-propriétaires', 'Documents personnalisés', 'Support prioritaire'],
       },
       {
         id: 'enterprise',
         name: 'Enterprise',
-        price: '200€',
+        price: '99€/mois',
         priceId: 'STRIPE_IMMO_ENTERPRISE_PRICE_ID',
-        features: ['300 crédits', '0,67€ par bail', 'Tout Pro +', 'Intégration API', 'Support dédié'],
+        features: ['Tout Pro +', 'Multi-agences', 'Intégration API', 'White label', 'Support dédié'],
       },
     ],
   },
@@ -122,7 +122,14 @@ export default function SelectProductPage() {
                 <Card
                   key={key}
                   className="cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => setSelectedProduct(key as Product)}
+                  onClick={() => {
+                    // Pour Inter, rediriger vers la sélection de métier
+                    if (key === 'inter') {
+                      router.push('/inter/select-business')
+                    } else {
+                      setSelectedProduct(key as Product)
+                    }
+                  }}
                 >
                   <CardHeader>
                     <div className={`flex h-16 w-16 items-center justify-center rounded-lg bg-${product.color}-100 dark:bg-${product.color}-900 mb-4`}>
@@ -133,7 +140,10 @@ export default function SelectProductPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      {product.plans.length} plan{product.plans.length > 1 ? 's' : ''} disponible{product.plans.length > 1 ? 's' : ''}
+                      {key === 'inter'
+                        ? 'Sélectionnez votre métier pour continuer'
+                        : `${product.plans.length} plan${product.plans.length > 1 ? 's' : ''} disponible${product.plans.length > 1 ? 's' : ''}`
+                      }
                     </p>
                     <Button className="w-full">
                       Sélectionner
