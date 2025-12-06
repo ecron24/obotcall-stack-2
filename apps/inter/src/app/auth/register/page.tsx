@@ -7,16 +7,26 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { apiClient } from '@/lib/api-client'
+import { BusinessTypeSelector } from '@/components/business'
+import type { BusinessType } from '@/types'
 
 export default function RegisterPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [selectedBusiness, setSelectedBusiness] = useState<BusinessType | null>(null)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
     setError('')
+
+    // Vérifier qu'un métier a été sélectionné
+    if (!selectedBusiness) {
+      setError('Veuillez sélectionner votre type d\'activité')
+      setLoading(false)
+      return
+    }
 
     const formData = new FormData(e.currentTarget)
     const email = formData.get('email') as string
@@ -32,13 +42,17 @@ export default function RegisterPage() {
         full_name,
         tenant_name,
         tenant_slug,
+        business_type_id: selectedBusiness.id,
       })
 
-      // Store token
+      // Store token and user data
       apiClient.setToken(response.access_token)
       localStorage.setItem('access_token', response.access_token)
       localStorage.setItem('user', JSON.stringify(response.user))
       localStorage.setItem('tenant', JSON.stringify(response.tenant))
+
+      // Store selected business type for dashboard customization
+      localStorage.setItem('selected_business_type', JSON.stringify(selectedBusiness))
 
       router.push('/dashboard')
     } catch (err: any) {
@@ -124,6 +138,31 @@ export default function RegisterPage() {
               <p className="text-xs text-muted-foreground">
                 Cet identifiant sera utilisé dans l'URL de votre compte
               </p>
+            </div>
+
+            {/* Sélecteur de métier */}
+            <div className="space-y-2 pt-2">
+              <label className="text-sm font-medium">Type d'activité *</label>
+              <BusinessTypeSelector
+                onChange={(business) => setSelectedBusiness(business)}
+                disabled={loading}
+                className="mt-2"
+              />
+              {selectedBusiness && (
+                <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{selectedBusiness.emoji}</span>
+                    <div>
+                      <div className="text-sm font-semibold text-blue-900">
+                        {selectedBusiness.name}
+                      </div>
+                      <div className="text-xs text-blue-700">
+                        Taux horaire: {selectedBusiness.default_labor_rate}€/h
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
