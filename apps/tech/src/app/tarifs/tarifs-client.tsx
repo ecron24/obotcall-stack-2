@@ -85,7 +85,7 @@ export function TarifsClient() {
                 <CardTitle>Starter</CardTitle>
                 <CardDescription>Pour les indépendants</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">29€</span>
+                  <span className="text-4xl font-bold">49€</span>
                   <span className="text-muted-foreground">/mois</span>
                 </div>
               </CardHeader>

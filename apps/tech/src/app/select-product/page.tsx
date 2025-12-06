@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Phone, Users, FileText, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Phone, Users, FileText, CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { Header } from '@/components/layout/header'
+import { Footer } from '@/components/layout/footer'
 
 type Product = 'inter' | 'agent' | 'immo'
 type Plan = {
@@ -27,7 +29,7 @@ const products = {
       {
         id: 'starter',
         name: 'Starter',
-        price: '29€/mois',
+        price: '49€/mois',
         priceId: 'STRIPE_INTER_STARTER_PRICE_ID',
         features: ['1 utilisateur', 'Interventions illimitées', 'Devis & Factures', 'Planning basique', 'Support email'],
       },
@@ -38,6 +40,13 @@ const products = {
         priceId: 'STRIPE_INTER_PRO_PRICE_ID',
         features: ['Utilisateurs illimités', 'Tout Starter +', 'Planning avancé', 'Multi-techniciens', 'Intégration Google Calendar', 'Support prioritaire'],
       },
+      {
+        id: 'enterprise',
+        name: 'Enterprise',
+        price: 'Sur contact',
+        priceId: 'STRIPE_INTER_ENTERPRISE_PRICE_ID',
+        features: ['Tout Pro +', 'SLA garanti', 'Personnalisation avancée', 'Formation dédiée', 'Support dédié 24/7'],
+      },
     ],
   },
   agent: {
@@ -47,18 +56,25 @@ const products = {
     color: 'purple',
     plans: [
       {
-        id: 'solo',
-        name: 'Solo',
+        id: 'starter',
+        name: 'Starter',
         price: '49€/mois',
-        priceId: 'STRIPE_AGENT_SOLO_PRICE_ID',
-        features: ['1 utilisateur', 'Contacts illimités', 'Devis & Contrats', 'Sinistres', '1 Go stockage'],
+        priceId: 'STRIPE_AGENT_STARTER_PRICE_ID',
+        features: ['1 utilisateur', 'Contacts illimités', 'Devis & Contrats', 'Sinistres', 'Support email'],
       },
       {
-        id: 'team',
-        name: 'Team',
-        price: '39€/utilisateur/mois',
-        priceId: 'STRIPE_AGENT_TEAM_PRICE_ID',
-        features: ['3+ utilisateurs', 'Tout Solo +', 'Facturation avancée', '10 Go stockage', 'Support prioritaire'],
+        id: 'pro',
+        name: 'Pro',
+        price: '99€/mois',
+        priceId: 'STRIPE_AGENT_PRO_PRICE_ID',
+        features: ['Utilisateurs illimités', 'Tout Starter +', 'Facturation avancée', 'Rapports personnalisés', 'Support prioritaire'],
+      },
+      {
+        id: 'enterprise',
+        name: 'Enterprise',
+        price: 'Sur contact',
+        priceId: 'STRIPE_AGENT_ENTERPRISE_PRICE_ID',
+        features: ['Tout Pro +', 'Multi-agences', 'Intégration API', 'White label', 'Support dédié 24/7'],
       },
     ],
   },
@@ -71,23 +87,23 @@ const products = {
       {
         id: 'starter',
         name: 'Starter',
-        price: '19€/mois',
+        price: '49€/mois',
         priceId: 'STRIPE_IMMO_STARTER_PRICE_ID',
         features: ['10 biens', 'Baux et contrats', 'Quittances', 'Gestion locataires', 'Support email'],
       },
       {
         id: 'pro',
         name: 'Pro',
-        price: '49€/mois',
+        price: '99€/mois',
         priceId: 'STRIPE_IMMO_PRO_PRICE_ID',
         features: ['Biens illimités', 'Tout Starter +', 'Multi-propriétaires', 'Documents personnalisés', 'Support prioritaire'],
       },
       {
         id: 'enterprise',
         name: 'Enterprise',
-        price: '99€/mois',
+        price: 'Sur contact',
         priceId: 'STRIPE_IMMO_ENTERPRISE_PRICE_ID',
-        features: ['Tout Pro +', 'Multi-agences', 'Intégration API', 'White label', 'Support dédié'],
+        features: ['Tout Pro +', 'Multi-agences', 'Intégration API', 'White label', 'Support dédié 24/7'],
       },
     ],
   },
@@ -103,16 +119,27 @@ export default function SelectProductPage() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">
-            Choisissez votre solution
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Sélectionnez le produit et le plan qui correspond à vos besoins
-          </p>
-        </div>
+    <div className="flex min-h-screen flex-col">
+      <Header />
+
+      <main className="flex-1 bg-muted/50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <Link
+            href="/"
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Retour à l'accueil
+          </Link>
+
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold tracking-tight mb-4">
+              Choisissez votre solution
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Sélectionnez le produit et le plan qui correspond à vos besoins
+            </p>
+          </div>
 
         {!selectedProduct ? (
           <div className="grid gap-8 md:grid-cols-3">
@@ -223,7 +250,10 @@ export default function SelectProductPage() {
             </div>
           </div>
         )}
-      </div>
+        </div>
+      </main>
+
+      <Footer />
     </div>
   )
 }
