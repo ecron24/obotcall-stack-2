@@ -41,9 +41,9 @@ export default function ProduitsPage() {
                   Gestion d&apos;interventions multi-métiers
                 </h2>
                 <p className="text-lg text-muted-foreground mb-6">
-                  Solution complète pour piscinistes, plombiers, électriciens, garagistes et
-                  tous les métiers d&apos;intervention. Gérez vos interventions, devis, factures
-                  et planning en toute simplicité.
+                  Solution complète pour piscinistes, plombiers, garagistes, électriciens,
+                  chauffagistes, éradiqueurs de nuisibles et tous les métiers d&apos;intervention.
+                  Gérez vos interventions, devis, factures et planning en toute simplicité.
                 </p>
 
                 <div className="space-y-4 mb-8">
@@ -105,29 +105,41 @@ export default function ProduitsPage() {
                   </div>
                   <CardTitle className="text-2xl">Métiers supportés</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   <div>
-                    <h4 className="font-semibold mb-2">🏊 Piscinistes</h4>
+                    <h4 className="font-semibold mb-1">🏊 Piscinistes</h4>
                     <p className="text-sm text-muted-foreground">
-                      Entretien, maintenance, réparation et installation de piscines
+                      Entretien, maintenance et installation de piscines
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">🔧 Plombiers</h4>
+                    <h4 className="font-semibold mb-1">🔧 Plombiers</h4>
                     <p className="text-sm text-muted-foreground">
-                      Dépannages, installations sanitaires, chauffage et climatisation
+                      Installations sanitaires et dépannages
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">⚡ Électriciens</h4>
+                    <h4 className="font-semibold mb-1">🚗 Garagistes</h4>
                     <p className="text-sm text-muted-foreground">
-                      Installations électriques, dépannages et mises aux normes
+                      Réparation et entretien automobile
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">🚗 Garagistes & autres métiers</h4>
+                    <h4 className="font-semibold mb-1">⚡ Électriciens</h4>
                     <p className="text-sm text-muted-foreground">
-                      Tous les métiers d&apos;intervention terrain et de maintenance
+                      Installations électriques et mises aux normes
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1">🔥 Chauffagistes</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Chauffage, climatisation et ventilation
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1">🐛 Éradiqueurs de nuisibles</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Dératisation, désinsectisation et désinfection
                     </p>
                   </div>
                 </CardContent>
