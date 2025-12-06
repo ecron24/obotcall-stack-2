@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft } from 'lucide-react'
 
 export default function SignupPage() {
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -21,6 +22,10 @@ export default function SignupPage() {
   const [success, setSuccess] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+
+  // Récupérer les paramètres product et business depuis l'URL
+  const product = searchParams.get('product')
+  const businessId = searchParams.get('business')
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,14 +45,20 @@ export default function SignupPage() {
     }
 
     try {
+      // Stocker product et business dans les métadonnées utilisateur
+      const metadata: any = {
+        full_name: fullName,
+        company: company,
+      }
+
+      if (product) metadata.selected_product = product
+      if (businessId) metadata.selected_business_id = businessId
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            full_name: fullName,
-            company: company,
-          },
+          data: metadata,
         },
       })
 
@@ -57,9 +68,22 @@ export default function SignupPage() {
       }
 
       setSuccess(true)
-      // Redirect to product selection after successful signup
+
+      // Redirection selon le produit sélectionné
       setTimeout(() => {
-        router.push('/select-product')
+        if (product === 'inter' && businessId) {
+          // Rediriger vers inter.app avec le business pré-sélectionné
+          window.location.href = `https://inter.app.obotcall.tech/auth/register?business=${businessId}`
+        } else if (product === 'immo') {
+          // Rediriger vers immo.app
+          window.location.href = 'https://immo.app.obotcall.tech/auth/register'
+        } else if (product === 'agent') {
+          // Rediriger vers agent.app
+          window.location.href = 'https://agent.app.obotcall.tech/auth/register'
+        } else {
+          // Flow normal : sélection de produit
+          router.push('/select-product')
+        }
       }, 2000)
     } catch (err: any) {
       setError(err.message || 'Une erreur est survenue')
@@ -81,7 +105,15 @@ export default function SignupPage() {
           </Link>
           <CardTitle className="text-2xl">Créer un compte</CardTitle>
           <CardDescription>
-            Commencez votre essai gratuit de 14 jours
+            {product === 'inter' ? (
+              'Créez votre compte pour accéder à Inter-App'
+            ) : product === 'immo' ? (
+              'Créez votre compte pour accéder à Immo-App'
+            ) : product === 'agent' ? (
+              'Créez votre compte pour accéder à Agent-App'
+            ) : (
+              'Commencez votre essai gratuit de 14 jours'
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -89,7 +121,17 @@ export default function SignupPage() {
             <div className="p-4 text-sm text-green-600 bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900 rounded-md">
               <p className="font-medium">Compte créé avec succès !</p>
               <p className="mt-1">Vérifiez votre email pour confirmer votre compte.</p>
-              <p className="mt-2 text-xs">Redirection en cours...</p>
+              <p className="mt-2 text-xs">
+                {product === 'inter' ? (
+                  'Redirection vers Inter-App...'
+                ) : product === 'immo' ? (
+                  'Redirection vers Immo-App...'
+                ) : product === 'agent' ? (
+                  'Redirection vers Agent-App...'
+                ) : (
+                  'Redirection en cours...'
+                )}
+              </p>
             </div>
           ) : (
             <form onSubmit={handleSignup} className="space-y-4">
