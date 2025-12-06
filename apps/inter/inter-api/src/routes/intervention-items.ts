@@ -224,7 +224,7 @@ interventionItems.patch('/:id', async (c) => {
       .from('intervention_items')
       .select('intervention_id, intervention:interventions!inner(tenant_id, status)')
       .eq('id', id)
-      .single()
+      .single() as any
 
     if (!existingItem || existingItem.intervention.tenant_id !== tenant.id) {
       return c.json({
@@ -289,7 +289,7 @@ interventionItems.delete('/:id', async (c) => {
       .from('intervention_items')
       .select('intervention_id, intervention:interventions!inner(tenant_id, status)')
       .eq('id', id)
-      .single()
+      .single() as any
 
     if (!existingItem || existingItem.intervention.tenant_id !== tenant.id) {
       return c.json({
