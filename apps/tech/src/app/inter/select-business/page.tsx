@@ -49,8 +49,8 @@ export default function SelectBusinessPage() {
   }
 
   const handleSelectBusiness = (business: BusinessType) => {
-    // Redirect directly to Inter app registration with business pre-selected
-    window.location.href = `https://inter.app.obotcall.tech/auth/register?business=${business.id}`
+    // Redirect to tarifs page with product and business pre-selected
+    router.push(`/tarifs?product=inter&business=${business.id}`)
   }
 
   return (
