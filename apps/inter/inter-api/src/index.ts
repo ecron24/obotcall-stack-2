@@ -27,7 +27,7 @@ app.use('*', logger())
 app.use('*', prettyJSON())
 
 // CORS configuration with proper defaults
-const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [
+const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
   'https://inter.app.obotcall.tech',
@@ -35,8 +35,19 @@ const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [
   'https://tech.obotcall.tech',
 ]
 
+// Add custom CORS_ORIGIN from env if provided
+if (process.env.CORS_ORIGIN) {
+  allowedOrigins.push(...process.env.CORS_ORIGIN.split(','))
+}
+
 app.use('*', cors({
-  origin: allowedOrigins,
+  origin: (origin) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return '*'
+
+    // Check if origin is in allowed list
+    return allowedOrigins.includes(origin) ? origin : allowedOrigins[0]
+  },
   credentials: true,
 }))
 
