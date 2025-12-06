@@ -40,13 +40,6 @@ const products = {
         priceId: 'STRIPE_INTER_PRO_PRICE_ID',
         features: ['Utilisateurs illimités', 'Tout Starter +', 'Planning avancé', 'Multi-techniciens', 'Intégration Google Calendar', 'Support prioritaire'],
       },
-      {
-        id: 'enterprise',
-        name: 'Enterprise',
-        price: 'Sur contact',
-        priceId: 'STRIPE_INTER_ENTERPRISE_PRICE_ID',
-        features: ['Tout Pro +', 'SLA garanti', 'Personnalisation avancée', 'Formation dédiée', 'Support dédié 24/7'],
-      },
     ],
   },
   agent: {
@@ -69,13 +62,6 @@ const products = {
         priceId: 'STRIPE_AGENT_PRO_PRICE_ID',
         features: ['Utilisateurs illimités', 'Tout Starter +', 'Facturation avancée', 'Rapports personnalisés', 'Support prioritaire'],
       },
-      {
-        id: 'enterprise',
-        name: 'Enterprise',
-        price: 'Sur contact',
-        priceId: 'STRIPE_AGENT_ENTERPRISE_PRICE_ID',
-        features: ['Tout Pro +', 'Multi-agences', 'Intégration API', 'White label', 'Support dédié 24/7'],
-      },
     ],
   },
   immo: {
@@ -97,13 +83,6 @@ const products = {
         price: '99€/mois',
         priceId: 'STRIPE_IMMO_PRO_PRICE_ID',
         features: ['Biens illimités', 'Tout Starter +', 'Multi-propriétaires', 'Documents personnalisés', 'Support prioritaire'],
-      },
-      {
-        id: 'enterprise',
-        name: 'Enterprise',
-        price: 'Sur contact',
-        priceId: 'STRIPE_IMMO_ENTERPRISE_PRICE_ID',
-        features: ['Tout Pro +', 'Multi-agences', 'Intégration API', 'White label', 'Support dédié 24/7'],
       },
     ],
   },
@@ -200,7 +179,7 @@ export default function SelectProductPage() {
               </p>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-3">
+            <div className="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
               {products[selectedProduct].plans.map((plan) => (
                 <Card key={plan.id} className="relative">
                   <CardHeader>
