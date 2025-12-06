@@ -44,9 +44,27 @@ app.get('/health', (c) => {
 app.route('/api/auth', authRoutes)
 app.route('/api/business-types', businessTypesRoutes) // Public for registration
 
-// Protected routes (auth required)
-app.use('/api/*', authMiddleware)
-app.use('/api/*', rateLimiter())
+// Protected routes (auth required) - exclude public routes
+app.use('/api/*', async (c, next) => {
+  const path = c.req.path
+
+  // Skip auth for public routes
+  if (path.startsWith('/api/auth') || path.startsWith('/api/business-types')) {
+    return next()
+  }
+
+  return authMiddleware(c, next)
+})
+app.use('/api/*', async (c, next) => {
+  const path = c.req.path
+
+  // Skip rate limiting for public routes
+  if (path.startsWith('/api/auth') || path.startsWith('/api/business-types')) {
+    return next()
+  }
+
+  return rateLimiter()(c, next)
+})
 
 app.route('/api/interventions', interventionsRoutes)
 app.route('/api/intervention-items', interventionItemsRoutes)
