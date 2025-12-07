@@ -113,22 +113,7 @@ export default function SelectBusinessPage() {
                   </div>
                   <CardTitle className="text-xl">{business.name}</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center space-y-2">
-                  <div className="text-sm text-muted-foreground space-y-1">
-                    <div className="flex items-center justify-center gap-2">
-                      <span>💰</span>
-                      <span>{business.default_labor_rate}€/h</span>
-                    </div>
-                    <div className="flex items-center justify-center gap-2">
-                      <span>🚗</span>
-                      <span>{business.default_travel_fee}€</span>
-                    </div>
-                    <div className="flex items-center justify-center gap-2">
-                      <span>📊</span>
-                      <span>TVA {business.default_tax_rate}%</span>
-                    </div>
-                  </div>
-
+                <CardContent className="text-center">
                   <div className="pt-4 opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm">
                       Choisir ce métier
