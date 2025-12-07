@@ -52,11 +52,8 @@ auth.post('/register', async (c) => {
       .insert({
         slug: validated.tenant_slug,
         name: validated.tenant_name,
-        subscription_plan: SubscriptionPlan.FREE,
-        subscription_status: 'trial',
-        trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days trial
-        current_users_count: 1,
-        current_interventions_count: 0
+        app_type: 'inter_app',
+        country_code: 'FR' // Default to France
       })
       .select()
       .single()
@@ -71,17 +68,13 @@ auth.post('/register', async (c) => {
       }, 500)
     }
 
-    // Create user record
+    // Create user record (without tenant_id and role - those are in user_tenant_roles)
     const { data: user, error: userError } = await supabaseAdmin
       .from('users')
       .insert({
         id: authData.user.id,
-        tenant_id: tenant.id,
         email: validated.email,
-        full_name: validated.full_name,
-        role: UserRole.OWNER,
-        is_active: true,
-        email_verified: true
+        full_name: validated.full_name
       })
       .select()
       .single()
@@ -93,29 +86,76 @@ auth.post('/register', async (c) => {
       console.error('User creation error:', userError)
       return c.json({
         error: 'Registration Failed',
-        message: 'Impossible de créer l\'utilisateur'
+        message: 'Impossible de créer l\'utilisateur',
+        details: userError?.message
       }, 500)
     }
 
-    // Generate access token
-    const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'magiclink',
-      email: validated.email
+    // Create user-tenant role
+    const { data: userRole, error: roleError } = await supabaseAdmin
+      .from('user_tenant_roles')
+      .insert({
+        user_id: authData.user.id,
+        tenant_id: tenant.id,
+        role: UserRole.OWNER,
+        is_active: true
+      })
+      .select()
+      .single()
+
+    if (roleError || !userRole) {
+      // Rollback: delete user, tenant and auth user
+      await supabaseAdmin.from('users').delete().eq('id', authData.user.id)
+      await supabaseAdmin.from('tenants').delete().eq('id', tenant.id)
+      await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
+      console.error('Role creation error:', roleError)
+      return c.json({
+        error: 'Registration Failed',
+        message: 'Impossible de créer le rôle utilisateur',
+        details: roleError?.message
+      }, 500)
+    }
+
+    // Create session to get access token
+    const { data: session, error: sessionError } = await supabaseAdmin.auth.signInWithPassword({
+      email: validated.email,
+      password: validated.password
     })
+
+    if (sessionError || !session.session) {
+      console.error('Session creation error:', sessionError)
+      // Registration succeeded but no session - user will need to login manually
+      return c.json({
+        message: 'Inscription réussie',
+        user: {
+          id: user.id,
+          email: user.email,
+          full_name: user.full_name,
+          role: userRole.role
+        },
+        tenant: {
+          id: tenant.id,
+          slug: tenant.slug,
+          name: tenant.name
+        }
+      }, 201)
+    }
 
     return c.json({
       message: 'Inscription réussie',
+      access_token: session.session.access_token,
+      refresh_token: session.session.refresh_token,
+      expires_at: session.session.expires_at,
       user: {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
-        role: user.role
+        role: userRole.role
       },
       tenant: {
         id: tenant.id,
         slug: tenant.slug,
-        name: tenant.name,
-        subscription_plan: tenant.subscription_plan
+        name: tenant.name
       }
     }, 201)
   } catch (error: any) {
@@ -150,23 +190,50 @@ auth.post('/login', async (c) => {
     })
 
     if (error || !data.user) {
+      console.error('Auth sign in error:', error)
       return c.json({
         error: 'Authentication Failed',
-        message: 'Email ou mot de passe incorrect'
+        message: 'Email ou mot de passe incorrect',
+        details: error?.message
       }, 401)
     }
+
+    console.log('Auth successful, user ID:', data.user.id)
 
     // Get user details
     const { data: user, error: userError } = await supabaseAdmin
       .from('users')
-      .select('*, tenants(*)')
+      .select('*')
       .eq('id', data.user.id)
       .single()
 
     if (userError || !user) {
+      console.error('User lookup error:', userError)
+      console.log('Looking for user ID:', data.user.id)
       return c.json({
         error: 'Authentication Failed',
-        message: 'Utilisateur non trouvé'
+        message: 'Utilisateur non trouvé dans la base de données',
+        details: userError?.message,
+        userId: data.user.id
+      }, 401)
+    }
+
+    // Get user's tenant role
+    const { data: userRole, error: roleError } = await supabaseAdmin
+      .from('user_tenant_roles')
+      .select('*, tenants(*)')
+      .eq('user_id', data.user.id)
+      .eq('is_active', true)
+      .single()
+
+    if (roleError || !userRole) {
+      console.error('Role lookup error:', roleError)
+      console.log('Looking for active role for user ID:', data.user.id)
+      return c.json({
+        error: 'Authentication Failed',
+        message: 'Aucun rôle actif trouvé pour cet utilisateur',
+        details: roleError?.message,
+        userId: data.user.id
       }, 401)
     }
 
@@ -179,10 +246,10 @@ auth.post('/login', async (c) => {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
-        role: user.role,
-        tenant_id: user.tenant_id
+        role: userRole.role,
+        tenant_id: userRole.tenant_id
       },
-      tenant: user.tenants
+      tenant: userRole.tenants
     })
   } catch (error: any) {
     console.error('Login error:', error)

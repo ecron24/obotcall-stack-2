@@ -145,7 +145,7 @@ export default function RegisterPage() {
                 type="text"
                 placeholder="mon-entreprise"
                 required
-                pattern="[a-z0-9-]+"
+                pattern="[a-z0-9\-]+"
                 title="Lettres minuscules, chiffres et tirets uniquement"
                 disabled={loading}
               />
