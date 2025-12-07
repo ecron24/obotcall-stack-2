@@ -46,31 +46,31 @@ export default function FonctionnalitesPage() {
                 Gestion d&apos;interventions multi-métiers
               </h2>
               <p className="mt-2 text-lg text-muted-foreground">
-                Solution complète pour piscinistes, plombiers, chauffagistes et tous les métiers d&apos;intervention
+                Solution complète pour piscinistes, plombiers, garagistes, électriciens, chauffagistes, éradiqueurs de nuisibles et tous les métiers d&apos;intervention. Gérez vos interventions, devis, factures et planning en toute simplicité.
               </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <Phone className="h-8 w-8 text-blue-600 mb-2" />
-                  <CardTitle>Routage intelligent</CardTitle>
+                  <CheckCircle2 className="h-8 w-8 text-blue-600 mb-2" />
+                  <CardTitle>Gestion complète des interventions</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Distribuez automatiquement les appels selon des règles métier personnalisées
+                    Planifiez, suivez et facturez toutes vos interventions terrain
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <BarChart3 className="h-8 w-8 text-blue-600 mb-2" />
-                  <CardTitle>Statistiques détaillées</CardTitle>
+                  <FileText className="h-8 w-8 text-blue-600 mb-2" />
+                  <CardTitle>Devis et facturation</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Analysez vos volumes d'appels, durées moyennes et performances en temps réel
+                    Créez rapidement des devis professionnels et transformez-les en factures
                   </p>
                 </CardContent>
               </Card>
@@ -78,47 +78,23 @@ export default function FonctionnalitesPage() {
               <Card>
                 <CardHeader>
                   <Clock className="h-8 w-8 text-blue-600 mb-2" />
-                  <CardTitle>Enregistrements</CardTitle>
+                  <CardTitle>Planning multi-techniciens</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Enregistrez et archivez vos conversations pour la formation et la qualité
+                    Organisez les interventions de votre équipe avec un planning intelligent
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <GitBranch className="h-8 w-8 text-blue-600 mb-2" />
-                  <CardTitle>Intégration N8N</CardTitle>
+                  <Database className="h-8 w-8 text-blue-600 mb-2" />
+                  <CardTitle>Gestion clients et équipements</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Automatisez vos workflows et connectez-vous à vos outils existants
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <Bell className="h-8 w-8 text-blue-600 mb-2" />
-                  <CardTitle>Notifications temps réel</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Recevez des alertes instantanées pour les appels importants
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <Shield className="h-8 w-8 text-blue-600 mb-2" />
-                  <CardTitle>Sécurité avancée</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Chiffrement des communications et authentification multi-facteurs
+                    Base de données clients complète avec historique des interventions
                   </p>
                 </CardContent>
               </Card>
