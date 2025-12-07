@@ -169,9 +169,6 @@ export default function RegisterPage() {
                           <div className="text-base font-semibold text-blue-900">
                             {selectedBusiness.name}
                           </div>
-                          <div className="text-sm text-blue-700">
-                            Taux horaire: {selectedBusiness.default_labor_rate}€/h • Déplacement: {selectedBusiness.default_travel_fee}€
-                          </div>
                         </div>
                       </div>
                       <button

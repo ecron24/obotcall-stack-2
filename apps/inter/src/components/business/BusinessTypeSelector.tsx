@@ -61,11 +61,6 @@ export function BusinessTypeSelector({
           >
             <div className="text-4xl mb-3">{type.emoji}</div>
             <h4 className="text-lg font-semibold text-gray-900">{type.name}</h4>
-            <div className="mt-2 flex flex-wrap gap-2 text-xs text-gray-600">
-              <span>Taux horaire: {type.default_labor_rate}€/h</span>
-              <span>•</span>
-              <span>Déplacement: {type.default_travel_fee}€</span>
-            </div>
             {selectedId === type.id && (
               <div className="absolute top-2 right-2 flex items-center justify-center w-6 h-6 bg-primary rounded-full text-white">
                 ✓

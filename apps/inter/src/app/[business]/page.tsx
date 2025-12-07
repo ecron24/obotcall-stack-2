@@ -201,34 +201,6 @@ export default function BusinessLandingPage() {
         </div>
       </section>
 
-      {/* Pricing Info */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Tarifs adaptés aux {business.name}s
-            </h2>
-            <div className="grid md:grid-cols-3 gap-6 mt-8">
-              <div className="p-6 bg-gray-50 rounded-lg">
-                <div className="text-sm font-semibold text-gray-600 mb-2">Taux horaire par défaut</div>
-                <div className="text-3xl font-bold text-gray-900">{business.default_labor_rate}€<span className="text-lg font-normal text-gray-600">/h</span></div>
-              </div>
-              <div className="p-6 bg-gray-50 rounded-lg">
-                <div className="text-sm font-semibold text-gray-600 mb-2">Frais de déplacement</div>
-                <div className="text-3xl font-bold text-gray-900">{business.default_travel_fee}€</div>
-              </div>
-              <div className="p-6 bg-blue-50 rounded-lg border-2 border-blue-200">
-                <div className="text-sm font-semibold text-blue-600 mb-2">TVA</div>
-                <div className="text-3xl font-bold text-blue-900">{business.default_tax_rate}%</div>
-              </div>
-            </div>
-            <p className="text-sm text-gray-500 mt-6">
-              Tous ces paramètres sont personnalisables selon vos besoins
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="bg-gradient-to-r from-blue-600 to-indigo-600 py-16">
         <div className="container mx-auto px-4 text-center">
