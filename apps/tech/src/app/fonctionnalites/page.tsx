@@ -43,10 +43,10 @@ export default function FonctionnalitesPage() {
             <div className="mb-12">
               <Badge className="mb-4">Inter</Badge>
               <h2 className="text-3xl font-bold tracking-tight">
-                Standard téléphonique intelligent
+                Gestion d&apos;interventions multi-métiers
               </h2>
               <p className="mt-2 text-lg text-muted-foreground">
-                Gérez tous vos appels professionnels avec intelligence et efficacité
+                Solution complète pour piscinistes, plombiers, chauffagistes et tous les métiers d&apos;intervention
               </p>
             </div>
 
