@@ -15,9 +15,9 @@ import { cn } from '@/lib/utils'
 const navigation = [
   { name: 'Tableau de bord', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Interventions', href: '/dashboard/interventions', icon: Wrench },
-  { name: 'Calendrier', href: '/dashboard/calendar', icon: Calendar },
+  { name: 'Calendrier', href: '/dashboard/calendrier', icon: Calendar },
   { name: 'Clients', href: '/dashboard/clients', icon: Users },
-  { name: 'Factures', href: '/dashboard/invoices', icon: FileText },
+  { name: 'Factures', href: '/dashboard/factures', icon: FileText },
   { name: 'Paramètres', href: '/dashboard/settings', icon: Settings },
 ]
 
