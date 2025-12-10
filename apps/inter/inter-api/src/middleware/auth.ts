@@ -36,7 +36,7 @@ export const authMiddleware = async (c: Context, next: Next) => {
       return c.json({ error: 'Unauthorized', message: 'Utilisateur non trouvé' }, 401)
     }
 
-    // Get user-tenant relationship
+    // Get user-tenant relationship (déjà filtré par is_active = true)
     const { data: userTenantRole, error: roleError } = await supabaseAdmin
       .from('user_tenant_roles')
       .select('tenant_id, role, is_active')
@@ -46,11 +46,6 @@ export const authMiddleware = async (c: Context, next: Next) => {
 
     if (roleError || !userTenantRole) {
       return c.json({ error: 'Forbidden', message: 'Aucun accès à un tenant actif' }, 403)
-    }
-
-    // Check if user role is active
-    if (!userTenantRole.is_active) {
-      return c.json({ error: 'Forbidden', message: 'Compte désactivé' }, 403)
     }
 
     // Get tenant with subscription
