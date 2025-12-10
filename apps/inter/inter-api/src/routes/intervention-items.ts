@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { getAuth } from '../middleware/auth.js'
+import { query, queryOne } from '../lib/postgres.js'
 import { supabaseAdmin } from '../lib/supabase.js'
 import { z } from 'zod'
 
@@ -35,35 +36,40 @@ interventionItems.get('/', async (c) => {
       }, 400)
     }
 
-    // Verify intervention belongs to tenant
-    const { data: intervention, error: interventionError } = await supabaseAdmin
-      .from('interventions')
-      .select('id')
-      .eq('id', interventionId)
-      .eq('tenant_id', tenant.id)
-      .single()
+    // Verify intervention belongs to tenant (using pg)
+    const intervention = await queryOne(
+      'SELECT id FROM inter_app.interventions WHERE id = $1 AND tenant_id = $2 AND deleted_at IS NULL',
+      [interventionId, tenant.id]
+    )
 
-    if (interventionError || !intervention) {
+    if (!intervention) {
       return c.json({
         error: 'Not Found',
         message: 'Intervention non trouvée'
       }, 404)
     }
 
-    // Get intervention items
-    const { data, error } = await supabaseAdmin
-      .from('intervention_items')
-      .select('*, product:products(*)')
-      .eq('intervention_id', interventionId)
-      .order('display_order')
-
-    if (error) {
-      console.error('List intervention items error:', error)
-      return c.json({
-        error: 'Database Error',
-        message: 'Erreur lors de la récupération des items'
-      }, 500)
-    }
+    // Get intervention items with products (join with public.products)
+    const data = await query(
+      `SELECT
+        ii.*,
+        CASE
+          WHEN p.id IS NOT NULL THEN json_build_object(
+            'id', p.id,
+            'name', p.name,
+            'sku', p.sku,
+            'unit', p.unit,
+            'unit_price_ht', p.unit_price_ht,
+            'tax_rate', p.tax_rate
+          )
+          ELSE NULL
+        END as product
+       FROM inter_app.intervention_items ii
+       LEFT JOIN public.products p ON p.id = ii.product_id
+       WHERE ii.intervention_id = $1 AND ii.deleted_at IS NULL
+       ORDER BY ii.display_order`,
+      [interventionId]
+    )
 
     return c.json(data || [])
   } catch (error) {
@@ -84,14 +90,30 @@ interventionItems.get('/:id', async (c) => {
     const { tenant } = getAuth(c)
     const id = c.req.param('id')
 
-    // Get item with intervention check
-    const { data, error } = await supabaseAdmin
-      .from('intervention_items')
-      .select('*, product:products(*), intervention:interventions!inner(tenant_id)')
-      .eq('id', id)
-      .single()
+    // Get item with intervention check and product
+    const data = await queryOne(
+      `SELECT
+        ii.*,
+        i.tenant_id,
+        CASE
+          WHEN p.id IS NOT NULL THEN json_build_object(
+            'id', p.id,
+            'name', p.name,
+            'sku', p.sku,
+            'unit', p.unit,
+            'unit_price_ht', p.unit_price_ht,
+            'tax_rate', p.tax_rate
+          )
+          ELSE NULL
+        END as product
+       FROM inter_app.intervention_items ii
+       INNER JOIN inter_app.interventions i ON i.id = ii.intervention_id AND i.deleted_at IS NULL
+       LEFT JOIN public.products p ON p.id = ii.product_id
+       WHERE ii.id = $1 AND ii.deleted_at IS NULL`,
+      [id]
+    )
 
-    if (error || !data) {
+    if (!data) {
       return c.json({
         error: 'Not Found',
         message: 'Item non trouvé'
@@ -99,14 +121,16 @@ interventionItems.get('/:id', async (c) => {
     }
 
     // Check tenant ownership
-    if (data.intervention.tenant_id !== tenant.id) {
+    if (data.tenant_id !== tenant.id) {
       return c.json({
         error: 'Forbidden',
         message: 'Accès non autorisé'
       }, 403)
     }
 
-    return c.json(data)
+    // Remove tenant_id from response
+    const { tenant_id, ...responseData } = data
+    return c.json(responseData)
   } catch (error) {
     console.error('Get intervention item error:', error)
     return c.json({
@@ -127,14 +151,12 @@ interventionItems.post('/', async (c) => {
     const validated = createInterventionItemSchema.parse(body)
 
     // Verify intervention belongs to tenant
-    const { data: intervention, error: interventionError } = await supabaseAdmin
-      .from('interventions')
-      .select('id, status')
-      .eq('id', validated.intervention_id)
-      .eq('tenant_id', tenant.id)
-      .single()
+    const intervention = await queryOne<{ id: string; status: string }>(
+      'SELECT id, status FROM inter_app.interventions WHERE id = $1 AND tenant_id = $2 AND deleted_at IS NULL',
+      [validated.intervention_id, tenant.id]
+    )
 
-    if (interventionError || !intervention) {
+    if (!intervention) {
       return c.json({
         error: 'Not Found',
         message: 'Intervention non trouvée'
@@ -149,7 +171,7 @@ interventionItems.post('/', async (c) => {
       }, 400)
     }
 
-    // If product_id is provided, verify it exists and get details
+    // If product_id is provided, verify it exists and get details (using Supabase for public.products)
     if (validated.product_id) {
       const { data: product } = await supabaseAdmin
         .from('products')
@@ -175,19 +197,16 @@ interventionItems.post('/', async (c) => {
     }
 
     // Create item
-    const { data, error } = await supabaseAdmin
-      .from('intervention_items')
-      .insert(validated)
-      .select('*, product:products(*)')
-      .single()
+    const fields = Object.keys(validated)
+    const values = Object.values(validated)
+    const placeholders = values.map((_, i) => `$${i + 1}`).join(', ')
 
-    if (error) {
-      console.error('Create intervention item error:', error)
-      return c.json({
-        error: 'Database Error',
-        message: 'Erreur lors de la création de l\'item'
-      }, 500)
-    }
+    const data = await queryOne(
+      `INSERT INTO inter_app.intervention_items (${fields.join(', ')})
+       VALUES (${placeholders})
+       RETURNING *`,
+      values
+    )
 
     return c.json(data, 201)
   } catch (error: any) {
@@ -220,13 +239,15 @@ interventionItems.patch('/:id', async (c) => {
     const validated = updateInterventionItemSchema.parse(body)
 
     // Get item and verify ownership
-    const { data: existingItem } = await supabaseAdmin
-      .from('intervention_items')
-      .select('intervention_id, intervention:interventions!inner(tenant_id, status)')
-      .eq('id', id)
-      .single() as any
+    const existingItem = await queryOne<{ intervention_id: string; tenant_id: string; status: string }>(
+      `SELECT ii.intervention_id, i.tenant_id, i.status
+       FROM inter_app.intervention_items ii
+       INNER JOIN inter_app.interventions i ON i.id = ii.intervention_id AND i.deleted_at IS NULL
+       WHERE ii.id = $1 AND ii.deleted_at IS NULL`,
+      [id]
+    )
 
-    if (!existingItem || existingItem.intervention.tenant_id !== tenant.id) {
+    if (!existingItem || existingItem.tenant_id !== tenant.id) {
       return c.json({
         error: 'Not Found',
         message: 'Item non trouvé'
@@ -234,7 +255,7 @@ interventionItems.patch('/:id', async (c) => {
     }
 
     // Check if intervention is editable
-    if (existingItem.intervention.status === 'cancelled') {
+    if (existingItem.status === 'cancelled') {
       return c.json({
         error: 'Validation Error',
         message: 'Impossible de modifier les items d\'une intervention annulée'
@@ -242,14 +263,19 @@ interventionItems.patch('/:id', async (c) => {
     }
 
     // Update item
-    const { data, error } = await supabaseAdmin
-      .from('intervention_items')
-      .update(validated)
-      .eq('id', id)
-      .select('*, product:products(*)')
-      .single()
+    const fields = Object.keys(validated)
+    const values = Object.values(validated)
+    const setClause = fields.map((field, i) => `${field} = $${i + 2}`).join(', ')
 
-    if (error || !data) {
+    const data = await queryOne(
+      `UPDATE inter_app.intervention_items
+       SET ${setClause}, updated_at = NOW()
+       WHERE id = $1 AND deleted_at IS NULL
+       RETURNING *`,
+      [id, ...values]
+    )
+
+    if (!data) {
       return c.json({
         error: 'Database Error',
         message: 'Erreur lors de la mise à jour de l\'item'
@@ -285,13 +311,15 @@ interventionItems.delete('/:id', async (c) => {
     const id = c.req.param('id')
 
     // Get item and verify ownership
-    const { data: existingItem } = await supabaseAdmin
-      .from('intervention_items')
-      .select('intervention_id, intervention:interventions!inner(tenant_id, status)')
-      .eq('id', id)
-      .single() as any
+    const existingItem = await queryOne<{ intervention_id: string; tenant_id: string; status: string }>(
+      `SELECT ii.intervention_id, i.tenant_id, i.status
+       FROM inter_app.intervention_items ii
+       INNER JOIN inter_app.interventions i ON i.id = ii.intervention_id AND i.deleted_at IS NULL
+       WHERE ii.id = $1 AND ii.deleted_at IS NULL`,
+      [id]
+    )
 
-    if (!existingItem || existingItem.intervention.tenant_id !== tenant.id) {
+    if (!existingItem || existingItem.tenant_id !== tenant.id) {
       return c.json({
         error: 'Not Found',
         message: 'Item non trouvé'
@@ -299,7 +327,7 @@ interventionItems.delete('/:id', async (c) => {
     }
 
     // Check if intervention is editable
-    if (existingItem.intervention.status === 'cancelled') {
+    if (existingItem.status === 'cancelled') {
       return c.json({
         error: 'Validation Error',
         message: 'Impossible de supprimer les items d\'une intervention annulée'
@@ -307,13 +335,12 @@ interventionItems.delete('/:id', async (c) => {
     }
 
     // Delete item
-    const { error } = await supabaseAdmin
-      .from('intervention_items')
-      .delete()
-      .eq('id', id)
+    const deleted = await queryOne(
+      'DELETE FROM inter_app.intervention_items WHERE id = $1 AND deleted_at IS NULL RETURNING id',
+      [id]
+    )
 
-    if (error) {
-      console.error('Delete intervention item error:', error)
+    if (!deleted) {
       return c.json({
         error: 'Database Error',
         message: 'Erreur lors de la suppression de l\'item'
@@ -349,12 +376,10 @@ interventionItems.post('/bulk', async (c) => {
     const interventionId = body.intervention_id
 
     // Verify intervention belongs to tenant
-    const { data: intervention } = await supabaseAdmin
-      .from('interventions')
-      .select('id, status')
-      .eq('id', interventionId)
-      .eq('tenant_id', tenant.id)
-      .single()
+    const intervention = await queryOne<{ id: string; status: string }>(
+      'SELECT id, status FROM inter_app.interventions WHERE id = $1 AND tenant_id = $2 AND deleted_at IS NULL',
+      [interventionId, tenant.id]
+    )
 
     if (!intervention) {
       return c.json({
@@ -380,19 +405,27 @@ interventionItems.post('/bulk', async (c) => {
       return validated
     })
 
-    // Bulk insert
-    const { data, error } = await supabaseAdmin
-      .from('intervention_items')
-      .insert(validatedItems)
-      .select('*, product:products(*)')
+    // Bulk insert using PostgreSQL - prepare values
+    const allValues: any[] = []
+    const valueGroups: string[] = []
+    const fields = Object.keys(validatedItems[0])
 
-    if (error) {
-      console.error('Bulk create intervention items error:', error)
-      return c.json({
-        error: 'Database Error',
-        message: 'Erreur lors de la création des items'
-      }, 500)
-    }
+    validatedItems.forEach((item, itemIndex) => {
+      const itemValues = Object.values(item)
+      const placeholders = itemValues.map((_, valIndex) => {
+        const paramIndex = allValues.length + 1
+        allValues.push(itemValues[valIndex])
+        return `$${paramIndex}`
+      }).join(', ')
+      valueGroups.push(`(${placeholders})`)
+    })
+
+    const data = await query(
+      `INSERT INTO inter_app.intervention_items (${fields.join(', ')})
+       VALUES ${valueGroups.join(', ')}
+       RETURNING *`,
+      allValues
+    )
 
     return c.json(data, 201)
   } catch (error: any) {
