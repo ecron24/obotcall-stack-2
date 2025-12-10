@@ -54,7 +54,7 @@ export const authMiddleware = async (c: Context, next: Next) => {
     // Get tenant with subscription
     const { data: tenant, error: tenantError } = await supabaseAdmin
       .from('tenants')
-      .select('*, subscriptions(*)')
+      .select('*, subscriptions!subscriptions_tenant_id_fkey(*)')
       .eq('id', userTenantRole.tenant_id)
       .eq('is_active', true)
       .single()
