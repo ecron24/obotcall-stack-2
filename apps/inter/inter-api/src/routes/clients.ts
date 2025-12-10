@@ -20,7 +20,7 @@ clients.get('/', async (c) => {
     const to = from + per_page - 1
 
     const { data, error, count } = await supabaseAdmin
-      .from('inter_app.clients')
+      .from('clients')
       .select('*', { count: 'exact' })
       .eq('tenant_id', tenant.id)
       .order('created_at', { ascending: false })
@@ -62,7 +62,7 @@ clients.get('/:id', async (c) => {
     const id = c.req.param('id')
 
     const { data, error } = await supabaseAdmin
-      .from('inter_app.clients')
+      .from('clients')
       .select('*, interventions(id, title, status, scheduled_at)')
       .eq('id', id)
       .eq('tenant_id', tenant.id)
@@ -96,7 +96,7 @@ clients.post('/', checkUsageLimit('clients'), async (c) => {
     const validated = createClientSchema.parse(body)
 
     const { data, error } = await supabaseAdmin
-      .from('inter_app.clients')
+      .from('clients')
       .insert({
         ...validated,
         tenant_id: tenant.id
@@ -141,7 +141,7 @@ clients.patch('/:id', async (c) => {
     const validated = updateClientSchema.parse(body)
 
     const { data, error } = await supabaseAdmin
-      .from('inter_app.clients')
+      .from('clients')
       .update(validated)
       .eq('id', id)
       .eq('tenant_id', tenant.id)
@@ -190,7 +190,7 @@ clients.delete('/:id', async (c) => {
 
     // Check if client has interventions
     const { count } = await supabaseAdmin
-      .from('inter_app.interventions')
+      .from('interventions')
       .select('id', { count: 'exact', head: true })
       .eq('client_id', id)
       .eq('tenant_id', tenant.id)
@@ -203,7 +203,7 @@ clients.delete('/:id', async (c) => {
     }
 
     const { error } = await supabaseAdmin
-      .from('inter_app.clients')
+      .from('clients')
       .delete()
       .eq('id', id)
       .eq('tenant_id', tenant.id)

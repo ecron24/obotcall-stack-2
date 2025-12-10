@@ -21,7 +21,7 @@ interventions.get('/', async (c) => {
 
     // Get interventions with client data
     const { data, error, count } = await supabaseAdmin
-      .from('inter_app.interventions')
+      .from('interventions')
       .select('*, clients(*), assigned_to:users!assigned_to_user_id(*)', { count: 'exact' })
       .eq('tenant_id', tenant.id)
       .order('created_at', { ascending: false })
@@ -63,7 +63,7 @@ interventions.get('/:id', async (c) => {
     const id = c.req.param('id')
 
     const { data, error } = await supabaseAdmin
-      .from('inter_app.interventions')
+      .from('interventions')
       .select('*, clients(*), assigned_to:users!assigned_to_user_id(*), created_by:users!created_by_user_id(*)')
       .eq('id', id)
       .eq('tenant_id', tenant.id)
@@ -98,7 +98,7 @@ interventions.post('/', checkUsageLimit('interventions'), async (c) => {
 
     // Verify client belongs to tenant
     const { data: client, error: clientError } = await supabaseAdmin
-      .from('inter_app.clients')
+      .from('clients')
       .select('id')
       .eq('id', validated.client_id)
       .eq('tenant_id', tenant.id)
@@ -129,7 +129,7 @@ interventions.post('/', checkUsageLimit('interventions'), async (c) => {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('inter_app.interventions')
+      .from('interventions')
       .insert({
         ...validated,
         tenant_id: tenant.id,
@@ -182,7 +182,7 @@ interventions.patch('/:id', async (c) => {
 
     // Check intervention exists and belongs to tenant
     const { data: existing, error: existingError } = await supabaseAdmin
-      .from('inter_app.interventions')
+      .from('interventions')
       .select('id')
       .eq('id', id)
       .eq('tenant_id', tenant.id)
@@ -198,7 +198,7 @@ interventions.patch('/:id', async (c) => {
     // If client_id is being updated, verify it belongs to tenant
     if (validated.client_id) {
       const { data: client, error: clientError } = await supabaseAdmin
-        .from('inter_app.clients')
+        .from('clients')
         .select('id')
         .eq('id', validated.client_id)
         .eq('tenant_id', tenant.id)
@@ -213,7 +213,7 @@ interventions.patch('/:id', async (c) => {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('inter_app.interventions')
+      .from('interventions')
       .update(validated)
       .eq('id', id)
       .eq('tenant_id', tenant.id)
@@ -255,7 +255,7 @@ interventions.delete('/:id', async (c) => {
     const id = c.req.param('id')
 
     const { error } = await supabaseAdmin
-      .from('inter_app.interventions')
+      .from('interventions')
       .delete()
       .eq('id', id)
       .eq('tenant_id', tenant.id)
