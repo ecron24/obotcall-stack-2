@@ -2,16 +2,24 @@
 -- MIGRATION 010: Mise à jour types d'intervention détaillés
 -- Date: 2025-12-10
 -- Description: Remplace les types d'intervention génériques par des types détaillés
---              pour Chauffagiste, Garagiste et Électricien
+--              pour les 6 métiers (Pisciniste, Plomberie, Dératisation, Garagiste, Électricien, Chauffagiste)
 -- ============================================
 
 -- =============================================
 -- SUPPRESSION DES ANCIENS TYPES D'INTERVENTION
 -- =============================================
 
--- 🌡️ Chauffagiste - Supprimer les 6 anciens types
+-- 🏊 Pisciniste - Supprimer les 9 anciens types
 DELETE FROM public.intervention_types
-WHERE business_type_id = '00000000-0000-0000-0001-000000000006';
+WHERE business_type_id = '00000000-0000-0000-0001-000000000001';
+
+-- 🔧 Plomberie - Supprimer les 8 anciens types
+DELETE FROM public.intervention_types
+WHERE business_type_id = '00000000-0000-0000-0001-000000000002';
+
+-- 🐀 Dératisation - Supprimer les 7 anciens types
+DELETE FROM public.intervention_types
+WHERE business_type_id = '00000000-0000-0000-0001-000000000003';
 
 -- 🚗 Garagiste - Supprimer les 9 anciens types
 DELETE FROM public.intervention_types
@@ -21,8 +29,113 @@ WHERE business_type_id = '00000000-0000-0000-0001-000000000004';
 DELETE FROM public.intervention_types
 WHERE business_type_id = '00000000-0000-0000-0001-000000000005';
 
+-- 🌡️ Chauffagiste - Supprimer les 6 anciens types
+DELETE FROM public.intervention_types
+WHERE business_type_id = '00000000-0000-0000-0001-000000000006';
+
 -- =============================================
--- 1️⃣ CHAUFFAGISTE - 18 types détaillés
+-- 1️⃣ PISCINISTE - 19 types détaillés
+-- =============================================
+
+INSERT INTO public.intervention_types (business_type_id, code, name, description, default_duration, emoji, color, display_order, is_active)
+VALUES
+  -- Catégorie: Installation & mise en service
+  ('00000000-0000-0000-0001-000000000001', 'installation_piscine', 'Installation piscine', 'Installation piscine kit ou maçonnée', 960, '🏗️', '#00a8ff', 1, true),
+  ('00000000-0000-0000-0001-000000000001', 'mise_en_service', 'Mise en service piscine', 'Mise en service complète', 240, '🌊', '#4cd137', 2, true),
+  ('00000000-0000-0000-0001-000000000001', 'installation_filtration', 'Installation pompe / filtration', 'Installation système de filtration', 180, '⚙️', '#0097e6', 3, true),
+  ('00000000-0000-0000-0001-000000000001', 'installation_chauffage_piscine', 'Installation chauffage piscine', 'Installation PAC/solaire/réchauffeur', 240, '🌡️', '#e74c3c', 4, true),
+
+  -- Catégorie: Entretien & maintenance
+  ('00000000-0000-0000-0001-000000000001', 'entretien_piscine', 'Entretien régulier piscine', 'Entretien contrat maintenance', 120, '🏊', '#44bd32', 5, true),
+  ('00000000-0000-0000-0001-000000000001', 'nettoyage_bassin', 'Nettoyage complet bassin', 'Nettoyage approfondi piscine', 180, '🧹', '#27ae60', 6, true),
+  ('00000000-0000-0000-0001-000000000001', 'traitement_eau', 'Traitement de l''eau', 'Analyse et équilibrage pH/chlore/sel', 60, '💧', '#00d2d3', 7, true),
+  ('00000000-0000-0000-0001-000000000001', 'hivernage', 'Hivernage piscine', 'Hivernage actif ou passif', 180, '❄️', '#487eb0', 8, true),
+  ('00000000-0000-0000-0001-000000000001', 'remise_en_route', 'Remise en route printemps', 'Remise en service après hiver', 240, '🌸', '#4cd137', 9, true),
+
+  -- Catégorie: Dépannage & réparations
+  ('00000000-0000-0000-0001-000000000001', 'depannage_filtration', 'Dépannage pompe de filtration', 'Réparation pompe ou filtration', 150, '🔧', '#e84118', 10, true),
+  ('00000000-0000-0000-0001-000000000001', 'reparation_fuite_hydraulique', 'Réparation fuites réseau hydraulique', 'Détection et réparation fuites', 180, '💦', '#e84118', 11, true),
+  ('00000000-0000-0000-0001-000000000001', 'changement_liner', 'Changement liner / membrane armée', 'Remplacement revêtement piscine', 480, '🎨', '#8c7ae6', 12, true),
+  ('00000000-0000-0000-0001-000000000001', 'reparation_local_tech', 'Réparation local technique', 'Intervention sur local technique', 120, '🔧', '#34495e', 13, true),
+
+  -- Catégorie: Équipements & accessoires
+  ('00000000-0000-0000-0001-000000000001', 'installation_robot', 'Installation robot de nettoyage', 'Installation robot automatique', 90, '🤖', '#9b59b6', 14, true),
+  ('00000000-0000-0000-0001-000000000001', 'installation_electrolyseur', 'Installation système au sel', 'Installation électrolyseur au sel', 180, '⚡', '#fbc531', 15, true),
+  ('00000000-0000-0000-0001-000000000001', 'installation_couverture', 'Installation couverture / volet roulant', 'Installation système de couverture', 240, '🛡️', '#16a085', 16, true),
+  ('00000000-0000-0000-0001-000000000001', 'installation_eclairage_piscine', 'Installation éclairage piscine', 'Installation éclairage LED piscine', 120, '💡', '#f39c12', 17, true),
+
+  -- Catégorie: Améliorations & rénovation
+  ('00000000-0000-0000-0001-000000000001', 'renovation_bassin', 'Rénovation bassin', 'Rénovation revêtement/escaliers', 720, '♻️', '#e67e22', 18, true),
+  ('00000000-0000-0000-0001-000000000001', 'securite_piscine', 'Installation systèmes de sécurité', 'Alarme/barrière/couverture sécurité', 180, '🚨', '#c0392b', 19, true);
+
+-- =============================================
+-- 2️⃣ PLOMBERIE - 18 types détaillés
+-- =============================================
+
+INSERT INTO public.intervention_types (business_type_id, code, name, description, default_duration, emoji, color, display_order, is_active)
+VALUES
+  -- Catégorie: Dépannage & fuites
+  ('00000000-0000-0000-0001-000000000002', 'depannage_plomberie', 'Dépannage plomberie', 'Dépannage urgence plomberie', 120, '🚨', '#e84118', 1, true),
+  ('00000000-0000-0000-0001-000000000002', 'recherche_fuite', 'Recherche de fuite', 'Détection fuite avec équipement', 90, '🔍', '#fbc531', 2, true),
+  ('00000000-0000-0000-0001-000000000002', 'reparation_fuite', 'Réparation fuite', 'Réparation fuite canalisations/raccords', 120, '💧', '#e84118', 3, true),
+  ('00000000-0000-0000-0001-000000000002', 'debouchage_evacuations', 'Débouchage évier / lavabo / WC', 'Débouchage canalisations', 90, '🚿', '#4cd137', 4, true),
+
+  -- Catégorie: Installation sanitaire
+  ('00000000-0000-0000-0001-000000000002', 'installation_wc', 'Installation WC', 'Pose WC suspendu ou au sol', 180, '🚽', '#0097e6', 5, true),
+  ('00000000-0000-0000-0001-000000000002', 'installation_lavabo', 'Installation lavabo / vasque', 'Pose lavabo ou vasque', 120, '🚰', '#00d2d3', 6, true),
+  ('00000000-0000-0000-0001-000000000002', 'installation_douche_baignoire', 'Installation douche / baignoire', 'Pose douche ou baignoire complète', 240, '🛁', '#3498db', 7, true),
+  ('00000000-0000-0000-0001-000000000002', 'installation_robinetterie', 'Installation robinetterie', 'Pose mitigeur/thermostatique', 90, '🔧', '#16a085', 8, true),
+  ('00000000-0000-0000-0001-000000000002', 'creation_modif_reseau_eau', 'Création / modification réseau eau', 'Création ou modification réseau', 240, '⚙️', '#34495e', 9, true),
+
+  -- Catégorie: Ballon / chauffe-eau
+  ('00000000-0000-0000-0001-000000000002', 'installation_chauffe_eau', 'Installation chauffe-eau', 'Installation chauffe-eau électrique/gaz', 180, '🌡️', '#e74c3c', 10, true),
+  ('00000000-0000-0000-0001-000000000002', 'depannage_chauffe_eau', 'Dépannage chauffe-eau', 'Réparation chauffe-eau', 120, '🔧', '#e84118', 11, true),
+  ('00000000-0000-0000-0001-000000000002', 'entretien_chauffe_eau', 'Entretien chauffe-eau (anti-tartre)', 'Détartrage et entretien', 90, '🧼', '#44bd32', 12, true),
+
+  -- Catégorie: Canalisation & évacuation
+  ('00000000-0000-0000-0001-000000000002', 'reparation_canalisation', 'Réparation canalisation eau', 'Réparation canalisation eau potable', 150, '🔧', '#e84118', 13, true),
+  ('00000000-0000-0000-0001-000000000002', 'reparation_evacuation', 'Réparation évacuation eaux usées', 'Réparation évacuation EU/EV', 150, '💦', '#7f8fa6', 14, true),
+  ('00000000-0000-0000-0001-000000000002', 'remplacement_siphon', 'Remplacement siphon / bonde', 'Changement siphon ou bonde', 45, '🔩', '#95a5a6', 15, true),
+  ('00000000-0000-0000-0001-000000000002', 'colonne_montante', 'Pose / remplacement colonne montante', 'Installation ou changement colonne', 360, '⬆️', '#2c3e50', 16, true),
+
+  -- Catégorie: Salle de bain / rénovation
+  ('00000000-0000-0000-0001-000000000002', 'renovation_salle_bain', 'Rénovation salle de bain', 'Rénovation complète salle de bain', 720, '🛠️', '#8c7ae6', 17, true),
+  ('00000000-0000-0000-0001-000000000002', 'accessibilite_pmr', 'Adaptation équipements PMR', 'Adaptation accessibilité PMR', 240, '♿', '#27ae60', 18, true);
+
+-- =============================================
+-- 3️⃣ DÉRATISATION - 16 types détaillés
+-- =============================================
+
+INSERT INTO public.intervention_types (business_type_id, code, name, description, default_duration, emoji, color, display_order, is_active)
+VALUES
+  -- Catégorie: Rongeurs
+  ('00000000-0000-0000-0001-000000000003', 'deratisation', 'Intervention dératisation', 'Traitement rats et souris', 120, '🐀', '#e84118', 1, true),
+  ('00000000-0000-0000-0001-000000000003', 'dispositifs_rongeurs', 'Pose dispositifs anti-rongeurs', 'Installation appâts et pièges', 90, '🪤', '#e67e22', 2, true),
+  ('00000000-0000-0000-0001-000000000003', 'traitement_acces_rongeurs', 'Traitement accès rongeurs', 'Détection et traitement points d''entrée', 120, '🔍', '#fbc531', 3, true),
+
+  -- Catégorie: Insectes rampants
+  ('00000000-0000-0000-0001-000000000003', 'traitement_cafards', 'Traitement cafards / blattes', 'Désinsectisation cafards', 120, '🪳', '#8c7ae6', 4, true),
+  ('00000000-0000-0000-0001-000000000003', 'traitement_fourmis', 'Traitement fourmis', 'Traitement colonies de fourmis', 90, '🐜', '#27ae60', 5, true),
+  ('00000000-0000-0000-0001-000000000003', 'traitement_punaises_lit', 'Traitement punaises de lit', 'Désinsectisation punaises', 180, '🛏️', '#c0392b', 6, true),
+  ('00000000-0000-0000-0001-000000000003', 'traitement_puces', 'Traitement puces', 'Traitement anti-puces', 90, '🦟', '#e67e22', 7, true),
+  ('00000000-0000-0000-0001-000000000003', 'traitement_araignees', 'Traitement araignées', 'Traitement anti-araignées', 60, '🕷️', '#7f8fa6', 8, true),
+
+  -- Catégorie: Insectes volants
+  ('00000000-0000-0000-0001-000000000003', 'destruction_frelons', 'Destruction nid de frelons', 'Enlèvement nid frelons asiatiques/européens', 120, '🐝', '#e84118', 9, true),
+  ('00000000-0000-0000-0001-000000000003', 'destruction_guepes', 'Destruction nid de guêpes', 'Enlèvement nid de guêpes', 90, '🐝', '#fbc531', 10, true),
+  ('00000000-0000-0000-0001-000000000003', 'traitement_moustiques', 'Traitement moustiques', 'Traitement anti-moustiques', 60, '🦟', '#3498db', 11, true),
+  ('00000000-0000-0000-0001-000000000003', 'traitement_mouches', 'Traitement mouches', 'Traitement anti-mouches', 60, '🪰', '#95a5a6', 12, true),
+
+  -- Catégorie: Bois & xylophages
+  ('00000000-0000-0000-0001-000000000003', 'traitement_termites', 'Traitement termites', 'Traitement anti-termites bois', 240, '🪵', '#9b59b6', 13, true),
+  ('00000000-0000-0000-0001-000000000003', 'traitement_xylophages', 'Traitement capricornes / vrillettes', 'Traitement insectes xylophages', 180, '🪲', '#8c7ae6', 14, true),
+
+  -- Catégorie: Autres nuisibles
+  ('00000000-0000-0000-0001-000000000003', 'eloignement_pigeons', 'Éloignement pigeons / volatiles', 'Mise en place système anti-pigeons', 120, '🕊️', '#34495e', 15, true),
+  ('00000000-0000-0000-0001-000000000003', 'desinfection_assainissement', 'Désinfection / assainissement', 'Désinfection et assainissement local', 90, '🧼', '#00d2d3', 16, true);
+
+-- =============================================
+-- 4️⃣ CHAUFFAGISTE - 18 types détaillés
 -- =============================================
 
 INSERT INTO public.intervention_types (business_type_id, code, name, description, default_duration, emoji, color, display_order, is_active)
@@ -58,7 +171,7 @@ VALUES
   ('00000000-0000-0000-0001-000000000006', 'reparation_fuite', 'Réparation fuite chauffage', 'Réparation fuite sur circuit', 90, '💧', '#e84118', 18, true);
 
 -- =============================================
--- 2️⃣ GARAGISTE - 23 types détaillés
+-- 5️⃣ GARAGISTE - 23 types détaillés
 -- =============================================
 
 INSERT INTO public.intervention_types (business_type_id, code, name, description, default_duration, emoji, color, display_order, is_active)
@@ -105,7 +218,7 @@ VALUES
   ('00000000-0000-0000-0001-000000000004', 'parebrise', 'Remplacement pare-brise', 'Changement pare-brise', 120, '🪟', '#0097e6', 23, true);
 
 -- =============================================
--- 3️⃣ ÉLECTRICIEN - 23 types détaillés
+-- 6️⃣ ÉLECTRICIEN - 23 types détaillés
 -- =============================================
 
 INSERT INTO public.intervention_types (business_type_id, code, name, description, default_duration, emoji, color, display_order, is_active)
@@ -153,22 +266,34 @@ VALUES
 
 DO $$
 DECLARE
-  v_chauffagiste INTEGER;
+  v_pisciniste INTEGER;
+  v_plomberie INTEGER;
+  v_deratisation INTEGER;
   v_garagiste INTEGER;
   v_electricien INTEGER;
+  v_chauffagiste INTEGER;
+  v_total INTEGER;
 BEGIN
-  SELECT COUNT(*) INTO v_chauffagiste FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000006';
+  SELECT COUNT(*) INTO v_pisciniste FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000001';
+  SELECT COUNT(*) INTO v_plomberie FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000002';
+  SELECT COUNT(*) INTO v_deratisation FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000003';
   SELECT COUNT(*) INTO v_garagiste FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000004';
   SELECT COUNT(*) INTO v_electricien FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000005';
+  SELECT COUNT(*) INTO v_chauffagiste FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000006';
+  SELECT COUNT(*) INTO v_total FROM public.intervention_types;
 
   RAISE NOTICE '============================================';
   RAISE NOTICE 'MIGRATION 010 COMPLETED SUCCESSFULLY';
   RAISE NOTICE '============================================';
-  RAISE NOTICE '✅ 🌡️  Chauffagiste: % types d''intervention détaillés', v_chauffagiste;
+  RAISE NOTICE '✅ 🏊 Pisciniste: % types d''intervention détaillés', v_pisciniste;
+  RAISE NOTICE '✅ 🔧 Plomberie: % types d''intervention détaillés', v_plomberie;
+  RAISE NOTICE '✅ 🐀 Dératisation: % types d''intervention détaillés', v_deratisation;
   RAISE NOTICE '✅ 🚗 Garagiste: % types d''intervention détaillés', v_garagiste;
   RAISE NOTICE '✅ ⚡ Électricien: % types d''intervention détaillés', v_electricien;
+  RAISE NOTICE '✅ 🌡️  Chauffagiste: % types d''intervention détaillés', v_chauffagiste;
   RAISE NOTICE '============================================';
-  RAISE NOTICE '📝 Types d''intervention organisés par catégorie';
+  RAISE NOTICE '📊 Total: % types d''intervention pour 6 métiers', v_total;
+  RAISE NOTICE '📝 Types organisés par catégorie métier';
   RAISE NOTICE '📝 Durées par défaut ajustées selon complexité';
   RAISE NOTICE '📝 Emojis et couleurs pour meilleure UX';
   RAISE NOTICE '============================================';
