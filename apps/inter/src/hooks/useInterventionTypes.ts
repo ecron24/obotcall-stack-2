@@ -32,7 +32,11 @@ export function useInterventionTypes(filters?: InterventionTypeFilters) {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to fetch intervention types')
+        // Récupérer le message d'erreur de l'API
+        const errorData = await response.json().catch(() => ({}))
+        const errorMessage = errorData.message || `HTTP ${response.status}: ${response.statusText}`
+        console.error('API Error:', errorMessage, errorData)
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()

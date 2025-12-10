@@ -26,7 +26,7 @@ export default function NewInterventionFormPage() {
   const { tenant, businessType, loading: loadingTenant } = useTenant()
 
   // Charger les types d'intervention (filtrés automatiquement par le business_type du tenant)
-  const { interventionTypes, loading: loadingTypes } = useInterventionTypes()
+  const { interventionTypes, loading: loadingTypes, error: errorTypes } = useInterventionTypes()
 
   const [loading, setLoading] = useState(false)
   const [client, setClient] = useState<any>(null)
@@ -560,11 +560,23 @@ export default function NewInterventionFormPage() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                 <p className="text-sm text-gray-500 mt-2">Chargement des types...</p>
               </div>
+            ) : errorTypes ? (
+              <div className="text-center py-8 border-2 border-red-300 bg-red-50 rounded-lg">
+                <p className="text-red-600 font-semibold">❌ Erreur de chargement</p>
+                <p className="text-sm text-red-500 mt-2">{errorTypes}</p>
+                <p className="text-xs text-gray-600 mt-3">
+                  💡 Si le message indique "Le type de métier n'est pas configuré",<br/>
+                  vous devez exécuter la migration 010 sur votre base Supabase.
+                </p>
+              </div>
             ) : interventionTypes.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
                 <p className="text-gray-500">Aucun type d'intervention disponible</p>
                 <p className="text-sm text-gray-400 mt-1">
                   {businessType ? `pour ${businessType.name}` : ''}
+                </p>
+                <p className="text-xs text-gray-600 mt-3">
+                  💡 Exécutez la migration 010 pour ajouter les types d'intervention
                 </p>
               </div>
             ) : (
