@@ -36,28 +36,44 @@ export const authMiddleware = async (c: Context, next: Next) => {
       return c.json({ error: 'Unauthorized', message: 'Utilisateur non trouvé' }, 401)
     }
 
-    // Check if user is active
-    if (!user.is_active) {
+    // Get user-tenant relationship
+    const { data: userTenantRole, error: roleError } = await supabaseAdmin
+      .from('user_tenant_roles')
+      .select('tenant_id, role, is_active')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .maybeSingle()
+
+    if (roleError || !userTenantRole) {
+      return c.json({ error: 'Forbidden', message: 'Aucun accès à un tenant actif' }, 403)
+    }
+
+    // Check if user role is active
+    if (!userTenantRole.is_active) {
       return c.json({ error: 'Forbidden', message: 'Compte désactivé' }, 403)
     }
 
-    // Get tenant
+    // Get tenant with subscription
     const { data: tenant, error: tenantError } = await supabaseAdmin
       .from('tenants')
-      .select('*')
-      .eq('id', user.tenant_id)
+      .select('*, subscriptions(*)')
+      .eq('id', userTenantRole.tenant_id)
+      .eq('is_active', true)
       .single()
 
     if (tenantError || !tenant) {
-      return c.json({ error: 'Unauthorized', message: 'Organisation non trouvée' }, 401)
+      return c.json({ error: 'Unauthorized', message: 'Organisation non trouvée ou désactivée' }, 401)
     }
 
-    // Check subscription status
-    if (tenant.subscription_status !== 'active' && tenant.subscription_status !== 'trial') {
-      return c.json({
-        error: 'Subscription Inactive',
-        message: 'Votre abonnement est inactif. Veuillez renouveler votre abonnement.'
-      }, 402) // 402 Payment Required
+    // Check subscription status (if subscription exists)
+    if (tenant.subscriptions && tenant.subscriptions.length > 0) {
+      const subscription = tenant.subscriptions[0]
+      if (subscription.status !== 'active' && subscription.status !== 'trialing') {
+        return c.json({
+          error: 'Subscription Inactive',
+          message: 'Votre abonnement est inactif. Veuillez renouveler votre abonnement.'
+        }, 402) // 402 Payment Required
+      }
     }
 
     // Store auth context
