@@ -2,39 +2,125 @@
 -- MIGRATION 010: Mise à jour types d'intervention détaillés
 -- Date: 2025-12-10
 -- Description: Remplace les types d'intervention génériques par des types détaillés
---              pour les 6 métiers (Pisciniste, Plomberie, Dératisation, Garagiste, Électricien, Chauffagiste)
+--              pour les 5 métiers (Plombier/Chauffagiste, Pisciniste, Dératisation, Garagiste, Électricien)
 -- ============================================
 
 -- =============================================
 -- SUPPRESSION DES ANCIENS TYPES D'INTERVENTION
 -- =============================================
 
--- 🏊 Pisciniste - Supprimer les 9 anciens types
+-- 🏊 Pisciniste - Supprimer les anciens types
 DELETE FROM public.intervention_types
 WHERE business_type_id = '00000000-0000-0000-0001-000000000001';
 
--- 🔧 Plomberie - Supprimer les 8 anciens types
+-- 🔧 Plombier/Chauffagiste - Supprimer les anciens types (Plomberie)
 DELETE FROM public.intervention_types
 WHERE business_type_id = '00000000-0000-0000-0001-000000000002';
 
--- 🐀 Dératisation - Supprimer les 7 anciens types
+-- 🐀 Dératisation - Supprimer les anciens types
 DELETE FROM public.intervention_types
 WHERE business_type_id = '00000000-0000-0000-0001-000000000003';
 
--- 🚗 Garagiste - Supprimer les 9 anciens types
+-- 🚗 Garagiste - Supprimer les anciens types
 DELETE FROM public.intervention_types
 WHERE business_type_id = '00000000-0000-0000-0001-000000000004';
 
--- ⚡ Électricien - Supprimer les 8 anciens types
+-- ⚡ Électricien - Supprimer les anciens types
 DELETE FROM public.intervention_types
 WHERE business_type_id = '00000000-0000-0000-0001-000000000005';
 
--- 🌡️ Chauffagiste - Supprimer les 6 anciens types
+-- 🌡️ Chauffagiste - Supprimer les anciens types (sera fusionné avec Plomberie)
 DELETE FROM public.intervention_types
 WHERE business_type_id = '00000000-0000-0000-0001-000000000006';
 
 -- =============================================
--- 1️⃣ PISCINISTE - 19 types détaillés
+-- 1️⃣ PLOMBIER/CHAUFFAGISTE - 36 types détaillés
+-- =============================================
+
+INSERT INTO public.intervention_types (business_type_id, code, name, description, default_duration, emoji, color, display_order, is_active)
+VALUES
+  -- ========================================
+  -- Catégorie PLOMBERIE: Dépannage & fuites
+  -- ========================================
+  ('00000000-0000-0000-0001-000000000002', 'depannage_plomberie', 'Dépannage plomberie', 'Dépannage urgence plomberie', 120, '🚨', '#e84118', 1, true),
+  ('00000000-0000-0000-0001-000000000002', 'recherche_fuite', 'Recherche de fuite', 'Détection fuite avec équipement', 90, '🔍', '#fbc531', 2, true),
+  ('00000000-0000-0000-0001-000000000002', 'reparation_fuite', 'Réparation fuite', 'Réparation fuite canalisations/raccords', 120, '💧', '#e84118', 3, true),
+  ('00000000-0000-0000-0001-000000000002', 'debouchage_evacuations', 'Débouchage évier / lavabo / WC', 'Débouchage canalisations', 90, '🚿', '#4cd137', 4, true),
+
+  -- ========================================
+  -- Catégorie PLOMBERIE: Installation sanitaire
+  -- ========================================
+  ('00000000-0000-0000-0001-000000000002', 'installation_wc', 'Installation WC', 'Pose WC suspendu ou au sol', 180, '🚽', '#0097e6', 5, true),
+  ('00000000-0000-0000-0001-000000000002', 'installation_lavabo', 'Installation lavabo / vasque', 'Pose lavabo ou vasque', 120, '🚰', '#00d2d3', 6, true),
+  ('00000000-0000-0000-0001-000000000002', 'installation_douche_baignoire', 'Installation douche / baignoire', 'Pose douche ou baignoire complète', 240, '🛁', '#3498db', 7, true),
+  ('00000000-0000-0000-0001-000000000002', 'installation_robinetterie', 'Installation robinetterie', 'Pose mitigeur/thermostatique', 90, '🔧', '#16a085', 8, true),
+  ('00000000-0000-0000-0001-000000000002', 'creation_modif_reseau_eau', 'Création / modification réseau eau', 'Création ou modification réseau', 240, '⚙️', '#34495e', 9, true),
+
+  -- ========================================
+  -- Catégorie PLOMBERIE: Ballon / chauffe-eau
+  -- ========================================
+  ('00000000-0000-0000-0001-000000000002', 'installation_chauffe_eau_plomberie', 'Installation chauffe-eau', 'Installation chauffe-eau électrique/gaz', 180, '🌡️', '#e74c3c', 10, true),
+  ('00000000-0000-0000-0001-000000000002', 'depannage_chauffe_eau_plomberie', 'Dépannage chauffe-eau', 'Réparation chauffe-eau', 120, '🔧', '#e84118', 11, true),
+  ('00000000-0000-0000-0001-000000000002', 'entretien_chauffe_eau_plomberie', 'Entretien chauffe-eau (anti-tartre)', 'Détartrage et entretien', 90, '🧼', '#44bd32', 12, true),
+
+  -- ========================================
+  -- Catégorie PLOMBERIE: Canalisation & évacuation
+  -- ========================================
+  ('00000000-0000-0000-0001-000000000002', 'reparation_canalisation', 'Réparation canalisation eau', 'Réparation canalisation eau potable', 150, '🔧', '#e84118', 13, true),
+  ('00000000-0000-0000-0001-000000000002', 'reparation_evacuation', 'Réparation évacuation eaux usées', 'Réparation évacuation EU/EV', 150, '💦', '#7f8fa6', 14, true),
+  ('00000000-0000-0000-0001-000000000002', 'remplacement_siphon', 'Remplacement siphon / bonde', 'Changement siphon ou bonde', 45, '🔩', '#95a5a6', 15, true),
+  ('00000000-0000-0000-0001-000000000002', 'colonne_montante', 'Pose / remplacement colonne montante', 'Installation ou changement colonne', 360, '⬆️', '#2c3e50', 16, true),
+
+  -- ========================================
+  -- Catégorie PLOMBERIE: Salle de bain / rénovation
+  -- ========================================
+  ('00000000-0000-0000-0001-000000000002', 'renovation_salle_bain', 'Rénovation salle de bain', 'Rénovation complète salle de bain', 720, '🛠️', '#8c7ae6', 17, true),
+  ('00000000-0000-0000-0001-000000000002', 'accessibilite_pmr', 'Adaptation équipements PMR', 'Adaptation accessibilité PMR', 240, '♿', '#27ae60', 18, true),
+
+  -- ========================================
+  -- Catégorie CHAUFFAGE: Chaudière
+  -- ========================================
+  ('00000000-0000-0000-0001-000000000002', 'install_chaudiere', 'Installation chaudière', 'Installation d''une nouvelle chaudière', 360, '🔧', '#e74c3c', 19, true),
+  ('00000000-0000-0000-0001-000000000002', 'entretien_chaudiere', 'Entretien chaudière', 'Entretien annuel de la chaudière', 120, '🔥', '#44bd32', 20, true),
+  ('00000000-0000-0000-0001-000000000002', 'depannage_chaudiere', 'Dépannage chaudière', 'Réparation panne chaudière', 150, '🚨', '#e84118', 21, true),
+  ('00000000-0000-0000-0001-000000000002', 'remplacement_chaudiere', 'Remplacement chaudière', 'Remplacement chaudière complète', 480, '♻️', '#f39c12', 22, true),
+
+  -- ========================================
+  -- Catégorie CHAUFFAGE: Radiateurs / Plancher chauffant
+  -- ========================================
+  ('00000000-0000-0000-0001-000000000002', 'install_radiateurs', 'Installation radiateurs', 'Installation de nouveaux radiateurs', 180, '♨️', '#e67e22', 23, true),
+  ('00000000-0000-0000-0001-000000000002', 'depannage_radiateurs', 'Dépannage radiateurs', 'Réparation radiateurs défectueux', 90, '🔧', '#e84118', 24, true),
+  ('00000000-0000-0000-0001-000000000002', 'install_plancher_chauffant', 'Installation plancher chauffant', 'Mise en place plancher chauffant', 720, '🏗️', '#3498db', 25, true),
+  ('00000000-0000-0000-0001-000000000002', 'depannage_plancher_chauffant', 'Dépannage plancher chauffant', 'Réparation plancher chauffant', 240, '🔍', '#e84118', 26, true),
+
+  -- ========================================
+  -- Catégorie CHAUFFAGE: Pompe à chaleur
+  -- ========================================
+  ('00000000-0000-0000-0001-000000000002', 'install_pac', 'Installation pompe à chaleur', 'Installation PAC complète', 600, '🌡️', '#16a085', 27, true),
+  ('00000000-0000-0000-0001-000000000002', 'entretien_pac', 'Entretien pompe à chaleur', 'Entretien annuel PAC', 150, '⚙️', '#44bd32', 28, true),
+  ('00000000-0000-0000-0001-000000000002', 'depannage_pac', 'Dépannage pompe à chaleur', 'Réparation panne PAC', 180, '🚨', '#e84118', 29, true),
+
+  -- ========================================
+  -- Catégorie CHAUFFAGE: Eau chaude sanitaire
+  -- ========================================
+  ('00000000-0000-0000-0001-000000000002', 'install_ecs', 'Installation système ECS', 'Installation système eau chaude', 240, '💧', '#00d2d3', 30, true),
+  ('00000000-0000-0000-0001-000000000002', 'depannage_ecs', 'Dépannage système ECS', 'Réparation système eau chaude', 120, '🔧', '#e84118', 31, true),
+  ('00000000-0000-0000-0001-000000000002', 'detartrage', 'Détartrage', 'Détartrage chauffe-eau/chaudière', 90, '🧼', '#fbc531', 32, true),
+
+  -- ========================================
+  -- Catégorie CHAUFFAGE: Régulation & optimisation
+  -- ========================================
+  ('00000000-0000-0000-0001-000000000002', 'install_regulation', 'Installation régulation connectée', 'Mise en place thermostat connecté', 120, '📱', '#8c7ae6', 33, true),
+  ('00000000-0000-0000-0001-000000000002', 'optimisation_conso', 'Optimisation consommation', 'Réglages pour réduire la consommation', 90, '📊', '#27ae60', 34, true),
+
+  -- ========================================
+  -- Catégorie CHAUFFAGE: Circuit & fuites
+  -- ========================================
+  ('00000000-0000-0000-0001-000000000002', 'purge_circuit', 'Purge circuit chauffage', 'Purge et désembouage circuit', 120, '💨', '#0097e6', 35, true),
+  ('00000000-0000-0000-0001-000000000002', 'reparation_fuite_chauffage', 'Réparation fuite chauffage', 'Réparation fuite sur circuit', 90, '💧', '#e84118', 36, true);
+
+-- =============================================
+-- 2️⃣ PISCINISTE - 19 types détaillés
 -- =============================================
 
 INSERT INTO public.intervention_types (business_type_id, code, name, description, default_duration, emoji, color, display_order, is_active)
@@ -69,40 +155,6 @@ VALUES
   ('00000000-0000-0000-0001-000000000001', 'securite_piscine', 'Installation systèmes de sécurité', 'Alarme/barrière/couverture sécurité', 180, '🚨', '#c0392b', 19, true);
 
 -- =============================================
--- 2️⃣ PLOMBERIE - 18 types détaillés
--- =============================================
-
-INSERT INTO public.intervention_types (business_type_id, code, name, description, default_duration, emoji, color, display_order, is_active)
-VALUES
-  -- Catégorie: Dépannage & fuites
-  ('00000000-0000-0000-0001-000000000002', 'depannage_plomberie', 'Dépannage plomberie', 'Dépannage urgence plomberie', 120, '🚨', '#e84118', 1, true),
-  ('00000000-0000-0000-0001-000000000002', 'recherche_fuite', 'Recherche de fuite', 'Détection fuite avec équipement', 90, '🔍', '#fbc531', 2, true),
-  ('00000000-0000-0000-0001-000000000002', 'reparation_fuite', 'Réparation fuite', 'Réparation fuite canalisations/raccords', 120, '💧', '#e84118', 3, true),
-  ('00000000-0000-0000-0001-000000000002', 'debouchage_evacuations', 'Débouchage évier / lavabo / WC', 'Débouchage canalisations', 90, '🚿', '#4cd137', 4, true),
-
-  -- Catégorie: Installation sanitaire
-  ('00000000-0000-0000-0001-000000000002', 'installation_wc', 'Installation WC', 'Pose WC suspendu ou au sol', 180, '🚽', '#0097e6', 5, true),
-  ('00000000-0000-0000-0001-000000000002', 'installation_lavabo', 'Installation lavabo / vasque', 'Pose lavabo ou vasque', 120, '🚰', '#00d2d3', 6, true),
-  ('00000000-0000-0000-0001-000000000002', 'installation_douche_baignoire', 'Installation douche / baignoire', 'Pose douche ou baignoire complète', 240, '🛁', '#3498db', 7, true),
-  ('00000000-0000-0000-0001-000000000002', 'installation_robinetterie', 'Installation robinetterie', 'Pose mitigeur/thermostatique', 90, '🔧', '#16a085', 8, true),
-  ('00000000-0000-0000-0001-000000000002', 'creation_modif_reseau_eau', 'Création / modification réseau eau', 'Création ou modification réseau', 240, '⚙️', '#34495e', 9, true),
-
-  -- Catégorie: Ballon / chauffe-eau
-  ('00000000-0000-0000-0001-000000000002', 'installation_chauffe_eau', 'Installation chauffe-eau', 'Installation chauffe-eau électrique/gaz', 180, '🌡️', '#e74c3c', 10, true),
-  ('00000000-0000-0000-0001-000000000002', 'depannage_chauffe_eau', 'Dépannage chauffe-eau', 'Réparation chauffe-eau', 120, '🔧', '#e84118', 11, true),
-  ('00000000-0000-0000-0001-000000000002', 'entretien_chauffe_eau', 'Entretien chauffe-eau (anti-tartre)', 'Détartrage et entretien', 90, '🧼', '#44bd32', 12, true),
-
-  -- Catégorie: Canalisation & évacuation
-  ('00000000-0000-0000-0001-000000000002', 'reparation_canalisation', 'Réparation canalisation eau', 'Réparation canalisation eau potable', 150, '🔧', '#e84118', 13, true),
-  ('00000000-0000-0000-0001-000000000002', 'reparation_evacuation', 'Réparation évacuation eaux usées', 'Réparation évacuation EU/EV', 150, '💦', '#7f8fa6', 14, true),
-  ('00000000-0000-0000-0001-000000000002', 'remplacement_siphon', 'Remplacement siphon / bonde', 'Changement siphon ou bonde', 45, '🔩', '#95a5a6', 15, true),
-  ('00000000-0000-0000-0001-000000000002', 'colonne_montante', 'Pose / remplacement colonne montante', 'Installation ou changement colonne', 360, '⬆️', '#2c3e50', 16, true),
-
-  -- Catégorie: Salle de bain / rénovation
-  ('00000000-0000-0000-0001-000000000002', 'renovation_salle_bain', 'Rénovation salle de bain', 'Rénovation complète salle de bain', 720, '🛠️', '#8c7ae6', 17, true),
-  ('00000000-0000-0000-0001-000000000002', 'accessibilite_pmr', 'Adaptation équipements PMR', 'Adaptation accessibilité PMR', 240, '♿', '#27ae60', 18, true);
-
--- =============================================
 -- 3️⃣ DÉRATISATION - 16 types détaillés
 -- =============================================
 
@@ -135,43 +187,7 @@ VALUES
   ('00000000-0000-0000-0001-000000000003', 'desinfection_assainissement', 'Désinfection / assainissement', 'Désinfection et assainissement local', 90, '🧼', '#00d2d3', 16, true);
 
 -- =============================================
--- 4️⃣ CHAUFFAGISTE - 18 types détaillés
--- =============================================
-
-INSERT INTO public.intervention_types (business_type_id, code, name, description, default_duration, emoji, color, display_order, is_active)
-VALUES
-  -- Catégorie: Chaudière
-  ('00000000-0000-0000-0001-000000000006', 'install_chaudiere', 'Installation chaudière', 'Installation d''une nouvelle chaudière', 360, '🔧', '#e74c3c', 1, true),
-  ('00000000-0000-0000-0001-000000000006', 'entretien_chaudiere', 'Entretien chaudière', 'Entretien annuel de la chaudière', 120, '🔥', '#44bd32', 2, true),
-  ('00000000-0000-0000-0001-000000000006', 'depannage_chaudiere', 'Dépannage chaudière', 'Réparation panne chaudière', 150, '🚨', '#e84118', 3, true),
-  ('00000000-0000-0000-0001-000000000006', 'remplacement_chaudiere', 'Remplacement chaudière', 'Remplacement chaudière complète', 480, '♻️', '#f39c12', 4, true),
-
-  -- Catégorie: Radiateurs / Plancher chauffant
-  ('00000000-0000-0000-0001-000000000006', 'install_radiateurs', 'Installation radiateurs', 'Installation de nouveaux radiateurs', 180, '♨️', '#e67e22', 5, true),
-  ('00000000-0000-0000-0001-000000000006', 'depannage_radiateurs', 'Dépannage radiateurs', 'Réparation radiateurs défectueux', 90, '🔧', '#e84118', 6, true),
-  ('00000000-0000-0000-0001-000000000006', 'install_plancher_chauffant', 'Installation plancher chauffant', 'Mise en place plancher chauffant', 720, '🏗️', '#3498db', 7, true),
-  ('00000000-0000-0000-0001-000000000006', 'depannage_plancher_chauffant', 'Dépannage plancher chauffant', 'Réparation plancher chauffant', 240, '🔍', '#e84118', 8, true),
-
-  -- Catégorie: Pompe à chaleur
-  ('00000000-0000-0000-0001-000000000006', 'install_pac', 'Installation pompe à chaleur', 'Installation PAC complète', 600, '🌡️', '#16a085', 9, true),
-  ('00000000-0000-0000-0001-000000000006', 'entretien_pac', 'Entretien pompe à chaleur', 'Entretien annuel PAC', 150, '⚙️', '#44bd32', 10, true),
-  ('00000000-0000-0000-0001-000000000006', 'depannage_pac', 'Dépannage pompe à chaleur', 'Réparation panne PAC', 180, '🚨', '#e84118', 11, true),
-
-  -- Catégorie: Eau chaude sanitaire
-  ('00000000-0000-0000-0001-000000000006', 'install_ecs', 'Installation système ECS', 'Installation système eau chaude', 240, '💧', '#00d2d3', 12, true),
-  ('00000000-0000-0000-0001-000000000006', 'depannage_ecs', 'Dépannage système ECS', 'Réparation système eau chaude', 120, '🔧', '#e84118', 13, true),
-  ('00000000-0000-0000-0001-000000000006', 'detartrage', 'Détartrage', 'Détartrage chauffe-eau/chaudière', 90, '🧼', '#fbc531', 14, true),
-
-  -- Catégorie: Régulation & optimisation
-  ('00000000-0000-0000-0001-000000000006', 'install_regulation', 'Installation régulation connectée', 'Mise en place thermostat connecté', 120, '📱', '#8c7ae6', 15, true),
-  ('00000000-0000-0000-0001-000000000006', 'optimisation_conso', 'Optimisation consommation', 'Réglages pour réduire la consommation', 90, '📊', '#27ae60', 16, true),
-
-  -- Catégorie: Plomberie chauffage
-  ('00000000-0000-0000-0001-000000000006', 'purge_circuit', 'Purge circuit chauffage', 'Purge et désembouage circuit', 120, '💨', '#0097e6', 17, true),
-  ('00000000-0000-0000-0001-000000000006', 'reparation_fuite', 'Réparation fuite chauffage', 'Réparation fuite sur circuit', 90, '💧', '#e84118', 18, true);
-
--- =============================================
--- 5️⃣ GARAGISTE - 23 types détaillés
+-- 4️⃣ GARAGISTE - 23 types détaillés
 -- =============================================
 
 INSERT INTO public.intervention_types (business_type_id, code, name, description, default_duration, emoji, color, display_order, is_active)
@@ -218,7 +234,7 @@ VALUES
   ('00000000-0000-0000-0001-000000000004', 'parebrise', 'Remplacement pare-brise', 'Changement pare-brise', 120, '🪟', '#0097e6', 23, true);
 
 -- =============================================
--- 6️⃣ ÉLECTRICIEN - 23 types détaillés
+-- 5️⃣ ÉLECTRICIEN - 23 types détaillés
 -- =============================================
 
 INSERT INTO public.intervention_types (business_type_id, code, name, description, default_duration, emoji, color, display_order, is_active)
@@ -261,38 +277,36 @@ VALUES
   ('00000000-0000-0000-0001-000000000005', 'videosurveillance_alarme', 'Vidéosurveillance / alarme', 'Installation système sécurité', 240, '📹', '#34495e', 23, true);
 
 -- =============================================
--- FIN MIGRATION 010
+-- VÉRIFICATION FINALE
 -- =============================================
 
 DO $$
 DECLARE
+  v_plombier_chauffagiste INTEGER;
   v_pisciniste INTEGER;
-  v_plomberie INTEGER;
   v_deratisation INTEGER;
   v_garagiste INTEGER;
   v_electricien INTEGER;
-  v_chauffagiste INTEGER;
   v_total INTEGER;
 BEGIN
+  SELECT COUNT(*) INTO v_plombier_chauffagiste FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000002';
   SELECT COUNT(*) INTO v_pisciniste FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000001';
-  SELECT COUNT(*) INTO v_plomberie FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000002';
   SELECT COUNT(*) INTO v_deratisation FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000003';
   SELECT COUNT(*) INTO v_garagiste FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000004';
   SELECT COUNT(*) INTO v_electricien FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000005';
-  SELECT COUNT(*) INTO v_chauffagiste FROM public.intervention_types WHERE business_type_id = '00000000-0000-0000-0001-000000000006';
   SELECT COUNT(*) INTO v_total FROM public.intervention_types;
 
   RAISE NOTICE '============================================';
   RAISE NOTICE 'MIGRATION 010 COMPLETED SUCCESSFULLY';
   RAISE NOTICE '============================================';
+  RAISE NOTICE '✅ 🔧🌡️  Plombier/Chauffagiste: % types d''intervention détaillés', v_plombier_chauffagiste;
   RAISE NOTICE '✅ 🏊 Pisciniste: % types d''intervention détaillés', v_pisciniste;
-  RAISE NOTICE '✅ 🔧 Plomberie: % types d''intervention détaillés', v_plomberie;
   RAISE NOTICE '✅ 🐀 Dératisation: % types d''intervention détaillés', v_deratisation;
-  RAISE NOTICE '✅ 🚗 Garagiste: % types d''intervention détaillés', v_garagiste;
+  RAISE NOTICE '✅ 🚗 Garagiste (auto/moto): % types d''intervention détaillés', v_garagiste;
   RAISE NOTICE '✅ ⚡ Électricien: % types d''intervention détaillés', v_electricien;
-  RAISE NOTICE '✅ 🌡️  Chauffagiste: % types d''intervention détaillés', v_chauffagiste;
   RAISE NOTICE '============================================';
-  RAISE NOTICE '📊 Total: % types d''intervention pour 6 métiers', v_total;
+  RAISE NOTICE '📊 Total: % types d''intervention pour 5 métiers', v_total;
+  RAISE NOTICE '📝 Plomberie et Chauffage fusionnés en un seul métier';
   RAISE NOTICE '📝 Types organisés par catégorie métier';
   RAISE NOTICE '📝 Durées par défaut ajustées selon complexité';
   RAISE NOTICE '📝 Emojis et couleurs pour meilleure UX';

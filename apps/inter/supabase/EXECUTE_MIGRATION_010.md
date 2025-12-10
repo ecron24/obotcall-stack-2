@@ -29,13 +29,12 @@ Cette migration remplace les types d'intervention génériques par **117 types d
 
 7. **Vérifiez** les notifications PostgreSQL :
    ```
+   ✅ 🔧🌡️ Plombier/Chauffagiste: 36 types d'intervention détaillés
    ✅ 🏊 Pisciniste: 19 types d'intervention détaillés
-   ✅ 🔧 Plomberie: 18 types d'intervention détaillés
    ✅ 🐀 Dératisation: 16 types d'intervention détaillés
-   ✅ 🚗 Garagiste: 23 types d'intervention détaillés
+   ✅ 🚗 Garagiste (auto/moto): 23 types d'intervention détaillés
    ✅ ⚡ Électricien: 23 types d'intervention détaillés
-   ✅ 🌡️ Chauffagiste: 18 types d'intervention détaillés
-   📊 Total: 117 types d'intervention pour 6 métiers
+   📊 Total: 117 types d'intervention pour 5 métiers
    ```
 
 ### Option 2 : Supabase CLI
@@ -71,46 +70,54 @@ FROM business_types bt
 LEFT JOIN intervention_types it ON it.business_type_id = bt.id
 WHERE bt.is_active = true
 GROUP BY bt.id, bt.name, bt.emoji
-ORDER BY bt.display_order;
+ORDER BY bt.name;
 ```
 
 Résultat attendu :
 ```
-     metier      | emoji | nb_types
------------------+-------+----------
- Pisciniste      | 🏊    |       19
- Plomberie       | 🔧    |       18
- Dératisation    | 🐀    |       16
- Garagiste       | 🚗    |       23
- Électricien     | ⚡    |       23
- Chauffagiste    | 🌡️    |       18
+          metier           | emoji | nb_types
+---------------------------+-------+----------
+ Plombier/Chauffagiste     | 🔧🌡️  |       36
+ Pisciniste                | 🏊    |       19
+ Dératisation              | 🐀    |       16
+ Garagiste (auto/moto)     | 🚗    |       23
+ Électricien               | ⚡    |       23
 ```
 
 ## 🔄 Que fait cette migration ?
 
-1. **Supprime** les anciens types génériques (47 types au total)
-2. **Insère** 117 nouveaux types détaillés avec :
-   - Slugs spécifiques (ex: `install_chaudiere`, `depannage_pac`)
-   - Labels en français
-   - Descriptions détaillées
-   - Durées par défaut ajustées
-   - Emojis pour identification visuelle
-   - Couleurs pour catégorisation
+1. **Supprime** les anciens types génériques de tous les métiers
+2. **Fusionne** Plomberie et Chauffage en un seul métier "Plombier/Chauffagiste"
+3. **Insère** 117 nouveaux types détaillés avec :
+   - 36 types pour Plombier/Chauffagiste (18 plomberie + 18 chauffage)
+   - 19 types pour Pisciniste
+   - 16 types pour Dératisation
+   - 23 types pour Garagiste (auto/moto)
+   - 23 types pour Électricien
+4. Chaque type contient :
+   - Code unique (ex: `install_chaudiere`, `depannage_pac`)
+   - Label en français
+   - Description détaillée
+   - Durée par défaut ajustée
+   - Emoji pour identification visuelle
+   - Couleur pour catégorisation
    - Ordre d'affichage par catégorie
 
 ## 🎯 Résultat après migration
 
 Quand vous créez une intervention dans l'app Inter :
+- **Plombier/Chauffagiste** → 36 types
+  - Plomberie : Dépannage, Débouchage, Installation sanitaire, Chauffe-eau, etc.
+  - Chauffage : Chaudière, PAC, Radiateurs, Plancher chauffant, etc.
 - **Pisciniste** → 19 types (Installation, Entretien, Hivernage, Réparations, etc.)
-- **Plombier** → 18 types (Dépannage, Débouchage, Installation sanitaire, etc.)
 - **Électricien** → 23 types (Installation, Mise aux normes, Domotique, etc.)
-- **Chauffagiste** → 18 types (Chaudière, PAC, Radiateurs, etc.)
-- **Garagiste** → 23 types (Révision, Freinage, Pneus, Distribution, etc.)
-- **Dératiseur** → 16 types (Rongeurs, Insectes, Xylophages, etc.)
+- **Garagiste (auto/moto)** → 23 types (Révision, Freinage, Pneus, Distribution, etc.)
+- **Dératisation** → 16 types (Rongeurs, Insectes, Xylophages, etc.)
 
 ## ⚠️ Important
 
 - Cette migration **supprime** les anciens types d'intervention
+- Elle **fusionne** Plomberie et Chauffagiste en un seul métier car ces professionnels font souvent les deux activités
 - Si vous avez des interventions existantes qui référencent les anciens types, elles pourraient être impactées
 - Testez d'abord sur un environnement de développement si possible
 
@@ -120,5 +127,6 @@ Si vous rencontrez une erreur :
 
 1. Vérifiez que les migrations précédentes (001-009) ont été exécutées
 2. Vérifiez que la table `intervention_types` existe
-3. Vérifiez que la table `business_types` contient bien les 6 métiers
-4. Contactez le support avec le message d'erreur complet
+3. Vérifiez que la table `business_types` contient bien les métiers
+4. Vérifiez que votre tenant a bien un `business_type_id` configuré
+5. Contactez le support avec le message d'erreur complet
