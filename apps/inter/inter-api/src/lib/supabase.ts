@@ -16,9 +16,6 @@ export const supabaseAdmin = createClient(
     auth: {
       autoRefreshToken: false,
       persistSession: false
-    },
-    db: {
-      schema: 'inter_app'
     }
   }
 )

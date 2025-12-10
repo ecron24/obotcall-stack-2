@@ -21,6 +21,7 @@ interventions.get('/', async (c) => {
 
     // Get interventions with client data
     const { data, error, count } = await supabaseAdmin
+      .schema('inter_app')
       .from('interventions')
       .select('*, clients(*), assigned_to:users!assigned_to_user_id(*)', { count: 'exact' })
       .eq('tenant_id', tenant.id)
@@ -63,6 +64,7 @@ interventions.get('/:id', async (c) => {
     const id = c.req.param('id')
 
     const { data, error } = await supabaseAdmin
+      .schema('inter_app')
       .from('interventions')
       .select('*, clients(*), assigned_to:users!assigned_to_user_id(*), created_by:users!created_by_user_id(*)')
       .eq('id', id)
@@ -98,6 +100,7 @@ interventions.post('/', checkUsageLimit('interventions'), async (c) => {
 
     // Verify client belongs to tenant
     const { data: client, error: clientError } = await supabaseAdmin
+      .schema('inter_app')
       .from('clients')
       .select('id')
       .eq('id', validated.client_id)
@@ -129,6 +132,7 @@ interventions.post('/', checkUsageLimit('interventions'), async (c) => {
     }
 
     const { data, error } = await supabaseAdmin
+      .schema('inter_app')
       .from('interventions')
       .insert({
         ...validated,
@@ -182,6 +186,7 @@ interventions.patch('/:id', async (c) => {
 
     // Check intervention exists and belongs to tenant
     const { data: existing, error: existingError } = await supabaseAdmin
+      .schema('inter_app')
       .from('interventions')
       .select('id')
       .eq('id', id)
@@ -198,6 +203,7 @@ interventions.patch('/:id', async (c) => {
     // If client_id is being updated, verify it belongs to tenant
     if (validated.client_id) {
       const { data: client, error: clientError } = await supabaseAdmin
+        .schema('inter_app')
         .from('clients')
         .select('id')
         .eq('id', validated.client_id)
@@ -213,6 +219,7 @@ interventions.patch('/:id', async (c) => {
     }
 
     const { data, error } = await supabaseAdmin
+      .schema('inter_app')
       .from('interventions')
       .update(validated)
       .eq('id', id)
@@ -255,6 +262,7 @@ interventions.delete('/:id', async (c) => {
     const id = c.req.param('id')
 
     const { error } = await supabaseAdmin
+      .schema('inter_app')
       .from('interventions')
       .delete()
       .eq('id', id)
