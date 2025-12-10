@@ -21,14 +21,17 @@ export function Header() {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-white px-6">
+    <header className="flex h-16 items-center justify-between border-b bg-white px-6 md:px-6 pl-20 md:pl-6">
       <div className="flex items-center gap-4">
         {businessType ? (
           <div className="flex items-center gap-3">
             <span className="text-2xl">{businessType.emoji}</span>
-            <div>
+            <div className="hidden sm:block">
               <h2 className="text-lg font-semibold">{tenant?.name}</h2>
               <p className="text-xs text-gray-500">{businessType.name}</p>
+            </div>
+            <div className="sm:hidden">
+              <h2 className="text-base font-semibold">{tenant?.name}</h2>
             </div>
           </div>
         ) : (
@@ -36,9 +39,12 @@ export function Header() {
         )}
       </div>
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" onClick={handleLogout}>
+        <Button variant="ghost" size="sm" onClick={handleLogout} className="hidden sm:flex">
           <LogOut className="mr-2 h-4 w-4" />
           Déconnexion
+        </Button>
+        <Button variant="ghost" size="icon" onClick={handleLogout} className="sm:hidden">
+          <LogOut className="h-4 w-4" />
         </Button>
       </div>
     </header>
