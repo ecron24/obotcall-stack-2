@@ -45,8 +45,11 @@ export const authMiddleware = async (c: Context, next: Next) => {
       .maybeSingle()
 
     if (roleError || !userTenantRole) {
+      console.error('❌ User-tenant role error:', roleError, 'Data:', userTenantRole)
       return c.json({ error: 'Forbidden', message: 'Aucun accès à un tenant actif' }, 403)
     }
+
+    console.log('✅ User-tenant role found:', userTenantRole.tenant_id)
 
     // Get tenant with subscription
     const { data: tenant, error: tenantError } = await supabaseAdmin
@@ -57,8 +60,11 @@ export const authMiddleware = async (c: Context, next: Next) => {
       .single()
 
     if (tenantError || !tenant) {
+      console.error('❌ Tenant error:', tenantError, 'Tenant:', tenant)
       return c.json({ error: 'Unauthorized', message: 'Organisation non trouvée ou désactivée' }, 401)
     }
+
+    console.log('✅ Tenant found:', tenant.name)
 
     // Check subscription status (if subscription exists)
     if (tenant.subscriptions && tenant.subscriptions.length > 0) {
