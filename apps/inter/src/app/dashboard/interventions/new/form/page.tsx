@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ProductCatalog } from '@/components/business'
+import { useTenant, useInterventionTypes } from '@/hooks'
 
 interface InterventionType {
   id: string
@@ -21,10 +22,14 @@ export default function NewInterventionFormPage() {
   const clientId = searchParams.get('client_id')
   const isNewClient = searchParams.get('new_client') === 'true'
 
+  // Récupérer le tenant et son business_type
+  const { tenant, businessType, loading: loadingTenant } = useTenant()
+
+  // Charger les types d'intervention (filtrés automatiquement par le business_type du tenant)
+  const { interventionTypes, loading: loadingTypes } = useInterventionTypes()
+
   const [loading, setLoading] = useState(false)
   const [client, setClient] = useState<any>(null)
-  const [businessType, setBusinessType] = useState<any>(null) // Objet complet business type
-  const [interventionTypes, setInterventionTypes] = useState<InterventionType[]>([])
 
   // Form data - Client
   const [clientForm, setClientForm] = useState({
@@ -74,8 +79,17 @@ export default function NewInterventionFormPage() {
     if (clientId) {
       loadClient()
     }
-    loadBusinessType()
   }, [clientId])
+
+  // Mettre à jour le taux horaire quand le businessType est chargé
+  useEffect(() => {
+    if (businessType?.default_labor_rate) {
+      setInterventionForm(prev => ({
+        ...prev,
+        taux_horaire: businessType.default_labor_rate.toString()
+      }))
+    }
+  }, [businessType])
 
   const loadClient = async () => {
     try {
@@ -103,34 +117,6 @@ export default function NewInterventionFormPage() {
       }
     } catch (err) {
       console.error('Error loading client:', err)
-    }
-  }
-
-  const loadBusinessType = async () => {
-    try {
-      // Charger le type de métier depuis localStorage
-      const stored = localStorage.getItem('selected_business_type')
-      if (stored) {
-        const business = JSON.parse(stored)
-        setBusinessType(business)
-        setInterventionForm(prev => ({
-          ...prev,
-          taux_horaire: business.default_labor_rate?.toString() || '45.00'
-        }))
-
-        // Charger les types d'intervention pour ce métier
-        const token = localStorage.getItem('access_token')
-        const response = await fetch(`${API_URL}/api/intervention-types?business_type_id=${business.id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
-
-        if (response.ok) {
-          const types = await response.json()
-          setInterventionTypes(Array.isArray(types) ? types : [])
-        }
-      }
-    } catch (err) {
-      console.error('Error loading business type:', err)
     }
   }
 
@@ -425,7 +411,7 @@ export default function NewInterventionFormPage() {
         )}
 
         {/* SECTION: Piscine (si métier pisciniste) */}
-        {businessType === 'pisciniste' && (
+        {businessType?.code === 'pool_maintenance' && (
           <section className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <span>🏊</span> Piscine <span className="text-sm font-normal text-gray-500">(optionnel)</span>
@@ -569,10 +555,17 @@ export default function NewInterventionFormPage() {
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Type(s) d'intervention <span className="text-red-500">*</span>
             </label>
-            {interventionTypes.length === 0 ? (
+            {loadingTypes ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                 <p className="text-sm text-gray-500 mt-2">Chargement des types...</p>
+              </div>
+            ) : interventionTypes.length === 0 ? (
+              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+                <p className="text-gray-500">Aucun type d'intervention disponible</p>
+                <p className="text-sm text-gray-400 mt-1">
+                  {businessType ? `pour ${businessType.name}` : ''}
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -593,7 +586,7 @@ export default function NewInterventionFormPage() {
                 ))}
               </div>
             )}
-            {interventionForm.intervention_types.length === 0 && (
+            {interventionForm.intervention_types.length === 0 && !loadingTypes && (
               <p className="text-sm text-gray-500 mt-2">
                 Sélectionnez au moins un type d'intervention
               </p>

@@ -17,23 +17,17 @@ export function useInterventionTypes(filters?: InterventionTypeFilters) {
       setLoading(true)
       setError(null)
 
-      // Construire les params de query
-      const params = new URLSearchParams()
-      if (filters?.business_type_id) {
-        params.set('business_type_id', filters.business_type_id)
-      }
-      if (filters?.is_active !== undefined) {
-        params.set('is_active', String(filters.is_active))
-      }
+      // Récupérer le token depuis localStorage
+      const token = localStorage.getItem('access_token')
 
-      const queryString = params.toString()
-      const url = `${API_URL}/api/intervention-types${queryString ? `?${queryString}` : ''}`
+      // L'API filtre automatiquement par business_type_id du tenant authentifié
+      // On n'envoie donc pas de paramètres query
+      const url = `${API_URL}/api/intervention-types`
 
       const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
-          // Ajoutez ici le header d'auth si nécessaire
-          // 'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`
         }
       })
 
@@ -78,9 +72,12 @@ export function useInterventionType(id: string) {
       setLoading(true)
       setError(null)
 
+      const token = localStorage.getItem('access_token')
+
       const response = await fetch(`${API_URL}/api/intervention-types/${id}`, {
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
       })
 
