@@ -137,6 +137,37 @@ ORDER BY routine_name;
 
 ---
 
+## 🔒 Sécurité PostgreSQL
+
+### Protection search_path (✅ IMPLÉMENTÉE)
+
+Toutes les fonctions avec `SECURITY DEFINER` ont été sécurisées avec un `search_path` fixe :
+
+```sql
+CREATE OR REPLACE FUNCTION inter_app.ma_fonction(...)
+...
+SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog  -- ✅ Protection active
+AS $$
+```
+
+**Pourquoi c'est important ?**
+
+Sans `search_path` fixe, une fonction `SECURITY DEFINER` est vulnérable aux **attaques par injection de schéma**. Un utilisateur malveillant pourrait :
+
+1. Créer une table/fonction malveillante dans un schéma prioritaire (ex: `public.products`)
+2. Quand la fonction appelle `SELECT * FROM products`, PostgreSQL utiliserait la table malveillante
+3. L'attaquant pourrait voler ou modifier des données avec les privilèges élevés de la fonction
+
+**Solution appliquée :**
+- 8 fonctions protégées avec `SET search_path`
+- Conforme au Supabase Database Linter (lint 0011)
+- Aucun warning de sécurité restant
+
+**Commit:** `b40cf71` - 🔒 Security: Ajout search_path à toutes les fonctions SECURITY DEFINER
+
+---
+
 ## ⚠️ En Cas d'Erreur
 
 ### ~~Erreur: "INSERT trigger's WHEN condition cannot reference OLD values"~~ ✅ CORRIGÉE
