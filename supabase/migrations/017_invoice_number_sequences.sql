@@ -27,6 +27,7 @@ CREATE OR REPLACE FUNCTION inter_app.generate_invoice_number(p_tenant_id UUID)
 RETURNS TEXT
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_year INTEGER;

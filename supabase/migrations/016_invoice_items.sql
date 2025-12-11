@@ -45,6 +45,7 @@ CREATE OR REPLACE FUNCTION inter_app.update_invoice_totals_from_items()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_invoice_id UUID;

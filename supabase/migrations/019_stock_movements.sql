@@ -59,6 +59,7 @@ CREATE OR REPLACE FUNCTION inter_app.update_product_stock()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_quantity_delta NUMERIC(10,2);
@@ -106,6 +107,7 @@ CREATE OR REPLACE FUNCTION inter_app.get_product_stock(
 RETURNS NUMERIC(10,2)
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_total_stock NUMERIC(10,2);
@@ -135,6 +137,7 @@ CREATE OR REPLACE FUNCTION inter_app.record_product_usage_in_intervention(
 RETURNS inter_app.stock_movements
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_movement inter_app.stock_movements;

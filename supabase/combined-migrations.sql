@@ -1,6 +1,6 @@
 -- ============================================
 -- COMBINED MIGRATIONS
--- Generated: 2025-12-11T10:51:48.816Z
+-- Generated: 2025-12-11T11:21:27.513Z
 -- Total migrations: 5
 -- ============================================
 
@@ -56,6 +56,7 @@ CREATE OR REPLACE FUNCTION inter_app.update_invoice_totals_from_items()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_invoice_id UUID;
@@ -214,6 +215,7 @@ CREATE OR REPLACE FUNCTION inter_app.generate_invoice_number(p_tenant_id UUID)
 RETURNS TEXT
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_year INTEGER;
@@ -366,6 +368,7 @@ CREATE OR REPLACE FUNCTION inter_app.convert_proforma_to_final(
 RETURNS inter_app.invoices
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_invoice inter_app.invoices;
@@ -410,6 +413,7 @@ CREATE OR REPLACE FUNCTION inter_app.validate_proforma_invoice(
 RETURNS inter_app.invoices
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_invoice inter_app.invoices;
@@ -454,6 +458,7 @@ CREATE OR REPLACE FUNCTION inter_app.mark_invoice_sent(
 RETURNS inter_app.invoices
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_invoice inter_app.invoices;
@@ -561,6 +566,7 @@ CREATE OR REPLACE FUNCTION inter_app.update_product_stock()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_quantity_delta NUMERIC(10,2);
@@ -608,6 +614,7 @@ CREATE OR REPLACE FUNCTION inter_app.get_product_stock(
 RETURNS NUMERIC(10,2)
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_total_stock NUMERIC(10,2);
@@ -637,6 +644,7 @@ CREATE OR REPLACE FUNCTION inter_app.record_product_usage_in_intervention(
 RETURNS inter_app.stock_movements
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_movement inter_app.stock_movements;

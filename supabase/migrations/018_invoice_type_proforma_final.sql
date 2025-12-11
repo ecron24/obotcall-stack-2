@@ -43,6 +43,7 @@ CREATE OR REPLACE FUNCTION inter_app.convert_proforma_to_final(
 RETURNS inter_app.invoices
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_invoice inter_app.invoices;
@@ -87,6 +88,7 @@ CREATE OR REPLACE FUNCTION inter_app.validate_proforma_invoice(
 RETURNS inter_app.invoices
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_invoice inter_app.invoices;
@@ -131,6 +133,7 @@ CREATE OR REPLACE FUNCTION inter_app.mark_invoice_sent(
 RETURNS inter_app.invoices
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = inter_app, public, pg_catalog
 AS $$
 DECLARE
   v_invoice inter_app.invoices;
