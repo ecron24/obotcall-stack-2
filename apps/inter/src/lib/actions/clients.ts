@@ -1,82 +1,106 @@
 'use server'
 
-import { createServerClient } from '@/lib/supabase/server'
-import { cache } from 'react'
+import { cookies } from 'next/headers'
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3011'
+
+/**
+ * Get auth token from cookies
+ */
+async function getAuthToken() {
+  const cookieStore = await cookies()
+  return cookieStore.get('access_token')?.value
+}
 
 /**
  * Récupère un client par son ID
  */
-export const getClient = cache(async (id: string) => {
+export async function getClient(id: string) {
   try {
-    const supabase = createServerClient()
+    const token = await getAuthToken()
+    if (!token) {
+      throw new Error('Non authentifié')
+    }
 
-    const { data, error } = await supabase
-      .schema('inter_app')
-      .from('clients')
-      .select('*')
-      .eq('id', id)
-      .single()
+    const response = await fetch(`${API_URL}/api/clients/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
 
-    if (error) {
-      console.error('Erreur récupération client:', error)
+    if (!response.ok) {
+      console.error('Erreur récupération client:', response.status)
       return null
     }
 
-    return data
+    return await response.json()
   } catch (error) {
     console.error('Error fetching client:', error)
     return null
   }
-})
+}
 
 /**
  * Récupère tous les clients
  */
-export const getClients = cache(async () => {
+export async function getClients() {
   try {
-    const supabase = createServerClient()
+    const token = await getAuthToken()
+    if (!token) {
+      throw new Error('Non authentifié')
+    }
 
-    const { data, error } = await supabase
-      .schema('inter_app')
-      .from('clients')
-      .select('*')
-      .order('created_at', { ascending: false })
+    const response = await fetch(`${API_URL}/api/clients?page=1&per_page=1000`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
 
-    if (error) {
-      console.error('Erreur récupération clients:', error)
+    if (!response.ok) {
+      console.error('Erreur récupération clients:', response.status)
       return []
     }
 
-    return data || []
+    const result = await response.json()
+    return result.data || []
   } catch (error) {
     console.error('Error fetching clients:', error)
     return []
   }
-})
+}
 
 /**
  * Recherche de clients par nom, email ou téléphone
  */
-export const searchClients = cache(async (query: string) => {
+export async function searchClients(query: string) {
   try {
-    const supabase = createServerClient()
+    const token = await getAuthToken()
+    if (!token) {
+      throw new Error('Non authentifié')
+    }
 
-    const { data, error } = await supabase
-      .schema('inter_app')
-      .from('clients')
-      .select('*')
-      .or(`name.ilike.%${query}%,email.ilike.%${query}%,phone.ilike.%${query}%`)
-      .order('name', { ascending: true })
-      .limit(10)
+    const response = await fetch(`${API_URL}/api/clients?search=${encodeURIComponent(query)}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
 
-    if (error) {
-      console.error('Erreur recherche clients:', error)
+    if (!response.ok) {
+      console.error('Erreur recherche clients:', response.status)
       return []
     }
 
-    return data || []
+    const result = await response.json()
+    return result.data || []
   } catch (error) {
     console.error('Error searching clients:', error)
     return []
   }
-})
+}
+
