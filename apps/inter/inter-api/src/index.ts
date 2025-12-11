@@ -9,7 +9,7 @@ import authRoutes from './routes/auth.js'
 import interventionsRoutes from './routes/interventions.js'
 import clientsRoutes from './routes/clients.js'
 import devisRoutes from './routes/devis.js'
-import facturesRoutes from './routes/factures.js'
+// import facturesRoutes from './routes/factures.js' // DEPRECATED: Use invoicesRoutes instead
 import invoicesRoutes from './routes/invoices.js'
 import tenantsRoutes from './routes/tenants.js'
 import businessTypesRoutes from './routes/business-types.js'
@@ -95,7 +95,7 @@ app.route('/api/intervention-types', interventionTypesRoutes)
 app.route('/api/clients', clientsRoutes)
 app.route('/api/products', productsRoutes)
 app.route('/api/devis', devisRoutes)
-app.route('/api/factures', facturesRoutes)
+// app.route('/api/factures', facturesRoutes) // DEPRECATED: Use /api/invoices instead
 app.route('/api/invoices', invoicesRoutes)
 app.route('/api/stock-movements', stockMovementsRoutes)
 app.route('/api/tenants', tenantsRoutes)

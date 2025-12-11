@@ -69,7 +69,7 @@ export default function NewFacturePage() {
         return
       }
 
-      const response = await fetch(`${API_URL}/api/factures`, {
+      const response = await fetch(`${API_URL}/api/invoices`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

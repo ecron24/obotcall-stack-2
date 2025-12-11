@@ -22,7 +22,7 @@ export async function getInvoice(id: string) {
       throw new Error('Non authentifié')
     }
 
-    const response = await fetch(`${API_URL}/api/factures/${id}`, {
+    const response = await fetch(`${API_URL}/api/invoices/${id}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -52,7 +52,7 @@ export async function getInvoices() {
       throw new Error('Non authentifié')
     }
 
-    const response = await fetch(`${API_URL}/api/factures?page=1&per_page=1000`, {
+    const response = await fetch(`${API_URL}/api/invoices?page=1&per_page=1000`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'

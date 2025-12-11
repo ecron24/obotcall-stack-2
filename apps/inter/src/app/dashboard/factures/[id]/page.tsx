@@ -94,17 +94,8 @@ export default function FactureDetailPage() {
       const data = await response.json()
       setInvoice(data)
 
-      // Fetch invoice items
-      const itemsResponse = await fetch(`${API_URL}/api/invoices/${invoiceId}/items`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      if (itemsResponse.ok) {
-        const itemsData = await itemsResponse.json()
-        setItems(itemsData.data || [])
-      }
+      // Items are already included in the invoice response
+      setItems(data.invoice_items || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue')
       console.error('Error fetching invoice:', err)
