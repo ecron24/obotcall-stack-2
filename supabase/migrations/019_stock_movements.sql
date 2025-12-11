@@ -182,7 +182,7 @@ CREATE POLICY "Users can view stock movements for their tenant"
     EXISTS (
       SELECT 1 FROM public.user_tenant_roles utr
       WHERE utr.tenant_id = stock_movements.tenant_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
         AND stock_movements.deleted_at IS NULL
     )
   );
@@ -195,7 +195,7 @@ CREATE POLICY "Users can insert stock movements for their tenant"
     EXISTS (
       SELECT 1 FROM public.user_tenant_roles utr
       WHERE utr.tenant_id = stock_movements.tenant_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
     )
   );
 
@@ -207,7 +207,7 @@ CREATE POLICY "Users can update stock movements for their tenant"
     EXISTS (
       SELECT 1 FROM public.user_tenant_roles utr
       WHERE utr.tenant_id = stock_movements.tenant_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
         AND stock_movements.deleted_at IS NULL
     )
   );
@@ -220,7 +220,7 @@ CREATE POLICY "Users can delete stock movements for their tenant"
     EXISTS (
       SELECT 1 FROM public.user_tenant_roles utr
       WHERE utr.tenant_id = stock_movements.tenant_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
     )
   );
 

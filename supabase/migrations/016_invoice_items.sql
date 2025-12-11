@@ -111,7 +111,7 @@ CREATE POLICY "Users can view invoice items for their tenant"
       SELECT 1 FROM inter_app.invoices i
       JOIN public.user_tenant_roles utr ON utr.tenant_id = i.tenant_id
       WHERE i.id = invoice_items.invoice_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
         AND invoice_items.deleted_at IS NULL
     )
   );
@@ -125,7 +125,7 @@ CREATE POLICY "Users can insert invoice items for their tenant"
       SELECT 1 FROM inter_app.invoices i
       JOIN public.user_tenant_roles utr ON utr.tenant_id = i.tenant_id
       WHERE i.id = invoice_items.invoice_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
     )
   );
 
@@ -138,7 +138,7 @@ CREATE POLICY "Users can update invoice items for their tenant"
       SELECT 1 FROM inter_app.invoices i
       JOIN public.user_tenant_roles utr ON utr.tenant_id = i.tenant_id
       WHERE i.id = invoice_items.invoice_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
         AND invoice_items.deleted_at IS NULL
     )
   );
@@ -152,7 +152,7 @@ CREATE POLICY "Users can delete invoice items for their tenant"
       SELECT 1 FROM inter_app.invoices i
       JOIN public.user_tenant_roles utr ON utr.tenant_id = i.tenant_id
       WHERE i.id = invoice_items.invoice_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
     )
   );
 

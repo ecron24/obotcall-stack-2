@@ -106,7 +106,7 @@ CREATE POLICY "Users can view sequences for their tenant"
     EXISTS (
       SELECT 1 FROM public.user_tenant_roles utr
       WHERE utr.tenant_id = invoice_number_sequences.tenant_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
     )
   );
 

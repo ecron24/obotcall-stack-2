@@ -1,6 +1,6 @@
 -- ============================================
 -- COMBINED MIGRATIONS
--- Generated: 2025-12-11T11:21:27.513Z
+-- Generated: 2025-12-11T11:28:44.642Z
 -- Total migrations: 5
 -- ============================================
 
@@ -122,7 +122,7 @@ CREATE POLICY "Users can view invoice items for their tenant"
       SELECT 1 FROM inter_app.invoices i
       JOIN public.user_tenant_roles utr ON utr.tenant_id = i.tenant_id
       WHERE i.id = invoice_items.invoice_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
         AND invoice_items.deleted_at IS NULL
     )
   );
@@ -136,7 +136,7 @@ CREATE POLICY "Users can insert invoice items for their tenant"
       SELECT 1 FROM inter_app.invoices i
       JOIN public.user_tenant_roles utr ON utr.tenant_id = i.tenant_id
       WHERE i.id = invoice_items.invoice_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
     )
   );
 
@@ -149,7 +149,7 @@ CREATE POLICY "Users can update invoice items for their tenant"
       SELECT 1 FROM inter_app.invoices i
       JOIN public.user_tenant_roles utr ON utr.tenant_id = i.tenant_id
       WHERE i.id = invoice_items.invoice_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
         AND invoice_items.deleted_at IS NULL
     )
   );
@@ -163,7 +163,7 @@ CREATE POLICY "Users can delete invoice items for their tenant"
       SELECT 1 FROM inter_app.invoices i
       JOIN public.user_tenant_roles utr ON utr.tenant_id = i.tenant_id
       WHERE i.id = invoice_items.invoice_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
     )
   );
 
@@ -294,7 +294,7 @@ CREATE POLICY "Users can view sequences for their tenant"
     EXISTS (
       SELECT 1 FROM public.user_tenant_roles utr
       WHERE utr.tenant_id = invoice_number_sequences.tenant_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
     )
   );
 
@@ -689,7 +689,7 @@ CREATE POLICY "Users can view stock movements for their tenant"
     EXISTS (
       SELECT 1 FROM public.user_tenant_roles utr
       WHERE utr.tenant_id = stock_movements.tenant_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
         AND stock_movements.deleted_at IS NULL
     )
   );
@@ -702,7 +702,7 @@ CREATE POLICY "Users can insert stock movements for their tenant"
     EXISTS (
       SELECT 1 FROM public.user_tenant_roles utr
       WHERE utr.tenant_id = stock_movements.tenant_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
     )
   );
 
@@ -714,7 +714,7 @@ CREATE POLICY "Users can update stock movements for their tenant"
     EXISTS (
       SELECT 1 FROM public.user_tenant_roles utr
       WHERE utr.tenant_id = stock_movements.tenant_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
         AND stock_movements.deleted_at IS NULL
     )
   );
@@ -727,7 +727,7 @@ CREATE POLICY "Users can delete stock movements for their tenant"
     EXISTS (
       SELECT 1 FROM public.user_tenant_roles utr
       WHERE utr.tenant_id = stock_movements.tenant_id
-        AND utr.user_id = auth.uid()
+        AND utr.user_id = (SELECT auth.uid())
     )
   );
 
