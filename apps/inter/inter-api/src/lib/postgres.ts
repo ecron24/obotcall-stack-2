@@ -1,4 +1,8 @@
 import { Pool } from 'pg'
+import dns from 'dns'
+
+// Force IPv4 resolution to avoid ENETUNREACH errors in Docker
+dns.setDefaultResultOrder('ipv4first')
 
 if (!process.env.DATABASE_URL) {
   throw new Error('Missing DATABASE_URL environment variable')
