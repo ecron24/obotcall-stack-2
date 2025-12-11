@@ -479,7 +479,6 @@ DROP TRIGGER IF EXISTS trigger_update_product_stock ON inter_app.stock_movements
 CREATE TRIGGER trigger_update_product_stock
   AFTER INSERT OR UPDATE OF quantity OR DELETE ON inter_app.stock_movements
   FOR EACH ROW
-  WHEN (OLD IS NULL OR OLD.deleted_at IS NULL)
   EXECUTE FUNCTION inter_app.update_product_stock();
 
 -- Indexes performance
