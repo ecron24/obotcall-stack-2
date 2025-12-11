@@ -47,7 +47,7 @@ const getMinimumPlanForFeature = (feature: string): string => {
  * Check if tenant has reached usage limit
  * @param resource Resource type (interventions, clients, etc.)
  */
-export const checkUsageLimit = (resource: 'interventions' | 'clients' | 'devis' | 'factures') => {
+export const checkUsageLimit = (resource: 'interventions' | 'clients' | 'devis' | 'factures' | 'invoices') => {
   return async (c: Context, next: Next) => {
     const { tenant } = getAuth(c)
 

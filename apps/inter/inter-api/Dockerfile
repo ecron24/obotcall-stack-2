@@ -7,6 +7,9 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 
+# Installer les dépendances de build pour modules natifs (bcrypt, etc.)
+RUN apk add --no-cache python3 make g++
+
 # Copier les fichiers de dépendances
 COPY package.json package-lock.json* ./
 RUN npm ci

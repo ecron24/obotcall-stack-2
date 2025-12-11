@@ -304,7 +304,7 @@ interventionItems.patch('/:id', async (c) => {
       .is('deleted_at', null)
       .single()
 
-    if (!item || item.intervention.tenant_id !== tenant.id) {
+    if (!item || (item.intervention as any)?.tenant_id !== tenant.id) {
       return c.json({
         error: 'Not Found',
         message: 'Item non trouvé'
@@ -366,7 +366,7 @@ interventionItems.delete('/:id', async (c) => {
       .is('deleted_at', null)
       .single()
 
-    if (!item || item.intervention.tenant_id !== tenant.id) {
+    if (!item || (item.intervention as any)?.tenant_id !== tenant.id) {
       return c.json({
         error: 'Not Found',
         message: 'Item non trouvé'
