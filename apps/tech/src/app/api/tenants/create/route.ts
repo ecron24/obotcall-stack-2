@@ -20,6 +20,8 @@ interface CreateTenantRequest {
   country_code: string
   owner_user_id: string
   plan?: 'free' | 'starter' | 'pro' | 'enterprise'
+  // Pour Inter-app seulement
+  business_type?: string
 }
 
 export async function POST(request: NextRequest) {
@@ -32,7 +34,8 @@ export async function POST(request: NextRequest) {
       app_type,
       country_code,
       owner_user_id,
-      plan = 'free'
+      plan = 'free',
+      business_type
     } = body
 
     // Validation
@@ -122,7 +125,7 @@ export async function POST(request: NextRequest) {
       .from('subscriptions')
       .insert({
         tenant_id: tenant.id,
-        plan: plan === 'free' ? 'free' : 'starter',
+        plan,
         status: plan === 'free' ? 'active' : 'trialing',
         billing_cycle: 'monthly',
         trial_start: new Date().toISOString(),
@@ -140,10 +143,11 @@ export async function POST(request: NextRequest) {
       // Note: On continue quand même, la subscription peut être créée plus tard
     }
 
-    // Initialiser les données par défaut pour inter_app
+    // Initialiser les données par défaut selon l'app_type
     if (app_type === 'inter_app') {
-      await initializeInterAppDefaults(tenant.id)
+      await initializeInterAppDefaults(tenant.id, business_type)
     }
+    // TODO: ajouter immo_app, agent_app, assist_app
 
     return NextResponse.json({
       tenant,
@@ -162,7 +166,7 @@ export async function POST(request: NextRequest) {
 /**
  * Initialise les données par défaut pour inter_app
  */
-async function initializeInterAppDefaults(tenantId: string) {
+async function initializeInterAppDefaults(tenantId: string, businessType?: string) {
   try {
     // Créer les company_settings par défaut
     await supabaseAdmin
@@ -177,6 +181,7 @@ async function initializeInterAppDefaults(tenantId: string) {
         invoice_footer_text: '',
         siret: '',
         tva_number: '',
+        business_type: businessType || 'other',
         created_at: new Date().toISOString()
       })
 
@@ -192,9 +197,9 @@ async function initializeInterAppDefaults(tenantId: string) {
       .from('product_categories')
       .insert(categories)
 
-    console.log(`✅ Initialized defaults for tenant ${tenantId}`)
+    console.log(`✅ Initialized Inter-App defaults for tenant ${tenantId}`)
   } catch (error) {
-    console.error('Error initializing defaults:', error)
+    console.error('Error initializing Inter-App defaults:', error)
     // Ne pas faire échouer la création du tenant si l'initialisation échoue
   }
 }
