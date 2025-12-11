@@ -199,12 +199,15 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     }
   }
 
+  // Cast to any for Stripe type compatibility
+  const sub = subscription as any
+
   const updateData: any = {
     status: subscription.status === 'active' ? 'active' :
             subscription.status === 'trialing' ? 'trialing' :
             subscription.status === 'past_due' ? 'past_due' : 'suspended',
-    current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-    current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+    current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
+    current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
   }
 
   // Si changement de plan
