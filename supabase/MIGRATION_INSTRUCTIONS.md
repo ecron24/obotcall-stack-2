@@ -166,6 +166,38 @@ Sans `search_path` fixe, une fonction `SECURITY DEFINER` est vulnérable aux **a
 
 **Commit:** `b40cf71` - 🔒 Security: Ajout search_path à toutes les fonctions SECURITY DEFINER
 
+### ⚡ Optimisation RLS Performance (✅ IMPLÉMENTÉE)
+
+Toutes les politiques RLS ont été optimisées pour éviter la ré-évaluation de `auth.uid()` :
+
+```sql
+-- ❌ AVANT (lent - évalué pour chaque ligne)
+WHERE utr.user_id = auth.uid()
+
+-- ✅ APRÈS (rapide - évalué une seule fois)
+WHERE utr.user_id = (SELECT auth.uid())
+```
+
+**Impact performance :**
+
+| Scénario | Avant | Après | Gain |
+|----------|-------|-------|------|
+| 1 000 lignes | 1 000 appels auth.uid() | 1 appel | 999x ⚡ |
+| 10 000 lignes | 10 000 appels | 1 appel | 9 999x ⚡ |
+
+**Pourquoi c'est important ?**
+
+Sans le `SELECT`, PostgreSQL évalue `auth.uid()` **pour chaque ligne testée** par la policy RLS. Avec 1000 factures, cela fait 1000 requêtes vers `auth.users` au lieu d'une seule.
+
+**Le `SELECT` force un "InitPlan"** : PostgreSQL évalue l'expression UNE FOIS avant de scanner les lignes, met le résultat en cache, et le réutilise.
+
+**Solution appliquée :**
+- 9 policies RLS optimisées (invoice_items, stock_movements, invoice_number_sequences)
+- Conforme au Supabase Database Linter (lint 0003)
+- Performance optimale même avec des milliers de lignes
+
+**Commit:** `c821466` - ⚡ Performance: Optimisation RLS policies avec (SELECT auth.uid())
+
 ---
 
 ## ⚠️ En Cas d'Erreur
