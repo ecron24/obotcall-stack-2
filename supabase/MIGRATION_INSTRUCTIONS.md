@@ -139,6 +139,13 @@ ORDER BY routine_name;
 
 ## ⚠️ En Cas d'Erreur
 
+### ~~Erreur: "INSERT trigger's WHEN condition cannot reference OLD values"~~ ✅ CORRIGÉE
+**Statut:** Cette erreur a été corrigée dans la version actuelle du fichier.
+
+**Contexte:** Dans un trigger INSERT, OLD n'existe pas (seulement NEW). La clause WHEN problématique a été supprimée.
+
+**Action:** Utilisez la dernière version de `combined-migrations-adapted.sql` (commit 508ffde ou plus récent).
+
 ### Erreur: "constraint already exists"
 **Solution:** La migration est idempotente, cette contrainte existe déjà. Continuez.
 
