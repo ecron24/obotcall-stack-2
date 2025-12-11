@@ -10,11 +10,13 @@ import interventionsRoutes from './routes/interventions.js'
 import clientsRoutes from './routes/clients.js'
 import devisRoutes from './routes/devis.js'
 import facturesRoutes from './routes/factures.js'
+import invoicesRoutes from './routes/invoices.js'
 import tenantsRoutes from './routes/tenants.js'
 import businessTypesRoutes from './routes/business-types.js'
 import interventionTypesRoutes from './routes/intervention-types.js'
 import productsRoutes from './routes/products.js'
 import interventionItemsRoutes from './routes/intervention-items.js'
+import stockMovementsRoutes from './routes/stock-movements.js'
 
 // Middleware
 import { authMiddleware } from './middleware/auth.js'
@@ -94,6 +96,8 @@ app.route('/api/clients', clientsRoutes)
 app.route('/api/products', productsRoutes)
 app.route('/api/devis', devisRoutes)
 app.route('/api/factures', facturesRoutes)
+app.route('/api/invoices', invoicesRoutes)
+app.route('/api/stock-movements', stockMovementsRoutes)
 app.route('/api/tenants', tenantsRoutes)
 
 // 404 handler
