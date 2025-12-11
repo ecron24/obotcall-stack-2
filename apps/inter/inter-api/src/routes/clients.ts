@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { getAuth } from '../middleware/auth.js'
 import { checkUsageLimit } from '../middleware/feature-flags.js'
-import { query, queryOne } from '../lib/postgres.js'
+import { supabaseAdmin } from '../lib/supabase.js'
 import { createClientSchema, updateClientSchema, paginationSchema } from '../lib/validation.js'
 
 const clients = new Hono()
@@ -16,30 +16,33 @@ clients.get('/', async (c) => {
     const queryParams = c.req.query()
     const { page, per_page } = paginationSchema.parse(queryParams)
 
-    const offset = (page - 1) * per_page
+    const from = (page - 1) * per_page
+    const to = from + per_page - 1
 
-    // Get total count
-    const [{ count }] = await query<{ count: string }>(
-      'SELECT COUNT(*) FROM inter_app.clients WHERE tenant_id = $1 AND deleted_at IS NULL',
-      [tenant.id]
-    )
+    const { data, error, count } = await supabaseAdmin
+      .schema('inter_app')
+      .from('clients')
+      .select('*', { count: 'exact' })
+      .eq('tenant_id', tenant.id)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false })
+      .range(from, to)
 
-    // Get paginated data
-    const data = await query(
-      `SELECT * FROM inter_app.clients
-       WHERE tenant_id = $1 AND deleted_at IS NULL
-       ORDER BY created_at DESC
-       LIMIT $2 OFFSET $3`,
-      [tenant.id, per_page, offset]
-    )
+    if (error) {
+      console.error('List clients error:', error)
+      return c.json({
+        error: 'Database Error',
+        message: 'Erreur lors de la récupération des clients'
+      }, 500)
+    }
 
     return c.json({
       data: data || [],
       pagination: {
         page,
         per_page,
-        total: parseInt(count),
-        total_pages: Math.ceil(parseInt(count) / per_page)
+        total: count || 0,
+        total_pages: Math.ceil((count || 0) / per_page)
       }
     })
   } catch (error) {
@@ -60,24 +63,25 @@ clients.get('/:id', async (c) => {
     const { tenant } = getAuth(c)
     const id = c.req.param('id')
 
-    const data = await queryOne(
-      `SELECT c.*,
-        json_agg(
-          json_build_object(
-            'id', i.id,
-            'title', i.title,
-            'status', i.status,
-            'scheduled_at', i.scheduled_at
-          )
-        ) FILTER (WHERE i.id IS NOT NULL) as interventions
-       FROM inter_app.clients c
-       LEFT JOIN inter_app.interventions i ON i.client_id = c.id AND i.deleted_at IS NULL
-       WHERE c.id = $1 AND c.tenant_id = $2 AND c.deleted_at IS NULL
-       GROUP BY c.id`,
-      [id, tenant.id]
-    )
+    const { data, error } = await supabaseAdmin
+      .schema('inter_app')
+      .from('clients')
+      .select(`
+        *,
+        interventions:interventions(
+          id,
+          title,
+          status,
+          scheduled_at
+        )
+      `)
+      .eq('id', id)
+      .eq('tenant_id', tenant.id)
+      .is('deleted_at', null)
+      .single()
 
-    if (!data) {
+    if (error) {
+      console.error('Get client error:', error)
       return c.json({
         error: 'Not Found',
         message: 'Client non trouvé'
@@ -104,16 +108,23 @@ clients.post('/', checkUsageLimit('clients'), async (c) => {
     const body = await c.req.json()
     const validated = createClientSchema.parse(body)
 
-    const fields = Object.keys(validated)
-    const values = Object.values(validated)
-    const placeholders = values.map((_, i) => `$${i + 2}`).join(', ')
+    const { data, error } = await supabaseAdmin
+      .schema('inter_app')
+      .from('clients')
+      .insert({
+        ...validated,
+        tenant_id: tenant.id
+      })
+      .select()
+      .single()
 
-    const data = await queryOne(
-      `INSERT INTO inter_app.clients (tenant_id, ${fields.join(', ')})
-       VALUES ($1, ${placeholders})
-       RETURNING *`,
-      [tenant.id, ...values]
-    )
+    if (error) {
+      console.error('Create client error:', error)
+      return c.json({
+        error: 'Database Error',
+        message: 'Erreur lors de la création du client'
+      }, 500)
+    }
 
     return c.json(data, 201)
   } catch (error: any) {
@@ -143,19 +154,18 @@ clients.patch('/:id', async (c) => {
     const body = await c.req.json()
     const validated = updateClientSchema.parse(body)
 
-    const fields = Object.keys(validated)
-    const values = Object.values(validated)
-    const setClause = fields.map((field, i) => `${field} = $${i + 3}`).join(', ')
+    const { data, error } = await supabaseAdmin
+      .schema('inter_app')
+      .from('clients')
+      .update(validated)
+      .eq('id', id)
+      .eq('tenant_id', tenant.id)
+      .is('deleted_at', null)
+      .select()
+      .single()
 
-    const data = await queryOne(
-      `UPDATE inter_app.clients
-       SET ${setClause}, updated_at = NOW()
-       WHERE id = $1 AND tenant_id = $2 AND deleted_at IS NULL
-       RETURNING *`,
-      [id, tenant.id, ...values]
-    )
-
-    if (!data) {
+    if (error) {
+      console.error('Update client error:', error)
       return c.json({
         error: 'Not Found',
         message: 'Client non trouvé'
@@ -189,28 +199,31 @@ clients.delete('/:id', async (c) => {
     const id = c.req.param('id')
 
     // Check if client has interventions
-    const [{ count }] = await query<{ count: string }>(
-      `SELECT COUNT(*) FROM inter_app.interventions
-       WHERE client_id = $1 AND tenant_id = $2 AND deleted_at IS NULL`,
-      [id, tenant.id]
-    )
+    const { count } = await supabaseAdmin
+      .schema('inter_app')
+      .from('interventions')
+      .select('*', { count: 'exact', head: true })
+      .eq('client_id', id)
+      .eq('tenant_id', tenant.id)
+      .is('deleted_at', null)
 
-    const interventionCount = parseInt(count)
-    if (interventionCount > 0) {
+    if (count && count > 0) {
       return c.json({
         error: 'Validation Error',
-        message: `Impossible de supprimer ce client car il a ${interventionCount} intervention(s) associée(s)`
+        message: `Impossible de supprimer ce client car il a ${count} intervention(s) associée(s)`
       }, 400)
     }
 
-    const data = await queryOne(
-      `DELETE FROM inter_app.clients
-       WHERE id = $1 AND tenant_id = $2 AND deleted_at IS NULL
-       RETURNING id`,
-      [id, tenant.id]
-    )
+    const { error } = await supabaseAdmin
+      .schema('inter_app')
+      .from('clients')
+      .delete()
+      .eq('id', id)
+      .eq('tenant_id', tenant.id)
+      .is('deleted_at', null)
 
-    if (!data) {
+    if (error) {
+      console.error('Delete client error:', error)
       return c.json({
         error: 'Not Found',
         message: 'Client non trouvé'
