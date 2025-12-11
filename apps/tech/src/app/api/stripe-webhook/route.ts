@@ -298,11 +298,14 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   // TODO: Envoyer un email au propriétaire du tenant
   // TODO: Marquer la subscription comme past_due
 
-  if (invoice.subscription) {
+  // Cast to any for Stripe type compatibility
+  const inv = invoice as any
+
+  if (inv.subscription) {
     const { data: subscription } = await supabase
       .from('subscriptions')
       .select('tenant_id')
-      .eq('stripe_subscription_id', invoice.subscription as string)
+      .eq('stripe_subscription_id', inv.subscription as string)
       .single()
 
     if (subscription) {
