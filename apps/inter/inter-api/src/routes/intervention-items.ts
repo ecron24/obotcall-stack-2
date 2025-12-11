@@ -410,9 +410,9 @@ interventionItems.post('/bulk', async (c) => {
     const valueGroups: string[] = []
     const fields = Object.keys(validatedItems[0])
 
-    validatedItems.forEach((item, itemIndex) => {
+    validatedItems.forEach((item: any, itemIndex: number) => {
       const itemValues = Object.values(item)
-      const placeholders = itemValues.map((_, valIndex) => {
+      const placeholders = itemValues.map((_, valIndex: number) => {
         const paramIndex = allValues.length + 1
         allValues.push(itemValues[valIndex])
         return `$${paramIndex}`
