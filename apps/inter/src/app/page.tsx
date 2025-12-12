@@ -17,9 +17,9 @@ export default function HomePage() {
         // Connecté → Dashboard
         router.push('/dashboard')
       } else {
-        // Non connecté → Redirect vers tech (hub SaaS)
-        const techUrl = process.env.NEXT_PUBLIC_TECH_APP_URL || 'https://app.obotcall.tech'
-        window.location.href = techUrl
+        // Non connecté → Login local (pour tests/dev)
+        // En production, on pourrait rediriger vers tech
+        router.push('/auth/login')
       }
     }
 
