@@ -268,21 +268,27 @@ export default function SettingsPage() {
       </Link>
 
       {/* Import de données */}
-      <button
-        onClick={() => alert('Fonctionnalité en cours de développement')}
-        className="w-full text-left bg-white rounded-lg shadow-sm p-6 hover:bg-gray-50 transition-colors"
+      <Link
+        href="/dashboard/settings/import"
+        className="block bg-white rounded-lg shadow-sm p-6 hover:bg-gray-50 transition-colors"
       >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            <div>
+              <div className="text-base font-medium text-gray-900">Import de données</div>
+              <div className="text-sm text-gray-500">Importer produits, catégories, équipements ou clients</div>
+            </div>
           </div>
-          <div>
-            <div className="text-base font-medium text-gray-900">Import de données</div>
-          </div>
+          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </div>
-      </button>
+      </Link>
 
       {/* Déconnexion */}
       <button
