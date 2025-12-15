@@ -1,6 +1,6 @@
-nom;prenom;email;telephone;adresse;code_postal;ville;type
-Dupont;Jean;jean.dupont@email.com;0612345678;12 rue de la Paix;75001;Paris;b2c
-Martin;Sophie;sophie.martin@email.com;0698765432;45 avenue des Champs;69001;Lyon;b2c
-Piscines Services;;;0145678901;8 rue du Commerce;33000;Bordeaux;b2b
-Durand;Pierre;pierre.durand@email.com;0623456789;23 boulevard Victor Hugo;13001;Marseille;b2c
-Aqua Pro;;;0156789012;67 avenue de la République;59000;Lille;b2b
+client_type;first_name;last_name;company_name;email;phone;address_line1;postal_code;city
+b2c;Jean;Dupont;;jean.dupont@email.com;0612345678;12 rue de la Paix;75001;Paris
+b2c;Sophie;Martin;;sophie.martin@email.com;0698765432;45 avenue des Champs;69001;Lyon
+b2b;;;Piscines Services;contact@piscines-services.fr;0145678901;8 rue du Commerce;33000;Bordeaux
+b2c;Pierre;Durand;;pierre.durand@email.com;0623456789;23 boulevard Victor Hugo;13001;Marseille
+b2b;;;Aqua Pro;contact@aqua-pro.fr;0156789012;67 avenue de la République;59000;Lille

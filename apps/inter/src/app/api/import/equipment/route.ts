@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     const errors: string[] = []
 
     // Valider les headers requis
-    const requiredHeaders = ['nom', 'type']
+    const requiredHeaders = ['equipment_type', 'client_email']
     const missingHeaders = requiredHeaders.filter(h => !headers.includes(h))
     if (missingHeaders.length > 0) {
       return NextResponse.json(
@@ -77,26 +77,46 @@ export async function POST(req: NextRequest) {
         })
 
         // Valider les données requises
-        if (!row.nom) {
-          errors.push(`Ligne ${lineNumber}: nom requis`)
+        if (!row.equipment_type) {
+          errors.push(`Ligne ${lineNumber}: equipment_type requis`)
           continue
         }
 
-        if (!row.type) {
-          errors.push(`Ligne ${lineNumber}: type requis`)
+        if (!row.client_email) {
+          errors.push(`Ligne ${lineNumber}: client_email requis pour identifier le client`)
+          continue
+        }
+
+        // Rechercher le client par email
+        const { data: client, error: clientError } = await supabase
+          .schema('inter_app')
+          .from('clients')
+          .select('id')
+          .eq('tenant_id', tenantId)
+          .eq('email', row.client_email)
+          .is('deleted_at', null)
+          .maybeSingle()
+
+        if (clientError) {
+          errors.push(`Ligne ${lineNumber}: Erreur recherche client: ${clientError.message}`)
+          continue
+        }
+
+        if (!client) {
+          errors.push(`Ligne ${lineNumber}: Client avec email "${row.client_email}" non trouvé`)
           continue
         }
 
         // Préparer les données de l'équipement
         const equipmentData: any = {
           tenant_id: tenantId,
-          client_id: row.client_id || null,
-          equipment_type: row.type,
-          name: row.nom,
-          brand: row.marque || null,
-          model: row.modele || null,
-          serial_number: row.numero_serie || null,
-          is_active: true,
+          client_id: client.id,
+          equipment_type: row.equipment_type,
+          brand: row.brand || null,
+          model: row.model || null,
+          serial_number: row.serial_number || null,
+          installation_date: row.installation_date || null,
+          status: row.status || 'active',
           created_by: session.user.id
         }
 

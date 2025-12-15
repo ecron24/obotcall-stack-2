@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     const errors: string[] = []
 
     // Valider les headers requis
-    const requiredHeaders = ['nom']
+    const requiredHeaders = ['name']
     const missingHeaders = requiredHeaders.filter(h => !headers.includes(h))
     if (missingHeaders.length > 0) {
       return NextResponse.json(
@@ -93,14 +93,14 @@ export async function POST(req: NextRequest) {
         })
 
         // Valider les données requises
-        if (!row.nom) {
-          errors.push(`Ligne ${lineNumber}: nom requis`)
+        if (!row.name) {
+          errors.push(`Ligne ${lineNumber}: name requis`)
           continue
         }
 
         // Récupérer parent_id si fourni
         let parentId = null
-        if (row.parent_id) {
+        if (row.parent_id && row.parent_id.trim()) {
           parentId = row.parent_id
         }
 
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
           .insert({
             business_type_id: businessTypeId,
             parent_id: parentId,
-            name: row.nom,
+            name: row.name,
             description: row.description || null,
             display_order: i,
             is_active: true

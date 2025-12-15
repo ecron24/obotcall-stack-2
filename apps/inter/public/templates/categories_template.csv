@@ -1,10 +1,10 @@
-nom;description;parent_id
+name;description;parent_id
 Produits chimiques;Produits pour traitement de l'eau;
 Équipements de filtration;Pompes, filtres et accessoires;
 Nettoyage;Matériel de nettoyage et entretien;
 Pièces détachées;Pièces de rechange;
-Chlore;Produits chlorés;cat-chimiques
-pH;Correcteurs de pH;cat-chimiques
-Anti-algues;Produits anti-algues;cat-chimiques
-Pompes;Pompes de filtration;cat-filtration
-Filtres;Filtres à sable et cartouche;cat-filtration
+Chlore;Produits chlorés;
+pH;Correcteurs de pH;
+Anti-algues;Produits anti-algues;
+Pompes;Pompes de filtration;
+Filtres;Filtres à sable et cartouche;

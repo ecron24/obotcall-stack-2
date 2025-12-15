@@ -1,6 +1,6 @@
-nom;type;marque;modele;numero_serie;client_id
-Pompe Hayward SP2810X15;pompe;Hayward;SP2810X15;SN123456;
-Filtre à sable Astral;filtre;Astral;Millenium;SN789012;
-Électrolyseur Zodiac;electrolyseur;Zodiac;EI Expert;SN345678;
-Robot Dolphin E10;robot;Dolphin;E10;SN901234;
-Chauffage Elecro Nano;chauffage;Elecro;Nano Splash;SN567890;
+equipment_type;brand;model;serial_number;client_email;installation_date;status
+pompe;Hayward;SP2810X15;SN123456;jean.dupont@email.com;2024-01-15;active
+filtre;Astral;Millenium;SN789012;sophie.martin@email.com;2024-02-20;active
+electrolyseur;Zodiac;EI Expert;SN345678;pierre.durand@email.com;2024-03-10;active
+robot;Dolphin;E10;SN901234;jean.dupont@email.com;2024-04-05;active
+chauffage;Elecro;Nano Splash;SN567890;sophie.martin@email.com;2024-05-12;active

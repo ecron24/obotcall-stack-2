@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     const errors: string[] = []
 
     // Valider les headers requis
-    const requiredHeaders = ['nom', 'prix', 'unite']
+    const requiredHeaders = ['code', 'name', 'type', 'unit', 'unit_price_ht']
     const missingHeaders = requiredHeaders.filter(h => !headers.includes(h))
     if (missingHeaders.length > 0) {
       return NextResponse.json(
@@ -93,13 +93,23 @@ export async function POST(req: NextRequest) {
         })
 
         // Valider les données requises
-        if (!row.nom) {
-          errors.push(`Ligne ${lineNumber}: nom requis`)
+        if (!row.code) {
+          errors.push(`Ligne ${lineNumber}: code requis`)
           continue
         }
 
-        if (!row.prix || isNaN(parseFloat(row.prix))) {
-          errors.push(`Ligne ${lineNumber}: prix invalide`)
+        if (!row.name) {
+          errors.push(`Ligne ${lineNumber}: name requis`)
+          continue
+        }
+
+        if (!row.unit_price_ht || isNaN(parseFloat(row.unit_price_ht))) {
+          errors.push(`Ligne ${lineNumber}: unit_price_ht invalide`)
+          continue
+        }
+
+        if (!row.type || !['product', 'service', 'labor'].includes(row.type)) {
+          errors.push(`Ligne ${lineNumber}: type doit être product, service ou labor`)
           continue
         }
 
@@ -142,13 +152,13 @@ export async function POST(req: NextRequest) {
           .insert({
             business_type_id: businessTypeId,
             category_id: categoryId,
-            code: row.reference || `PROD-${Date.now()}-${i}`,
-            name: row.nom,
+            code: row.code,
+            name: row.name,
             description: row.description || null,
-            type: 'product',
-            unit: row.unite || 'unité',
-            unit_price_ht: parseFloat(row.prix),
-            tax_rate: 20.00,
+            type: row.type,
+            unit: row.unit || 'unité',
+            unit_price_ht: parseFloat(row.unit_price_ht),
+            tax_rate: row.tax_rate ? parseFloat(row.tax_rate) : 20.00,
             has_stock: true,
             stock_quantity: 0,
             is_active: true

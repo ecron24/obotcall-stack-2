@@ -25,29 +25,29 @@ export default function ImportPage() {
     products: {
       label: 'Produits',
       icon: '📦',
-      format: 'nom;reference;category_id;prix;unite;description',
-      example: 'Chlore granulé;CHLORE-001;cat-123;25.50;kg;Chlore pour traitement piscine',
+      format: 'code;name;description;type;unit;unit_price_ht;tax_rate;category_id',
+      example: 'CHLORE-001;Chlore granulé 5kg;Chlore rapide;product;kg;25.50;20.00;',
       template: '/templates/products_template.csv'
     },
     categories: {
       label: 'Catégories',
       icon: '📁',
-      format: 'nom;description;parent_id',
+      format: 'name;description;parent_id',
       example: 'Produits chimiques;Produits pour traitement eau;',
       template: '/templates/categories_template.csv'
     },
     equipment: {
       label: 'Équipements',
       icon: '🔧',
-      format: 'nom;type;marque;modele;numero_serie;client_id',
-      example: 'Pompe Hayward;pompe;Hayward;SP2810X15;SN12345;client-123',
+      format: 'equipment_type;brand;model;serial_number;client_email;installation_date;status',
+      example: 'pompe;Hayward;SP2810X15;SN12345;client@email.com;2024-01-15;active',
       template: '/templates/equipment_template.csv'
     },
     clients: {
       label: 'Clients',
       icon: '👥',
-      format: 'nom;prenom;email;telephone;adresse;code_postal;ville',
-      example: 'Dupont;Jean;jean.dupont@email.com;0612345678;12 rue de la Paix;75001;Paris',
+      format: 'client_type;first_name;last_name;company_name;email;phone;address_line1;postal_code;city',
+      example: 'b2c;Jean;Dupont;;jean.dupont@email.com;0612345678;12 rue de la Paix;75001;Paris',
       template: '/templates/clients_template.csv'
     }
   }

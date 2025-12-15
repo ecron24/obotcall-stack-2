@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     const errors: string[] = []
 
     // Valider les headers requis
-    const requiredHeaders = ['telephone']
+    const requiredHeaders = ['client_type', 'phone', 'address_line1', 'postal_code', 'city']
     const missingHeaders = requiredHeaders.filter(h => !headers.includes(h))
     if (missingHeaders.length > 0) {
       return NextResponse.json(
@@ -77,24 +77,27 @@ export async function POST(req: NextRequest) {
         })
 
         // Valider les données requises
-        if (!row.telephone) {
-          errors.push(`Ligne ${lineNumber}: téléphone requis`)
+        if (!row.phone) {
+          errors.push(`Ligne ${lineNumber}: phone requis`)
           continue
         }
 
-        // Déterminer le type de client (B2B ou B2C)
-        const clientType = row.type?.toLowerCase() ||
-                          (row.nom && !row.prenom ? 'b2b' : 'b2c')
+        if (!row.client_type || !['b2b', 'b2c'].includes(row.client_type)) {
+          errors.push(`Ligne ${lineNumber}: client_type doit être b2b ou b2c`)
+          continue
+        }
+
+        const clientType = row.client_type
 
         // Préparer les données du client
         const clientData: any = {
           tenant_id: tenantId,
           client_type: clientType,
-          phone: row.telephone,
+          phone: row.phone,
           email: row.email || null,
-          address_line1: row.adresse || 'Non renseignée',
-          postal_code: row.code_postal || '00000',
-          city: row.ville || 'Non renseignée',
+          address_line1: row.address_line1,
+          postal_code: row.postal_code,
+          city: row.city,
           country_code: 'FR',
           is_active: true,
           created_by: session.user.id
@@ -103,21 +106,21 @@ export async function POST(req: NextRequest) {
         // Ajouter les champs spécifiques selon le type
         if (clientType === 'b2c') {
           // Client particulier
-          if (!row.prenom || !row.nom) {
-            errors.push(`Ligne ${lineNumber}: nom et prénom requis pour client B2C`)
+          if (!row.first_name || !row.last_name) {
+            errors.push(`Ligne ${lineNumber}: first_name et last_name requis pour client B2C`)
             continue
           }
-          clientData.first_name = row.prenom
-          clientData.last_name = row.nom
+          clientData.first_name = row.first_name
+          clientData.last_name = row.last_name
         } else {
           // Client entreprise
-          if (!row.nom) {
-            errors.push(`Ligne ${lineNumber}: nom d'entreprise requis pour client B2B`)
+          if (!row.company_name) {
+            errors.push(`Ligne ${lineNumber}: company_name requis pour client B2B`)
             continue
           }
-          clientData.company_name = row.nom
+          clientData.company_name = row.company_name
           clientData.siret = row.siret || null
-          clientData.vat_number = row.tva || null
+          clientData.vat_number = row.vat_number || null
         }
 
         // Insérer le client
