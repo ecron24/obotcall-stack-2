@@ -72,8 +72,8 @@ const PRODUCTS = [
 // Codes des métiers à afficher (dans l'ordre)
 const ALLOWED_BUSINESS_CODES = [
   'pool_maintenance',    // Pisciniste
-  'plumbing_hvac',       // Chauffagiste / Plomberie
-  'electrician',         // Électricien
+  'plumbing',            // Plombier/Chauffagiste
+  'electrical',          // Électricien
   'pest_control',        // Dératisation
   'auto_repair'          // Garagiste
 ]
