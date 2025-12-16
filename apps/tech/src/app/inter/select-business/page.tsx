@@ -49,8 +49,9 @@ export default function SelectBusinessPage() {
   }
 
   const handleSelectBusiness = (business: BusinessType) => {
-    // Redirect to tarifs page with product and business pre-selected
-    router.push(`/tarifs?product=inter&business=${business.id}`)
+    // MODE DEV/TEST: Redirect directement vers signup au lieu de Stripe
+    // En production, utiliser: router.push(`/tarifs?product=inter&business=${business.id}`)
+    router.push(`/signup?product=inter&business=${business.id}`)
   }
 
   return (

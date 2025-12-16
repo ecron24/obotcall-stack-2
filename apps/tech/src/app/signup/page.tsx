@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -89,6 +89,20 @@ export default function SignupPage() {
 
   const router = useRouter()
   const supabase = createClient()
+  const searchParams = useSearchParams()
+
+  // Pré-remplir depuis URL params (ex: ?product=inter&business=xxx)
+  useEffect(() => {
+    const product = searchParams.get('product')
+    const business = searchParams.get('business')
+
+    if (product === 'inter' || product === 'inter_app') {
+      setFormData(prev => ({ ...prev, productType: 'inter_app' }))
+    }
+    if (business) {
+      setFormData(prev => ({ ...prev, businessType: business }))
+    }
+  }, [searchParams])
 
   const updateFormData = (field: keyof SignupFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
