@@ -24,7 +24,14 @@ interface SignupFormData {
 
   // Step 3: Choix produit
   productType: 'inter_app' | 'immo_app' | 'agent_app' | 'assist_app' | null
-  businessType?: string // Pour Inter-App uniquement
+  businessType?: string // UUID du business_type pour Inter-App uniquement
+}
+
+interface BusinessType {
+  id: string
+  code: string
+  name: string
+  emoji: string
 }
 
 const PRODUCTS = [
@@ -62,20 +69,23 @@ const PRODUCTS = [
   }
 ]
 
-const BUSINESS_TYPES = [
-  { value: 'pool_maintenance', label: 'Pisciniste' },
-  { value: 'plumbing', label: 'Plombier' },
-  { value: 'electrician', label: 'Électricien' },
-  { value: 'hvac', label: 'Chauffagiste' },
-  { value: 'gardening', label: 'Paysagiste' },
-  { value: 'renovation', label: 'Rénovation' },
-  { value: 'other', label: 'Autre métier' }
+// Codes des métiers à afficher (dans l'ordre)
+const ALLOWED_BUSINESS_CODES = [
+  'pool_maintenance',    // Pisciniste
+  'plumbing_hvac',       // Chauffagiste / Plomberie
+  'electrician',         // Électricien
+  'pest_control',        // Dératisation
+  'auto_repair'          // Garagiste
 ]
+
+const INTER_API_URL = 'https://api.inter.app.obotcall.tech'
 
 export default function SignupPage() {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [loadingBusinessTypes, setLoadingBusinessTypes] = useState(false)
   const [error, setError] = useState('')
+  const [businessTypes, setBusinessTypes] = useState<BusinessType[]>([])
   const [formData, setFormData] = useState<SignupFormData>({
     email: '',
     password: '',
@@ -91,6 +101,11 @@ export default function SignupPage() {
   const supabase = createClient()
   const searchParams = useSearchParams()
 
+  // Charger les business types depuis l'API
+  useEffect(() => {
+    loadBusinessTypes()
+  }, [])
+
   // Pré-remplir depuis URL params (ex: ?product=inter&business=xxx)
   useEffect(() => {
     const product = searchParams.get('product')
@@ -103,6 +118,35 @@ export default function SignupPage() {
       setFormData(prev => ({ ...prev, businessType: business }))
     }
   }, [searchParams])
+
+  const loadBusinessTypes = async () => {
+    try {
+      setLoadingBusinessTypes(true)
+      const response = await fetch(`${INTER_API_URL}/api/business-types`)
+
+      if (!response.ok) {
+        throw new Error('Erreur lors du chargement des métiers')
+      }
+
+      const data = await response.json()
+      const allBusinessTypes = Array.isArray(data) ? data : []
+
+      // Filtrer pour ne garder que les métiers autorisés
+      const filteredBusinessTypes = allBusinessTypes
+        .filter(bt => ALLOWED_BUSINESS_CODES.includes(bt.code))
+        // Trier dans l'ordre des ALLOWED_BUSINESS_CODES
+        .sort((a, b) => {
+          return ALLOWED_BUSINESS_CODES.indexOf(a.code) - ALLOWED_BUSINESS_CODES.indexOf(b.code)
+        })
+
+      setBusinessTypes(filteredBusinessTypes)
+    } catch (err: any) {
+      console.error('Error loading business types:', err)
+      // En cas d'erreur, continuer sans bloquer l'inscription
+    } finally {
+      setLoadingBusinessTypes(false)
+    }
+  }
 
   const updateFormData = (field: keyof SignupFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -224,7 +268,7 @@ export default function SignupPage() {
           country_code: formData.countryCode,
           owner_user_id: authData.user.id,
           plan: 'free', // Commence toujours en FREE
-          business_type: formData.businessType
+          business_type: formData.businessType // UUID du business_type
         })
       })
 
@@ -235,9 +279,18 @@ export default function SignupPage() {
 
       const { tenant } = await response.json()
 
-      // 4. Rediriger vers la sélection de plan
-      // L'utilisateur peut rester en FREE ou upgrader
-      router.push(`/select-product?tenant=${tenant.slug}&product=${formData.productType}`)
+      // 4. Rediriger vers l'app correspondante
+      if (formData.productType === 'inter_app') {
+        // Rediriger vers inter-app
+        window.location.href = `https://inter.app.obotcall.tech/auth/login`
+      } else if (formData.productType === 'immo_app') {
+        window.location.href = `https://immo.app.obotcall.tech/auth/login`
+      } else if (formData.productType === 'agent_app') {
+        window.location.href = `https://agent.app.obotcall.tech/auth/login`
+      } else {
+        // Fallback : sélection de produit
+        router.push(`/select-product?tenant=${tenant.slug}&product=${formData.productType}`)
+      }
 
     } catch (err: any) {
       console.error('Signup error:', err)
@@ -406,19 +459,26 @@ export default function SignupPage() {
               {formData.productType === 'inter_app' && (
                 <div>
                   <Label htmlFor="businessType">Votre métier *</Label>
-                  <select
-                    id="businessType"
-                    className="w-full border rounded-md px-3 py-2 mt-2"
-                    value={formData.businessType || ''}
-                    onChange={(e) => updateFormData('businessType', e.target.value)}
-                  >
-                    <option value="">Sélectionnez votre métier...</option>
-                    {BUSINESS_TYPES.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
-                      </option>
-                    ))}
-                  </select>
+                  {loadingBusinessTypes ? (
+                    <div className="flex items-center gap-2 py-2 text-sm text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Chargement des métiers...
+                    </div>
+                  ) : (
+                    <select
+                      id="businessType"
+                      className="w-full border rounded-md px-3 py-2 mt-2"
+                      value={formData.businessType || ''}
+                      onChange={(e) => updateFormData('businessType', e.target.value)}
+                    >
+                      <option value="">Sélectionnez votre métier...</option>
+                      {businessTypes.map((type) => (
+                        <option key={type.id} value={type.id}>
+                          {type.emoji} {type.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               )}
             </div>

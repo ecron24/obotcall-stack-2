@@ -19,6 +19,15 @@ interface BusinessType {
 
 const INTER_API_URL = 'https://api.inter.app.obotcall.tech'
 
+// Codes des métiers à afficher (dans l'ordre)
+const ALLOWED_BUSINESS_CODES = [
+  'pool_maintenance',    // Pisciniste
+  'plumbing_hvac',       // Chauffagiste / Plomberie
+  'electrician',         // Électricien
+  'pest_control',        // Dératisation
+  'auto_repair'          // Garagiste
+]
+
 export default function SelectBusinessPage() {
   const router = useRouter()
   const [businessTypes, setBusinessTypes] = useState<BusinessType[]>([])
@@ -39,7 +48,17 @@ export default function SelectBusinessPage() {
       }
 
       const data = await response.json()
-      setBusinessTypes(Array.isArray(data) ? data : [])
+      const allBusinessTypes = Array.isArray(data) ? data : []
+
+      // Filtrer pour ne garder que les métiers autorisés
+      const filteredBusinessTypes = allBusinessTypes
+        .filter(bt => ALLOWED_BUSINESS_CODES.includes(bt.code))
+        // Trier dans l'ordre des ALLOWED_BUSINESS_CODES
+        .sort((a, b) => {
+          return ALLOWED_BUSINESS_CODES.indexOf(a.code) - ALLOWED_BUSINESS_CODES.indexOf(b.code)
+        })
+
+      setBusinessTypes(filteredBusinessTypes)
     } catch (err: any) {
       console.error('Error loading business types:', err)
       setError(err.message || 'Impossible de charger les métiers')
