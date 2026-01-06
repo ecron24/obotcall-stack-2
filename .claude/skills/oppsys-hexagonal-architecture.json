@@ -1,0 +1,26 @@
+{
+  "name": "oppsys-hexagonal-architecture",
+  "description": "Build full-stack applications using OppSys-v2 hexagonal architecture pattern with type-safe monorepo, Hono backend, React frontend, and Supabase integration",
+  "version": "1.0.0",
+  "author": "Claude",
+  "tags": [
+    "architecture",
+    "hexagonal",
+    "clean-architecture",
+    "monorepo",
+    "typescript",
+    "hono",
+    "react",
+    "supabase",
+    "tanstack",
+    "full-stack"
+  ],
+  "triggerPhrases": [
+    "create hexagonal architecture",
+    "build with oppsys architecture",
+    "create monorepo app",
+    "build clean architecture",
+    "create type-safe api",
+    "build full-stack app with hexagonal pattern"
+  ]
+}
