@@ -1,3 +1,8 @@
+---
+name: oppsys-hexagonal-architecture
+description: Build full-stack applications using the OppSys-v2 hexagonal architecture pattern with type-safe monorepo, Hono backend, React frontend, and Supabase integration. Includes domain-driven design, error-as-value pattern, and complete scheduling/calendar implementation guide.
+---
+
 # OppSys Hexagonal Architecture Skill
 
 ## Description
